@@ -259,7 +259,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                     gridLines: {
                         color: xtools.application.chartGridColor
                     },
-                    afterBuildTicks: function(axis) {
+                    afterBuildTicks: function (axis) {
                         // For logarithmic scale, default ticks are too close and overlap.
                         if (type == "logarithmic" || false) {
                             let newticks = [];
