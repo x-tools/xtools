@@ -355,16 +355,24 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                         reverse: i18nRTL,
                         padding: 0,
                         callback: function (value) {
+                            let res = []
+                            let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
+                            let hours = dataset.map((day) => day.data)
+                                .flat()
+                                .filter((datum) => datum.x == value);
+                            res.push( hours.reduce(function (a, b) {
+                                return a + parseInt(b.value, 10);
+                            }, 0) );
                             if (value % 2 === 0) {
-                                return value + ":00";
-                            } else {
-                                return '';
+                                res.push( value + ":00" );
                             }
+                            return res;
                         }
                     },
                     gridLines: {
                         color: xtools.application.chartGridColor
-                    }
+                    },
+                    position: "bottom",
                 }]
             },
             tooltips: {
