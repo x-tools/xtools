@@ -77,7 +77,7 @@
 	"blame-as-of-desc": "Utilizzalo per eseguire una ricerca dei responsabili sulle versione obsolete della voce.",
 	"blame-query-desc": "La query di ricerca dovrebbe includere qualsiasi wikitesto sottostante.",
 	"block": "Blocca",
-	"block-current": "Blocco attuale",
+	"block-current-count": "Blocchi attuali",
 	"block-log": "Registro dei blocchi",
 	"block-longest": "Blocco più lungo",
 	"blocks": "Blocchi",

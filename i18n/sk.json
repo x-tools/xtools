@@ -68,7 +68,6 @@
 	"blame-as-of-desc": "Použite toto pre vykonanie hľadania viny na starších verziách článku.",
 	"blame-query-desc": "Vyhľadávacia požiadavka by mala obsahovať podkladový wikitext.",
 	"block": "Zablokovanie",
-	"block-current": "Aktuálne zablokovanie",
 	"block-log": "Denník blokovaní",
 	"block-longest": "Najdlhšie blokovanie",
 	"blocks": "Zablokovania",

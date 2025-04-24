@@ -63,7 +63,6 @@
 	"blame-as-of-desc": "Korišćenjem ove opcije, izvršćete pretragu po starijim verzijama članka.",
 	"blame-query-desc": "Upit za pretragu treba da sadrži bilo koji osnovni vikitekst.",
 	"block": "Blokada",
-	"block-current": "Trenutna blokada",
 	"block-log": "Evidencija blokiranja",
 	"block-longest": "Najduža blokada",
 	"blocks": "Blokade",
