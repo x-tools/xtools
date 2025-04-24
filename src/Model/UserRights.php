@@ -63,6 +63,9 @@ class UserRights extends Model
                     'removed' => [],
                     'grantType' => strtotime($acDate) > time() ? 'pending' : 'automatic',
                     'type' => 'local',
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
                 ];
                 krsort($this->rightsChanges);
             }
@@ -223,77 +226,86 @@ class UserRights extends Model
         $rightsChanges = [];
 
         foreach ($logData as $row) {
-            // Can happen if the log entry has been deleted.
+            // Happens when the log entry has been partially deleted.
+            // This is when comment or performer was deleted.
             if (!isset($row['log_params']) || null === $row['log_params']) {
-                continue;
-            }
-
-            $unserialized = @unserialize($row['log_params']);
-
-            if (false !== $unserialized) {
-                $old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
-                $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
-                $added = array_diff($new, $old);
-                $removed = array_diff($old, $new);
-                $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
-                $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
-
-                // Check for changes only to expiry. If such exists, treat it as added. Various issets are safeguards.
-                if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
-                    foreach ($old as $index => $right) {
-                        $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
-                        $newExpiry = $newMetadata[$index]['expiry'] ?? null;
-
-                        // Check if an expiry was added, removed, or modified.
-                        if ((null !== $oldExpiry && null === $newExpiry) ||
-                            (null === $oldExpiry && null !== $newExpiry) ||
-                            (null !== $oldExpiry && null !== $newExpiry)
-                        ) {
-                            $added[$index] = $right;
-
-                            // Remove the last auto-removal(s), which must exist.
-                            foreach (array_reverse($rightsChanges, true) as $timestamp => $change) {
-                                if (in_array($right, $change['removed']) && !in_array($right, $change['added']) &&
-                                    'automatic' === $change['grantType']
-                                ) {
-                                    unset($rightsChanges[$timestamp]);
+                // As log_params is NULL, we don't know.
+                // Leave arrays here to not crash later.
+                // Twig will know from log_deleted.
+                $added = [];
+                $removed = [];
+            // Nothing was deleted.
+            } else {
+                $unserialized = @unserialize($row['log_params']);
+    
+                if (false !== $unserialized) {
+                    $old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
+                    $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
+                    $added = array_diff($new, $old);
+                    $removed = array_diff($old, $new);
+                    $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
+                    $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
+    
+                    // Check for changes only to expiry.
+                    // If such exists, treat it as added. Various issets are safeguards.
+                    if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
+                        foreach ($old as $index => $right) {
+                            $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
+                            $newExpiry = $newMetadata[$index]['expiry'] ?? null;
+    
+                            // Check if an expiry was added, removed, or modified.
+                            if ((null !== $oldExpiry && null === $newExpiry) ||
+                                (null === $oldExpiry && null !== $newExpiry) ||
+                                (null !== $oldExpiry && null !== $newExpiry)
+                            ) {
+                                $added[$index] = $right;
+    
+                                // Remove the last auto-removal(s), which must exist.
+                                foreach (array_reverse($rightsChanges, true) as $timestamp => $change) {
+                                    if (in_array($right, $change['removed']) && !in_array($right, $change['added']) &&
+                                        'automatic' === $change['grantType']
+                                    ) {
+                                        unset($rightsChanges[$timestamp]);
+                                    }
                                 }
                             }
                         }
                     }
+    
+                    // If a right was removed, remove any previously pending auto-removals.
+                    if (count($removed) > 0) {
+                        $this->unsetAutoRemoval($rightsChanges, $removed);
+                    }
+    
+                    $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
+                } else {
+                    // This is the old school format that most likely contains
+                    // the list of rights additions as a comma-separated list.
+                    try {
+                        [$old, $new] = explode("\n", $row['log_params']);
+                        $old = array_filter(array_map('trim', explode(',', $old)));
+                        $new = array_filter(array_map('trim', explode(',', (string)$new)));
+                        $added = array_diff($new, $old);
+                        $removed = array_diff($old, $new);
+                    } catch (Exception $e) {
+                        // Really, really old school format that may be missing metadata
+                        // altogether. Here we'll just leave $added and $removed empty.
+                        $added = [];
+                        $removed = [];
+                    }
                 }
-
-                // If a right was removed, remove any previously pending auto-removals.
-                if (count($removed) > 0) {
-                    $this->unsetAutoRemoval($rightsChanges, $removed);
+    
+                // Remove '(none)'.
+                if (in_array('(none)', $added)) {
+                    array_splice($added, array_search('(none)', $added), 1);
                 }
-
-                $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
-            } else {
-                // This is the old school format that most likely contains
-                // the list of rights additions as a comma-separated list.
-                try {
-                    [$old, $new] = explode("\n", $row['log_params']);
-                    $old = array_filter(array_map('trim', explode(',', $old)));
-                    $new = array_filter(array_map('trim', explode(',', (string)$new)));
-                    $added = array_diff($new, $old);
-                    $removed = array_diff($old, $new);
-                } catch (Exception $e) {
-                    // Really, really old school format that may be missing metadata
-                    // altogether. Here we'll just leave $added and $removed empty.
-                    $added = [];
-                    $removed = [];
+                if (in_array('(none)', $removed)) {
+                    array_splice($removed, array_search('(none)', $removed), 1);
                 }
+                $added = array_values($added);
+                $removed = array_values($removed);
             }
-
-            // Remove '(none)'.
-            if (in_array('(none)', $added)) {
-                array_splice($added, array_search('(none)', $added), 1);
-            }
-            if (in_array('(none)', $removed)) {
-                array_splice($removed, array_search('(none)', $removed), 1);
-            }
-
+            
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
@@ -302,6 +314,9 @@ class UserRights extends Model
                 'removed' => array_values($removed),
                 'grantType' => 'autopromote' === $row['log_action'] ? 'automatic' : 'manual',
                 'type' => $row['type'],
+                'paramsDeleted' => $row['log_deleted'] > 0,
+                'commentDeleted' => ($row['log_deleted'] % 4) >= 2,
+                'performerDeleted' => ($row['log_deleted'] % 8) >= 4,
             ];
         }
 
@@ -344,6 +359,9 @@ class UserRights extends Model
                     'removed' => [$entry],
                     'grantType' => strtotime($expiry) > time() ? 'pending' : 'automatic',
                     'type' => $row['type'],
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
                 ];
             }
         }
