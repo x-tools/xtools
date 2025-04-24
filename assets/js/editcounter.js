@@ -244,7 +244,6 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                 xAxes: [{
                     type: type,
                     stacked: true,
-                    display: "auto",
                     ticks: {
                         // Note: this has no effect in log scale.
                         // We could force it using 1, but then the difference
