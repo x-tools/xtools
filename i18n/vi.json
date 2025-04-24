@@ -86,7 +86,6 @@
 	"blame-as-of-desc": "Sử dụng điều này để thực hiện tìm kiếm lỗi trên các phiên bản cũ của bài viết.",
 	"blame-query-desc": "Truy vấn tìm kiếm nên bao gồm bất kỳ wikitext cơ bản.",
 	"block": "Cấm",
-	"block-current": "Tác vụ cấm hiện hành",
 	"block-log": "Nhật trình cấm",
 	"block-longest": "Thời gian cấm dài nhất",
 	"blocks": "Cấm thành viên",

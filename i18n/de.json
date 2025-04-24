@@ -84,7 +84,6 @@
 	"blame-as-of-desc": "Benutze dies, um eine Blame-Suche in älteren Versionen des Artikels durchzuführen.",
 	"blame-query-desc": "Die Suchanfrage sollte den zugrundeliegenden Wikitext enthalten.",
 	"block": "Sperre",
-	"block-current": "Aktuelle Sperre",
 	"block-log": "Benutzersperr-Logbuch",
 	"block-longest": "Längste Sperre",
 	"blocks": "Sperren",

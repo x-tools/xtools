@@ -79,7 +79,6 @@
 	"blame-as-of-desc": "Makalenin daha eski sürümlerinde suç arama yapmak için bunu kullanın.",
 	"blame-query-desc": "Arama sorgusu, altta yatan vikimetin içermelidir.",
 	"block": "Engellenme",
-	"block-current": "Mevcut engel",
 	"block-log": "Engelleme günlüğü",
 	"block-longest": "En uzun süreli engel",
 	"blocks": "Engellemeler",
