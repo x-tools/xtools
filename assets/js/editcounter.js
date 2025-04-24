@@ -202,7 +202,6 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
     var namespaces = datasets.map(function (dataset) {
         return dataset.label;
     });
-    console.log(datasets);
     xtools.editcounter.maxDigits[id] = maxTotal.toString().length;
     xtools.editcounter.chartLabels[id] = labels;
 
