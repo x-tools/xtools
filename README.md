@@ -31,6 +31,6 @@ third parties and associated maintenance burden.
 
 ## Licence
 
-Copyright © 2008-2023 [XTools contributors](https://github.com/x-tools/xtools/graphs/contributors).
+Copyright © 2008-2025 [XTools contributors](https://github.com/x-tools/xtools/graphs/contributors).
 
 XTools source code is licensed under [GPL 3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html).
