@@ -202,12 +202,15 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
     var namespaces = datasets.map(function (dataset) {
         return dataset.label;
     });
-
+    console.log(datasets);
     xtools.editcounter.maxDigits[id] = maxTotal.toString().length;
     xtools.editcounter.chartLabels[id] = labels;
 
     /** global: i18nRTL */
     /** global: i18nLang */
+    // on 2.7 I believe we have no other way to update a chart's config
+    // than to tear it out and put it again.
+    let createchart = (type="linear") =>
     window[id + 'countsChart'] = new Chart($('#' + id + 'counts-canvas'), {
         type: 'horizontalBar',
         data: {
@@ -240,8 +243,13 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
             maintainAspectRatio: false,
             scales: {
                 xAxes: [{
+                    type: type,
                     stacked: true,
+                    display: "auto",
                     ticks: {
+                        // Note: this has no effect in log scale.
+                        // We could force it using 1, but then the difference
+                        // Between lines is barely visible, I tried.
                         beginAtZero: true,
                         reverse: i18nRTL,
                         callback: function (value) {
@@ -252,7 +260,20 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                     },
                     gridLines: {
                         color: xtools.application.chartGridColor
-                    }
+                    },
+                    afterBuildTicks: function(axis) {
+                        // For logarithmic scale, default ticks are too close and overlap.
+                        if (type == "logarithmic" || false) {
+                            let newticks = [];
+                            axis.ticks.forEach((x,i) => {
+                                // So we enforce 1.5* distance.
+                                if (i == 0 || newticks[newticks.length-1]*1.5 < x) {
+                                    newticks.push(x)
+                                }
+                            });
+                            axis.ticks = newticks;
+                        }
+                    },
                 }],
                 yAxes: [{
                     stacked: true,
@@ -267,6 +288,21 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
             }
         }
     });
+    // Initialise it, linear by default
+    createchart();
+    $(function () {
+        $('.use-log-scale')
+            .prop('checked', false)
+            .on('click', function () {
+                let uselog = $(this).prop('checked');
+                // Set the other checkbox too
+                $('.use-log-scale').prop('checked', uselog);
+                // As I said above, no other way AFAIK
+                window[id + 'countsChart'].destroy();
+                createchart(uselog?"logarithmic":"linear");
+            });
+    });
+                
 };
 
 /**
