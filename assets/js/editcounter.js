@@ -360,11 +360,11 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                             let hours = dataset.map((day) => day.data)
                                 .flat()
                                 .filter((datum) => datum.x == value);
-                            res.push( hours.reduce(function (a, b) {
+                            res.push(hours.reduce(function (a, b) {
                                 return a + parseInt(b.value, 10);
-                            }, 0) );
+                            }, 0));
                             if (value % 2 === 0) {
-                                res.push( value + ":00" );
+                                res.push(value + ":00");
                             }
                             return res;
                         }
