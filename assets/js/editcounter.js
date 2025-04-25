@@ -353,15 +353,17 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
-                        callback: function (value) {
-                            let res = []
-                            let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
-                            let hours = dataset.map((day) => day.data)
-                                .flat()
-                                .filter((datum) => datum.x == value);
-                            res.push(hours.reduce(function (a, b) {
-                                return a + parseInt(b.value, 10);
-                            }, 0));
+                        callback: function (value, a, b, c) {
+                            let res = [];
+                            if ($("#timecard-bubble-chart").attr("width") >= 1000) {
+                                let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
+                                let hours = dataset.map((day) => day.data)
+                                    .flat()
+                                    .filter((datum) => datum.x == value);
+                                res.push(hours.reduce(function (a, b) {
+                                    return a + parseInt(b.value, 10);
+                                }, 0));
+                            }
                             if (value % 2 === 0) {
                                 res.push(value + ":00");
                             }
