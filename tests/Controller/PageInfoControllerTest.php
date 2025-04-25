@@ -105,4 +105,20 @@ class PageInfoControllerTest extends ControllerTestAdapter
             '/api/page/automated_edits/enwiki/Ravine_du_Sud',
         ]);
     }
+
+    /**
+     * Test that cross-origin resource sharing (CORS) is set up correctly.
+     */
+    public function testCors(): void
+    {
+        $this->client->request('GET', '/pageinfo');
+        static::assertNull($this->client->getResponse()->headers->get('Vary'));
+
+        if (!static::getContainer()->getParameter('app.is_wmf')) {
+            return;
+        }
+
+        $this->client->request('GET', '/api/page/pageinfo/en.wikipedia.org/Ravine_du_Sud?format=html');
+        static::assertSame('Origin', $this->client->getResponse()->headers->get('Vary'));
+    }
 }
