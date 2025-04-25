@@ -349,7 +349,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     ticks: {
                         beginAtZero: true,
                         min: 0,
-                        max: 24,
+                        max: 23,
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
