@@ -349,12 +349,15 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     ticks: {
                         beginAtZero: true,
                         min: 0,
-                        max: 23,
+                        max: 24,
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
                         callback: function (value, a, b, c) {
+                            // Skip the 24:00, it's only there to give room for the fractional timezones
+                            if (value === 24) return;
                             let res = [];
+                            // Add hour totals if wider than 1000px (else we get overlap)
                             if ($("#timecard-bubble-chart").attr("width") >= 1000) {
                                 let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
                                 let hours = dataset.map((day) => day.data)
