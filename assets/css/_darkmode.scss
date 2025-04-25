@@ -322,4 +322,8 @@ $tooltip-shadow: #333;
     }
   }
 
+  .footer-brandng {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
 }
