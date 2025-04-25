@@ -84,7 +84,7 @@
 	"blame-as-of-desc": "使用此來執行在條目舊版本上的歸究搜尋。",
 	"blame-query-desc": "搜尋查詢應包含任何潛在的 wikitext。",
 	"block": "封鎖",
-	"block-current": "目前封鎖",
+	"block-current-count": "目前封鎖",
 	"block-log": "封鎖日誌",
 	"block-longest": "最長封鎖",
 	"blocks": "封鎖",

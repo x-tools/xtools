@@ -73,7 +73,6 @@
 	"blame-as-of-desc": "Använd den här för att utföra en skuldsökning av äldre versioner av artikeln.",
 	"blame-query-desc": "Sökfråga borde innehålla underliggande wikitext.",
 	"block": "Blockeringar",
-	"block-current": "Nuvarande blockering",
 	"block-log": "Blockeringslogg",
 	"block-longest": "Längsta blockering",
 	"blocks": "Blockeringar",

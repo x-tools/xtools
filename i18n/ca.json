@@ -69,7 +69,6 @@
 	"blame-as-of-desc": "Utilitzeu-ho per a fer una cerca de culpa a les versions anteriors de l'article.",
 	"blame-query-desc": "La consulta de cerca ha d'incloure qualsevol wikitext subjacent.",
 	"block": "Bloc",
-	"block-current": "Bloc actual",
 	"block-log": "Registre de blocs",
 	"block-longest": "Bloc més llarg",
 	"blocks": "Blocs",

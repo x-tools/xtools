@@ -61,7 +61,6 @@
 	"blame-as-of-desc": "Uzez ca utensilo por serchar anciena versioni dil artiklo.",
 	"blame-query-desc": "La questiono dil inquesto mustas inkluzar omna texto wiki implicita.",
 	"block": "Blokusar",
-	"block-current": "Nuna blokuso",
 	"block-log": "Blokuso-registraro",
 	"block-longest": "Maxim longa blokuso",
 	"blocks": "Blokusi",
@@ -266,6 +265,8 @@
 	"sunday": "Sundio",
 	"support": "Suporto",
 	"thank": "Dankar",
+	"tool-globalcontribs": "Globala kontributadi",
+	"tool-globalcontribs-desc": "Montras redakturi da ul uzero tra omna projeti",
 	"total-authors": "Quanto di autori",
 	"username-or-ip": "Nomo dil uzero, o IPv4 od IPv6"
 }
