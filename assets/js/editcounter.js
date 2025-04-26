@@ -275,7 +275,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
  * @param {Object} The JSON object returned by getAllEditSizes.
  * @param {string} The Chartjs color string for the bars.
  */
- xtools.editcounter.setupSizeHistogram = function (dataset) {
+xtools.editcounter.setupSizeHistogram = function (dataset) {
     // First sanitize input, to get array.
     let values = dataset.sizes;
     let total = values.length;
