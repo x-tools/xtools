@@ -41,34 +41,23 @@
 
     <script type="text/javascript">
         $(function() {
-            /** @type {Array} To be passed into Chart.js */
-            var datasets = [];
-
             /** @type {Array} The labels for the y-axis. */
             var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
 
             /** @type {Number} Max value of the year totals */
-            var maxTotal = 0;
+            var maxTotal = {{ max(ec.monthCounts.totals|map(x => max(x))) }};
 
+            /** @type {Array} To be passed into Chart.js */
+            var datasets = [
             // Format data for use in charts.
-            {% for nsId,months in ec.monthCounts.totals %}
-                var dataset = {
+            {% for nsId,namespaceData in ec.monthCounts.totals %}
+                {
                     label: "{{ nsName(nsId, project.namespaces) }}",
                     backgroundColor: "{{ color(nsId) }}",
-                    data: []
-                };
-
-                {% for month,count in months %}
-                    dataset.data.push({{ count }});
-                    // Determine maximum value for the totals. This is needed
-                    //   so that we know how much spacing to add in the labels.
-                    if ({{ count }} > maxTotal) {
-                        maxTotal = {{ count }};
-                    }
-                {%- endfor -%}
-
-                datasets.push(dataset);
+                    data: Object.values({{ namespaceData|json_encode()|raw }}),
+                },
             {% endfor %}
+            ];
 
             var showLegend = {% if is_sub_request %}false{% else %}true{% endif %};
             xtools.editcounter.setupMonthYearChart('month', datasets, labels, maxTotal, showLegend);
