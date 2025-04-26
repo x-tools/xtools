@@ -25,6 +25,7 @@
 
     .chart-wrapper {
         display: flex;
+        flex-wrap: wrap;    
         float: left;
         margin-right: 50px;
     }
