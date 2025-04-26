@@ -275,12 +275,12 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
  * @param {Object} The JSON object returned by getAllEditSizes.
  * @param {string} The Chartjs color string for the bars.
  */
- xtools.editcounter.setupSizeHistogram = function (values, bgcolor) {
+ xtools.editcounter.setupSizeHistogram = function (dataset) {
     // First sanitize input, to get array.
-    values = Object.values(values);
+    let values = dataset.sizes;
     let total = values.length;
     // Setup counts. 0-10 are 200-wide parts, 11 is >2000.
-    let counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    dataset.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     values.forEach((x) => {
         // That's the slice of 200 it should go into
         let index = Math.floor(Number(Math.abs(x))/200);
@@ -288,24 +288,18 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
         if (index > 10) {
             index = 10;
         }
-        counts[index] ++;
+        dataset.data[index] ++;
     });
 
     // The labels for intervals of width 200
-    let labels = counts.map((_,i) => (i*200)+"-"+((i+1)*200));
+    let labels = dataset.data.map((_,i) => (i*200)+"-"+((i+1)*200));
     labels[10] = ">"+(10*200);
-    // Chartjs needs an array
-    let bg = Array(11).fill(bgcolor);
 
     window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: "Number of edits in that size interval*",
-                backgroundColor: bg,
-                data: counts,
-            }],
+            datasets: [dataset],
         },
         options: {
             tooltips: {

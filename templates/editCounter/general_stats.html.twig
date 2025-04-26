@@ -521,7 +521,12 @@
         </div>
         <script type="text/javascript">
             $(function() {
-                xtools.editcounter.setupSizeHistogram({{ ec.getAllEditSizes|json_encode()|raw }}, "{{ color(8) }}");
+                dataset = {
+                    label: "{{ msg('num-edits-size-interval') }}*",
+                    backgroundColor: "{{ color(8) }}",
+                    sizes: Object.values({{ ec.getAllEditSizes|json_encode()|raw }}),
+                };
+                xtools.editcounter.setupSizeHistogram(dataset);
             });
         </script>
         <div class="footnotes">
