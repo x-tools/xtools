@@ -514,34 +514,16 @@
                 )
             }}
         {% endif %}
-        {{
-            chart.pie_chart('small_edits',
-                [{
-                    label: '< ' ~ 20|num_format ~ ' ' ~ msg('num-bytes', [20]) ~ '*',
-                    value: ec.countSmallEdits,
-                    percentage: ((ec.countSmallEdits / ec.countLast5000) * 100)
-                },
-                {
-                    label: '≥ ' ~ 20|num_format ~ ' ' ~ msg('num-bytes', [20]) ~ '*',
-                    value: ec.countLast5000 - ec.countSmallEdits,
-                    percentage: 100 - ((ec.countSmallEdits / ec.countLast5000) * 100)
-                }]
-            )
-        }}
-        {{
-            chart.pie_chart('large_edits',
-                [{
-                    label: '< ' ~ 1000|num_format ~ ' ' ~ msg('num-bytes', [1000]) ~ '*',
-                    value: ec.countLast5000 - ec.countLargeEdits,
-                    percentage: 100 - ((ec.countLargeEdits / ec.countLast5000) * 100)
-                },
-                {
-                    label: '≥ ' ~ 1000|num_format ~ ' ' ~ msg('num-bytes', [1000]) ~ '*',
-                    value: ec.countLargeEdits,
-                    percentage: ((ec.countLargeEdits / ec.countLast5000) * 100)
-                }]
-            )
-        }}
+        <div style="float:left">
+        <div style="position:relative;height:200px;min-width:650px">
+            <canvas id="sizechart-canvas"></canvas>
+        </div>
+        </div>
+        <script type="text/javascript">
+            $(function() {
+                xtools.editcounter.setupSizeHistogram({{ ec.getAllEditSizes|json_encode()|raw }}, "{{ color(8) }}");
+            });
+        </script>
         <div class="footnotes">
             * {{ msg('data-limit', [5000, 5000|num_format]) }}
         </div>

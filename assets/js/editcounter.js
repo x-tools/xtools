@@ -270,6 +270,66 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 };
 
 /**
+ * Setup edit size histogram
+ * from PHP data.
+ * @param {Object} The JSON object returned by getAllEditSizes.
+ * @param {string} The Chartjs color string for the bars.
+ */
+ xtools.editcounter.setupSizeHistogram = function (values, bgcolor) {
+    // First sanitize input, to get array.
+    values = Object.values(values);
+    let total = values.length;
+    // Setup counts. 0-10 are 200-wide parts, 11 is >2000.
+    let counts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    values.forEach((x) => {
+        // That's the slice of 200 it should go into
+        let index = Math.floor(Number(Math.abs(x))/200);
+        // Force all slices past 10th to the 11th.
+        if (index > 10) {
+            index = 10;
+        }
+        counts[index] ++;
+    });
+
+    // The labels for intervals of width 200
+    let labels = counts.map((_,i) => (i*200)+"-"+((i+1)*200));
+    labels[10] = ">"+(10*200);
+    // Chartjs needs an array
+    let bg = Array(11).fill(bgcolor);
+
+    window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Number of edits in that size interval*",
+                backgroundColor: bg,
+                data: counts,
+            }],
+        },
+        options: {
+            tooltips: {
+                mode: 'nearest',
+                intersect: true,
+                callbacks: {
+                    label: function (tooltip) {
+                        percentage = getPercentage(tooltip.yLabel, total);
+
+                        return tooltip.yLabel.toLocaleString(i18nLang) + ' ' +
+                            '(' + percentage + ')';
+                    },
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: "top",
+            }
+        }
+    });
+};
+
+/**
  * Builds the timecard chart and adds a listener for the 'local time' option.
  * @param {Array} timeCardDatasets
  * @param {Object} days
