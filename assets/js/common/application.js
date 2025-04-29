@@ -628,6 +628,12 @@ function setupAutocompletion()
     }
 }
 
+/*
+ * Loading timer id if one is running.
+ * Used to prevent concurrent timers.
+ */
+let loadingTimerId;
+
 /**
  * For any form submission, this disables the submit button and replaces its text with
  * a loading message and a counting timer.
@@ -642,6 +648,10 @@ function displayWaitingNoticeOnSubmission(undo)
         $('.form-control').prop('readonly', false);
         $('.form-submit').prop('disabled', false);
         $('.form-submit').text($.i18n('submit')).prop('disabled', false);
+        if (loadingTimerId) {
+            clearInterval(loadingTimerId);
+            loadingTimerId = null;
+        }
     } else {
         $('#content form').on('submit', function () {
             // Remove focus from any active element
@@ -656,7 +666,7 @@ function displayWaitingNoticeOnSubmission(undo)
 
             // Add the counter.
             var startTime = Date.now();
-            setInterval(function () {
+            loadingTimerId = setInterval(function () {
                 var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
                 var minutes = Math.floor(elapsedSeconds / 60);
                 var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
