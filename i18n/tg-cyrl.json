@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Farorud",
+			"Jaloliddin Madaminov",
 			"ToJack",
 			"Vashgird",
 			"ZulfiqorF"
@@ -54,9 +55,15 @@
 	"average-page-size": "Андозаи миёнаи саҳифа",
 	"average-per-page": "Вироишоти миёнаи ҳар як саҳифа",
 	"average-time-bw-edits": "Вақти миёна байни вироишот (рӯз)",
+	"average-time-bw-edits-abbr": "мзбу",
 	"back": "Оқиб",
 	"basic-information": "Бозгашт",
+	"blame-as-of": "Ба анвои",
+	"blame-as-of-desc": "Инро барои ҷустуҷӯи айб дар версияҳои кӯҳнаи мақола истифода баред.",
+	"blame-query-desc": "Дархости ҷустуҷӯ бояд ҳама гуна викиматни асосиро дар бар гирад.",
 	"block": "Бастан",
+	"block-current-count": "Бастаҳои кунунӣ",
+	"block-log": "Сабти басташавӣ",
 	"block-longest": "Дарозтарин бастан",
 	"blocks": "Басташудаҳо",
 	"bot": "Бот",
@@ -81,6 +88,7 @@
 	"date": "Сана",
 	"date-from": "Аз: $1",
 	"date-range": "$1 - $2",
+	"date-to": "Ба: $1",
 	"delete": "Ҳазф кардан",
 	"deleted": "Ҳазфшуда",
 	"deleted-bytes": "Ҳазфшуда (байт)",
