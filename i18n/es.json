@@ -85,7 +85,6 @@
 	"blame-as-of-desc": "Use esto para realizar una búsqueda de culpa en versiones anteriores del artículo.",
 	"blame-query-desc": "La consulta de búsqueda debe incluir cualquier wikitexto subyacente.",
 	"block": "Bloquear",
-	"block-current": "Bloqueo actual",
 	"block-log": "Registro de bloqueos",
 	"block-longest": "Bloqueo más largo",
 	"blocks": "Bloqueos",

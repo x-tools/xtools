@@ -302,10 +302,9 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     radius: function (context) {
                         var index = context.dataIndex;
                         var data = context.dataset.data[index];
-                        // var size = context.chart.width;
-                        // var base = data.value / 100;
-                        // return (size / 50) * base;
-                        return data.scale;
+                        // Max height a bubble can have. -20 to account for bottom labels, /9 because there are a bit less than 9 such sections, and /2 to get a radius not diameter
+                        var maxRadius = ((context.chart.height - 20) / 9 / 2);
+                        return (data.scale / 20) * maxRadius;
                     },
                     hitRadius: 8
                 }
@@ -354,17 +353,32 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
-                        callback: function (value) {
-                            if (value % 2 === 0) {
-                                return value + ":00";
-                            } else {
-                                return '';
+                        callback: function (value, a, b, c) {
+                            // Skip the 24:00, it's only there to give room for the fractional timezones
+                            if (value === 24) {
+                                return "";
                             }
+                            let res = [];
+                            // Add hour totals if wider than 1000px (else we get overlap)
+                            if ($("#timecard-bubble-chart").attr("width") >= 1000) {
+                                let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
+                                let hours = dataset.map((day) => day.data)
+                                    .flat()
+                                    .filter((datum) => datum.x == value);
+                                res.push(hours.reduce(function (a, b) {
+                                    return a + parseInt(b.value, 10);
+                                }, 0));
+                            }
+                            if (value % 2 === 0) {
+                                res.push(value + ":00");
+                            }
+                            return res;
                         }
                     },
                     gridLines: {
                         color: xtools.application.chartGridColor
-                    }
+                    },
+                    position: "bottom",
                 }]
             },
             tooltips: {

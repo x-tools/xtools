@@ -77,7 +77,6 @@
 	"blame-as-of-desc": "Käytä tätä etsiäksesi tietyn tekstin kirjoittajan artikkelin vanhemmista versioissa.",
 	"blame-query-desc": "Hakukyselyn tulee sisältää kaikki alla oleva wikiteksti.",
 	"block": "Estoja asettettu",
-	"block-current": "Nykyinen esto",
 	"block-log": "Estoloki",
 	"block-longest": "Pisin esto",
 	"blocks": "Estot",

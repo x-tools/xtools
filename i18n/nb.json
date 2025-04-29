@@ -70,7 +70,6 @@
 	"blame-as-of-desc": "Bruk dette for å gjøre et skyldsøk i eldre versjoner av artikkelen.",
 	"blame-query-desc": "Søkespørringen bør inkludere all underliggende wikitekst.",
 	"block": "Blokkering",
-	"block-current": "Gjeldende blokkering",
 	"block-log": "Blokkeringslogg",
 	"block-longest": "Lengste blokkering",
 	"blocks": "Blokkeringer",
