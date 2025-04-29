@@ -353,17 +353,32 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                         stepSize: 1,
                         reverse: i18nRTL,
                         padding: 0,
-                        callback: function (value) {
-                            if (value % 2 === 0) {
-                                return value + ":00";
-                            } else {
-                                return '';
+                        callback: function (value, a, b, c) {
+                            // Skip the 24:00, it's only there to give room for the fractional timezones
+                            if (value === 24) {
+                                return "";
                             }
+                            let res = [];
+                            // Add hour totals if wider than 1000px (else we get overlap)
+                            if ($("#timecard-bubble-chart").attr("width") >= 1000) {
+                                let dataset = (window.chart ? window.chart.data.datasets : timeCardDatasets);
+                                let hours = dataset.map((day) => day.data)
+                                    .flat()
+                                    .filter((datum) => datum.x == value);
+                                res.push(hours.reduce(function (a, b) {
+                                    return a + parseInt(b.value, 10);
+                                }, 0));
+                            }
+                            if (value % 2 === 0) {
+                                res.push(value + ":00");
+                            }
+                            return res;
                         }
                     },
                     gridLines: {
                         color: xtools.application.chartGridColor
-                    }
+                    },
+                    position: "bottom",
                 }]
             },
             tooltips: {
