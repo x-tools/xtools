@@ -626,6 +626,14 @@ function setupAutocompletion()
             })
         });
     }
+    let allowAmpersand = (e) => {
+        if (e.key == "&") {
+            $(e.target).blur().focus();
+        }
+    };
+    $pageInput.on("keydown", allowAmpersand);
+    $userInput.on("keydown", allowAmpersand);
+
 }
 
 /**
