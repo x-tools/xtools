@@ -2,6 +2,8 @@
 	"@metadata": {
 		"authors": [
 			"Ajeje Brazorf",
+			"Alien333",
+			"Bananax47",
 			"Cigaryno",
 			"Derugon",
 			"Florian COLLIN",
@@ -87,7 +89,7 @@
 	"blame-as-of-desc": "Utiliser cet outil pour effectuer une recherche de responsabilité sur des versions plus anciennes de l’article.",
 	"blame-query-desc": "La requête de recherche doit inclure le wikicode sous-jacent.",
 	"block": "Blocage",
-	"block-current": "Blocage actuel",
+	"block-current-count": "Blocages actuels",
 	"block-log": "Journal des blocages",
 	"block-longest": "Plus long blocage",
 	"blocks": "Blocages",

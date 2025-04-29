@@ -322,6 +322,8 @@ class PageInfoController extends XtoolsController
 
         // All /api routes by default respond with a JSON content type.
         $response->headers->set('Content-Type', 'text/html');
+        // T381941
+        $response->setVary(['Origin']);
 
         // This endpoint is hit constantly and user could be browsing the same page over
         // and over (popular noticeboard, for instance), so offload brief caching to browser.

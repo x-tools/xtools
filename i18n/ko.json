@@ -74,7 +74,6 @@
 	"blame-as-of-desc": "문서의 오래된 판의 특정 문구 검색을 수행하려면 이것을 사용하십시오.",
 	"blame-query-desc": "검색 쿼리에는 기반이 되는 위키텍스트가 포함되어야 합니다.",
 	"block": "차단",
-	"block-current": "현재 블록",
 	"block-log": "차단 기록",
 	"block-longest": "가장 긴 차단",
 	"blocks": "차단",
