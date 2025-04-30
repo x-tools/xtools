@@ -643,7 +643,7 @@ section > .panel-body {
     padding-top: 20px;
     position: relative;
 
-    #deleted_edits {
+    canvas:not(#sizechart-canvas) {
         max-width: 150px;
     }
 
