@@ -22,69 +22,102 @@
     {% for ns, pages in te.topEdits %}
         {% set showPageAssessment = project.hasPageAssessments(ns) %}
         {% set content %}
-        <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
-            <thead><tr>
-                <th>
-                    <span class="sort-link sort-link--edits" data-column="edits">
-                        {{ msg('edits')|ucfirst }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-                <th>
-                    <span class="sort-link sort-link--page" data-column="page">
-                        {{ msg('page-title') }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-                {% if showPageAssessment %}
+        <div class="side-to-side">
+            <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
+                <thead><tr>
                     <th>
-                        <span class="sort-link sort-link--assessment" data-column="assessment">
-                            {{ msg('assessment') }}
+                        <span class="sort-link sort-link--edits" data-column="edits">
+                            {{ msg('edits')|ucfirst }}
                             <span class="glyphicon glyphicon-sort"></span>
                         </span>
                     </th>
-                {% endif %}
-                <th>{{ msg('links') }}</th>
-            </tr></thead>
-            <tbody>
-                {% for page in pages %}
-                    {% set pageTitle = titleWithNs(page.page_title, page.namespace, project.namespaces) %}
-                    <tr>
-                        <td class="sort-entry--edits" data-value="{{ page.count }}">
-                            {{ page.count|num_format }}
-                        </td>
-                        <td class="sort-entry--page display-title" data-value="{{ pageTitle }}">
-                            {{ wiki.pageLinkRaw(pageTitle, project) }}
-                        </td>
-                        {% if showPageAssessment %}
-                            <td class="sort-entry--assessment" data-value="{{ page.assessment.class }}">
-                                {% set badge = project.pageAssessments.badgeURL(page.assessment.class) %}
-                                {% if badge is defined %}
-                                    <img alt="{{ page.assessment.class }}" src="{{ badge }}" class="assessment-badge" />
-                                {% endif %}
-                                {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
+                    <th>
+                        <span class="sort-link sort-link--page" data-column="page">
+                            {{ msg('page-title') }}
+                            <span class="glyphicon glyphicon-sort"></span>
+                        </span>
+                    </th>
+                    {% if showPageAssessment %}
+                        <th>
+                            <span class="sort-link sort-link--assessment" data-column="assessment">
+                                {{ msg('assessment') }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    {% endif %}
+                    <th>{{ msg('links') }}</th>
+                </tr></thead>
+                <tbody>
+                    {% for page in pages %}
+                        {% set pageTitle = titleWithNs(page.page_title, page.namespace, project.namespaces) %}
+                        <tr>
+                            <td class="sort-entry--edits" data-value="{{ page.count }}">
+                                {{ page.count|num_format }}
                             </td>
-                        {% endif %}
-                        <td>
-                            {{ wiki.pageLogLinkRaw(pageTitle, project) }}
-                            &middot;
-                            <a href="{{ path('PageInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-pageinfo') }}</a>
-                            &middot;
-                            <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-                {% if pages|length >= 10 and te.topEdits|length > 1 %}
-                    <tr>
-                        <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                            <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns}) }}">
-                                {{ msg('more') }}&hellip;
-                            </a>
-                        </td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
+                            <td class="sort-entry--page display-title" data-value="{{ pageTitle }}">
+                                {{ wiki.pageLinkRaw(pageTitle, project) }}
+                            </td>
+                            {% if showPageAssessment %}
+                                <td class="sort-entry--assessment" data-value="{{ page.assessment.class }}">
+                                    {% set badge = project.pageAssessments.badgeURL(page.assessment.class) %}
+                                    {% if badge is defined %}
+                                        <img alt="{{ page.assessment.class }}" src="{{ badge }}" class="assessment-badge" />
+                                    {% endif %}
+                                    {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
+                                </td>
+                            {% endif %}
+                            <td>
+                                {{ wiki.pageLogLinkRaw(pageTitle, project) }}
+                                &middot;
+                                <a href="{{ path('PageInfoResult', {project:project.domain, page:pageTitle}) }}">{{ msg('tool-pageinfo') }}</a>
+                                &middot;
+                                <a href="{{ path('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.namespace, page:page.page_title}) }}" >{{ msg('tool-topedits') }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if pages|length >= 10 and te.topEdits|length > 1 %}
+                        <tr>
+                            <td colspan={{ showPageAssessment ? 4 : 3 }}>
+                                <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns}) }}">
+                                    {{ msg('more') }}&hellip;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% if showPageAssessment %}
+                <table class="table table-bordered table-hover table-striped">
+                    <caption class="text-center">{{ msg('top-wikiprojects', [10]) }}</caption>
+                    <thead><tr>
+                        <th>
+                            <span class="sort-link sort-link--wikiproject" data-column="wikiproject">
+                                {{ msg('wikiproject') }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="sort-link sort-link--count" data-column="count">
+                                {{ msg('count') }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                    </tr></thead>
+                    <tbody>
+                        {% for wikiproject, count in te.projectTotals(ns) %}
+                            <tr>
+                                <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
+                                    {{ wikiproject }}
+                                </td>
+                                <td class="sort-entry--count" data-value="{{ count }}">
+                                    {{ count|num_format }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
 
         {% if not(is_sub_request) and te.namespace is not same as('all') %}
             {% set numPages = (te.getNumPagesNamespace / te.limit)|round(0, 'ceil') %}

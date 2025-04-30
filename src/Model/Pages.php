@@ -300,6 +300,37 @@ class Pages extends Model
     }
 
     /**
+     * Get the number of pages the user created by WikiProject.
+     * @return array Keys are the WikiProject name, values are the counts.
+     */
+    public function getWikiprojectCounts(): array
+    {
+        if ($this->getNumPages() > $this->resultsPerPage() || true) {
+            $counts = $this->repository->getWikiprojectCounts(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->redirects
+            );
+        } else {
+            $counts = [];
+            foreach ($this->pages as $nsPages) {
+                foreach ($nsPages as $page) {
+                    if (!isset($counts[$page['assessment']['project']])) {
+                        $counts[$page['assessment']['project']] = 1;
+                    } else {
+                        $counts[$page['assessment']['project']]++;
+                    }
+                }
+            }
+        }
+
+        arsort($counts);
+
+        return $counts;
+    }   
+
+    /**
      * Number of results to show, depending on the namespace.
      * @param bool $all Whether to get *all* results. This should only be used for
      *     export options. HTTP and JSON should paginate.

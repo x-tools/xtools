@@ -724,3 +724,12 @@ a.help-icon {
 .reverted-edit {
     background: #fcf8e3 !important;
 }
+
+.side-to-side table {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.side-to-side {
+    clear: both;
+}

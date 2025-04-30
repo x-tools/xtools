@@ -341,6 +341,71 @@ class PagesRepository extends UserRepository
     }
 
     /**
+     * Get the number of pages the user created by WikiProject.
+     * Max 10 projects.
+     * @param Project $project
+     * @param User $user
+     * @param int|string $namespace
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @return array Keys are the WikiProject names, values are the counts.
+     */
+    public function getWikiprojectCounts(
+        Project $project,
+        User $user,
+        $namespace,
+        string $redirects,
+        $start = false,
+        $end = false
+    ): array {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created_wikiprojects');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $pageAssessmentsTable = $project->getTableName('page_assessments');
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+
+        $conditions = array_merge(
+            $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
+            $this->getUserConditions('' !== $start.$end)
+        );
+        $revDateConditions = $this->getDateConditions($start, $end);
+
+        $sql = "SELECT pap_project_title,count(pap_project_title) as `count`
+                FROM $pageTable
+                LEFT JOIN $revisionTable ON page_id = rev_page
+                JOIN $pageAssessmentsTable ON page_id = pa_page_id
+                JOIN $paProjectsTable ON pa_project_id = pap_project_id
+                WHERE ".$conditions['whereRev']."
+                    AND rev_parent_id = '0'".
+                    $conditions['namespaceRev'].
+                    $conditions['redirects'].
+                    $revDateConditions."
+                GROUP BY pap_project_title
+                ORDER BY `count` DESC
+                LIMIT 10";
+
+        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
+
+        // index => [name, count]
+        $result = $resultQuery->fetchAllNumeric();
+        // convert that to: name => count
+        $totals = [];
+        foreach ($result as $k => [$name, $count]) {
+            $totals[$name] = $count;
+        }
+        // sort by count decreasing
+        arsort($totals);
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $totals);
+    }
+
+    /**
      * Fetch the closest 'delete' event as of the time of the given $offset.
      *
      * @param Project $project

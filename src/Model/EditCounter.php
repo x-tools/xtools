@@ -46,7 +46,7 @@ class EditCounter extends Model
     protected array $timeCardData;
 
     /**
-     * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
+     * Revision size data, with the keys 'average_size', 'large_edits' and 'small_edits'.
      * @var string[] As returned by the DB, unconverted to int or float
      */
     protected array $editSizeData;
