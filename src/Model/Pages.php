@@ -328,7 +328,7 @@ class Pages extends Model
         arsort($counts);
 
         return $counts;
-    }   
+    }
 
     /**
      * Number of results to show, depending on the namespace.

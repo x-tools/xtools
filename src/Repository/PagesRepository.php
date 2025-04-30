@@ -395,7 +395,7 @@ class PagesRepository extends UserRepository
         $result = $resultQuery->fetchAllNumeric();
         // convert that to: name => count
         $totals = [];
-        foreach ($result as $k => [$name, $count]) {
+        foreach ($result as [$name, $count]) {
             $totals[$name] = $count;
         }
         // sort by count decreasing
