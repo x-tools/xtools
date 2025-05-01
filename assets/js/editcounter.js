@@ -276,6 +276,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
  * @param {string} The Chartjs color string for the bars.
  */
 xtools.editcounter.setupSizeHistogram = function (dataset) {
+    let bars = 11;
     // First sanitize input, to get array.
     let values = dataset.sizeData;
     let total = Object.keys(values).length - 3;
@@ -288,30 +289,31 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
     datasetZero.backgroundColor = dataset.backgroundColorZero;
     datasetZero.label = dataset.labelZero;
     // Setup counts.
-    dataset.data =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    datasetNeg.data =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    datasetZero.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    dataset.data =     new Array(bars).fill(0);
+    datasetNeg.data =  new Array(bars).fill(0);
+    datasetZero.data = new Array(bars).fill(0);
     values.forEach((x) => {
         if (x == 0) {
             datasetZero.data[0] += 1;
         } else {
             // That's the slice index
-            let index = Math.ceil(Math.min(9, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2)))) + 1;
+            let index = Math.ceil(Math.min(11, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2))));
             ( x < 0 ? datasetNeg : dataset ).data[index] += 1;
         }
     });
-    console.log(dataset, datasetNeg, datasetZero);
     // The labels for intervals
-    let labels = ["0", "0-10", "10-20", "20-40", "40-80", "80-160", "160-320", "320-640", "640-1280", "1280-2560", ">2560"];
+    let labels = ["0-10"]
+    .concat(Array.from(new Array(bars-2), (_,i) => (10*2**i)+"-"+(10*2**(i+1))))
+    .concat([">"+(10*2**(bars-2))]);
 
     window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
-                dataset,
                 datasetNeg,
                 datasetZero,
+                dataset,
             ],
         },
         options: {
@@ -335,9 +337,15 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
             scales: {
                 yAxes: [{
                     stacked: true,
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
                 }],
                 xAxes: [{
                     stacked: true,
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
                 }],
             },
         }
