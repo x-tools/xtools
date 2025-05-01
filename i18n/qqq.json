@@ -529,7 +529,7 @@
 	"wiki": "Short label for Wiki\n{{Identical|Wiki}}",
 	"wiki-set-change": "Label for MediaWiki action done by stewards that changes the wiki sets. See [[meta:Special:WikiSets]] for possible translations.",
 	"wikiproject": "{{Identical|WikiProject}}",
-	"top-wikiprojects": "Caption for table of the $1 top WikiProjects (by number of edits or pages). This message should be short.",
+	"top-wikiprojects": "Caption for table of the top WikiProjects (by number of edits or pages). This message should be short.",
 	"wikitext": "Name of the markup language used on wiki pages. This message is shown as one of the download options.\n{{Identical|Wikitext}}",
 	"with-summary": "Chart label for edits with summary. This message should be short",
 	"words": "Label for the number of words that are in an article.\n{{Identical|Word}}",
