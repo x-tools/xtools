@@ -277,29 +277,42 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
  */
 xtools.editcounter.setupSizeHistogram = function (dataset) {
     // First sanitize input, to get array.
-    let values = dataset.sizes;
-    let total = values.length;
-    // Setup counts. 0-10 are 200-wide parts, 11 is >2000.
-    dataset.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let values = dataset.sizeData;
+    let total = Object.keys(values).length - 3;
+    values.length = total;
+    values = Array.from(values)
+    let datasetNeg = {};
+    datasetNeg.backgroundColor = dataset.backgroundColorNegative;
+    datasetNeg.label = dataset.labelNegative;
+    let datasetZero = {};
+    datasetZero.backgroundColor = dataset.backgroundColorZero;
+    datasetZero.label = dataset.labelZero;
+    // Setup counts.
+    dataset.data =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    datasetNeg.data =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    datasetZero.data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     values.forEach((x) => {
-        // That's the slice of 200 it should go into
-        let index = Math.floor(Number(Math.abs(x))/200);
-        // Force all slices past 10th to the 11th.
-        if (index > 10) {
-            index = 10;
+        if (x == 0) {
+            datasetZero.data[0] += 1;
+        } else {
+            // That's the slice index
+            let index = Math.ceil(Math.min(9, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2)))) + 1;
+            ( x < 0 ? datasetNeg : dataset ).data[index] += 1;
         }
-        dataset.data[index] ++;
     });
-
-    // The labels for intervals of width 200
-    let labels = dataset.data.map((_,i) => (i*200)+"-"+((i+1)*200));
-    labels[10] = ">"+(10*200);
+    console.log(dataset, datasetNeg, datasetZero);
+    // The labels for intervals
+    let labels = ["0", "0-10", "10-20", "20-40", "40-80", "80-160", "160-320", "320-640", "640-1280", "1280-2560", ">2560"];
 
     window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [dataset],
+            datasets: [
+                dataset,
+                datasetNeg,
+                datasetZero,
+            ],
         },
         options: {
             tooltips: {
@@ -318,7 +331,15 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
             maintainAspectRatio: false,
             legend: {
                 position: "top",
-            }
+            },
+            scales: {
+                yAxes: [{
+                    stacked: true,
+                }],
+                xAxes: [{
+                    stacked: true,
+                }],
+            },
         }
     });
 };

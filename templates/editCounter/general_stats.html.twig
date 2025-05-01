@@ -514,7 +514,7 @@
                 )
             }}
         {% endif %}
-        <div style="float:left">
+        <div style="float:left">{{ msg('num-edits-size-interval') }}*
         <div style="position:relative;height:200px;min-width:650px">
             <canvas id="sizechart-canvas"></canvas>
         </div>
@@ -522,10 +522,15 @@
         <script type="text/javascript">
             $(function() {
                 dataset = {
-                    label: "{{ msg('num-edits-size-interval') }}*",
+                    label: "{{ msg('additions') }}",
                     backgroundColor: "{{ color(8) }}",
-                    sizes: Object.values({{ ec.getAllEditSizes|json_encode()|raw }}),
+                    labelNegative: "{{ msg('removals') }}",
+                    backgroundColorNegative: "{{ color(0) }}",
+                    labelZero: "{{ msg('size-zero') }}",
+                    backgroundColorZero: "{{ color(11) }}",
+                    sizeData: {{ ec.getAllEditSizes|json_encode()|raw }},
                 };
+                console.log(dataset);
                 xtools.editcounter.setupSizeHistogram(dataset);
             });
         </script>
