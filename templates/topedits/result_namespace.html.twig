@@ -87,35 +87,38 @@
                 </tbody>
             </table>
             {% if showPageAssessment %}
-                <table class="table table-bordered table-hover table-striped">
-                    <caption class="text-center">{{ msg('top-wikiprojects') }}</caption>
-                    <thead><tr>
-                        <th>
-                            <span class="sort-link sort-link--wikiproject" data-column="wikiproject">
-                                {{ msg('wikiproject') }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                        <th>
-                            <span class="sort-link sort-link--count" data-column="count">
-                                {{ msg('count') }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    </tr></thead>
-                    <tbody>
-                        {% for wikiproject, count in te.projectTotals(ns) %}
-                            <tr>
-                                <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                                    {{ wikiproject }}
-                                </td>
-                                <td class="sort-entry--count" data-value="{{ count }}">
-                                    {{ count|num_format }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% set totals = te.projectTotals(ns) %}
+                {% if totals|keys|length > 0 %}
+                    <table class="table table-bordered table-hover table-striped">
+                        <caption class="text-center">{{ msg('top-wikiprojects') }}</caption>
+                        <thead><tr>
+                            <th>
+                                <span class="sort-link sort-link--wikiproject" data-column="wikiproject">
+                                    {{ msg('wikiproject') }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                            <th>
+                                <span class="sort-link sort-link--count" data-column="count">
+                                    {{ msg('count') }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        </tr></thead>
+                        <tbody>
+                            {% for wikiproject, count in totals %}
+                                <tr>
+                                    <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
+                                        {{ wikiproject }}
+                                    </td>
+                                    <td class="sort-entry--count" data-value="{{ count }}">
+                                        {{ count|num_format }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             {% endif %}
         </div>
 
