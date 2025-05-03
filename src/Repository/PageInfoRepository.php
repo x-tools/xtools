@@ -7,7 +7,6 @@ namespace App\Repository;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use PDO;
