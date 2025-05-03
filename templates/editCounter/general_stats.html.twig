@@ -523,11 +523,11 @@
             $(function() {
                 dataset = {
                     label: "{{ msg('additions') }}",
-                    backgroundColor: "{{ color(8) }}",
+                    backgroundColor: "{{ color(1) }}",
                     labelNegative: "{{ msg('removals') }}",
                     backgroundColorNegative: "{{ color(0) }}",
                     labelZero: "{{ msg('size-zero') }}",
-                    backgroundColorZero: "{{ color(11) }}",
+                    backgroundColorZero: "{{ color(4) }}",
                     sizeData: {{ ec.getAllEditSizes|json_encode()|raw }},
                 };
                 console.log(dataset);
