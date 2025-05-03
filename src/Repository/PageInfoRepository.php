@@ -99,10 +99,15 @@ class PageInfoRepository extends AutoEditsRepository
      * @param false|int $end
      * @param ?int $limit
      * @param bool $count Return a count rather than the full set of rows.
-     * @return ResultStatement resolving with keys 'count', 'username' and 'current'.
+     * @return array with rows with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end, ?int $limit, bool $count = false): ResultStatement
+    public function getBotData(Page $page, $start, $end, ?int $limit, bool $count = false): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_bot_data');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getitem($cacheKey)->get();
+        }
+
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
@@ -150,7 +155,9 @@ class PageInfoRepository extends AutoEditsRepository
                 WHERE ug_group = 'bot' $datesConditions
                 $groupBy";
 
-        return $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()]);
+        $statement = $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()])
+            ->fetchAllAssociative();
+        return $this->setCache($cacheKey, $statement);
     }
 
     /**
