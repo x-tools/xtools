@@ -298,7 +298,7 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
         } else {
             // That's the slice index
             let index = Math.ceil(Math.min(11, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2))));
-            ( x < 0 ? datasetNeg : dataset ).data[index] += 1;
+            ( x < 0 ? datasetNeg : dataset ).data[index] += ( x < 0 ? -1 : 1);
         }
     });
     // The labels for intervals
@@ -322,9 +322,9 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
                 intersect: true,
                 callbacks: {
                     label: function (tooltip) {
-                        percentage = getPercentage(tooltip.yLabel, total);
+                        percentage = getPercentage(Math.abs(tooltip.yLabel), total);
 
-                        return tooltip.yLabel.toLocaleString(i18nLang) + ' ' +
+                        return Math.abs(tooltip.yLabel).toLocaleString(i18nLang) + ' ' +
                             '(' + percentage + ')';
                     },
                 }
@@ -339,7 +339,10 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
                     stacked: true,
                     gridLines: {
                         color: xtools.application.chartGridColor
-                    }
+                    },
+                    ticks: {
+                        callback: Math.abs,
+                    },
                 }],
                 xAxes: [{
                     stacked: true,
