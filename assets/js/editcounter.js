@@ -270,35 +270,39 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 };
 
 /**
- * Setup edit size histogram
- * from PHP data.
- * @param {Object} The JSON object returned by getAllEditSizes.
- * @param {string} The Chartjs color string for the bars.
+ * Setup edit size histogram as a vertical bar chart
+ * from the PHP EditSizeData.
+ * @param {Object} data JSON object returned by getAllEditSizes.
+ * @param {Array} colors CSS colors for additions, removals, and same-size, in that order.
+ * @param {Array} barLabels i18n'd bar labels for additions, removals and same-size, in that order.
  */
-xtools.editcounter.setupSizeHistogram = function (dataset) {
+xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
     let bars = 11;
     // First sanitize input, to get array.
-    let values = dataset.sizeData;
-    let total = Object.keys(values).length - 3;
-    values.length = total;
-    values = Array.from(values)
+    let total = Object.keys(data).length - 3;
+    data.length = total;
+    data = Array.from(data)
+    // Then make datasets
+    let datasetPos = {};
+    datasetPos.backgroundColor = colors[0];
+    datasetPos.label = barLabels[0];
     let datasetNeg = {};
-    datasetNeg.backgroundColor = dataset.backgroundColorNegative;
-    datasetNeg.label = dataset.labelNegative;
+    datasetNeg.backgroundColor = colors[1];
+    datasetNeg.label = barLabels[1];
     let datasetZero = {};
-    datasetZero.backgroundColor = dataset.backgroundColorZero;
-    datasetZero.label = dataset.labelZero;
+    datasetZero.backgroundColor = colors[2];
+    datasetZero.label = barLabels[2];
     // Setup counts.
-    dataset.data =     new Array(bars).fill(0);
+    datasetPos.data =  new Array(bars).fill(0);
     datasetNeg.data =  new Array(bars).fill(0);
     datasetZero.data = new Array(bars).fill(0);
-    values.forEach((x) => {
+    data.forEach((x) => {
         if (x == 0) {
             datasetZero.data[0] += 1;
         } else {
             // That's the slice index
             let index = Math.ceil(Math.min(11, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2))));
-            ( x < 0 ? datasetNeg : dataset ).data[index] += ( x < 0 ? -1 : 1);
+            ( x < 0 ? datasetNeg : datasetPos ).data[index] += ( x < 0 ? -1 : 1);
         }
     });
     // The labels for intervals
@@ -311,9 +315,10 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
         data: {
             labels: labels,
             datasets: [
+                // The order matters; zero must appear first to be below pos
                 datasetNeg,
                 datasetZero,
-                dataset,
+                datasetPos,
             ],
         },
         options: {
@@ -322,6 +327,7 @@ xtools.editcounter.setupSizeHistogram = function (dataset) {
                 intersect: true,
                 callbacks: {
                     label: function (tooltip) {
+                        // the Math.abs' serve to show the internally negative removal counts as positive
                         percentage = getPercentage(Math.abs(tooltip.yLabel), total);
 
                         return Math.abs(tooltip.yLabel).toLocaleString(i18nLang) + ' ' +

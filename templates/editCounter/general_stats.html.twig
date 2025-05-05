@@ -521,17 +521,11 @@
         </div>
         <script type="text/javascript">
             $(function() {
-                dataset = {
-                    label: "{{ msg('additions') }}",
-                    backgroundColor: "{{ color(1) }}",
-                    labelNegative: "{{ msg('removals') }}",
-                    backgroundColorNegative: "{{ color(0) }}",
-                    labelZero: "{{ msg('size-zero') }}",
-                    backgroundColorZero: "{{ color(4) }}",
-                    sizeData: {{ ec.getAllEditSizes|json_encode()|raw }},
-                };
-                console.log(dataset);
-                xtools.editcounter.setupSizeHistogram(dataset);
+                xtools.editcounter.setupSizeHistogram(
+                    {{ ec.getAllEditSizes|json_encode()|raw }},
+                    ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
+                    ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
+                );
             });
         </script>
         <div class="footnotes">
