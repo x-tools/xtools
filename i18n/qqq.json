@@ -497,7 +497,6 @@
 	"translation-credits": "Footer message crediting translation tools translatewiki.net ($1), Intuition ($2), and jQuery.i18n ($3)",
 	"tsv": "{{Optional}}\nLink for TSV file. See https://en.wikipedia.org/wiki/Tab-separated_values for information on what a TSV file is.\nTSV is the name of a file format and should probably not be translated.",
 	"tuesday": "{{Identical|Tuesday}}",
-	"type": "Generic word for 'type', such as the type of RfX in the RfX tool.\n{{Identical|Type}}",
 	"unapprove": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user\n{{Identical|Unapprove}}",
 	"unblock": "Name of a MediaWiki log action, used as header of a row in the table of log action counts for a user\n{{Identical|Unblock}}",
 	"unique-pages-edited": "Label for number of unique pages a user has edited.",
