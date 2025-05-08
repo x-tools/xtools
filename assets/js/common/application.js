@@ -709,14 +709,13 @@ function setupLinkLoadingNotices(undo)
     } else {
         // Get the list of links:
         $("a").filter(
-            (index, el) => {
-                el.className == "" && // only plain links, not buttons
-                el.href.startsWith(document.location.origin) && // to XTools
-                new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
-                el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
-            }
-        // And then add a listener
+            (index, el) =>
+            el.className == "" && // only plain links, not buttons
+            el.href.startsWith(document.location.origin) && // to XTools
+            new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
+            el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
         ).on("click", (ev) => {
+            // And then add a listener
             let el = $(ev.target);
             el.prop("initialtext", el.html());
             el.html($.i18n('loading') + ' <span id=\'submit_timer\'></span>');
