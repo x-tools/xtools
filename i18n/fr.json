@@ -298,7 +298,6 @@
 	"num-deletions": "suppression{{PLURAL:$1||s}}",
 	"num-editors": "rédacteur{{PLURAL:$1||s}}",
 	"num-edits": "modification{{PLURAL:$1||s}}",
-	"num-edits-size-interval": "Nombre de modificatiosn dans cet intervalle de taille",
 	"num-hours": "heure{{PLURAL:$1||s}}",
 	"num-minutes": "minute{{PLURAL:$1||s}}",
 	"num-months": "mois{{PLURAL:$1|}}",
