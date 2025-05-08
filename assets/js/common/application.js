@@ -634,7 +634,8 @@ function setupAutocompletion()
  * Create a new loading timer interval.
  * Uses #submit_timer.
  */
-function createTimerInterval() {
+function createTimerInterval()
+{
     var startTime = Date.now();
     return setInterval(function () {
         var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
@@ -684,7 +685,8 @@ let linkTimer = null;
 /*
  * Resets a link out of loading.
  */
-function clearLinkTimer () {
+function clearLinkTimer()
+{
     // clear the timer proper
     clearInterval(linkTimer);
     linkTimer = null;
@@ -700,16 +702,19 @@ function clearLinkTimer () {
  *                         This is used on page load to solve an isssue with Safari and Firefox
  *                         where after browsing back, the "loading" state persists.
  */
-function setupLinkLoadingNotices(undo) {
+function setupLinkLoadingNotices(undo)
+{
     if (undo) {
         clearLinkTimer();
     } else {
         // Get the list of links:
-        $("a").filter((index, el) =>
-            el.className == "" && // only plain links, not buttons
-            el.href.startsWith(document.location.origin) && // to XTools
-            new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
-            el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
+        $("a").filter(
+            (index, el) => {
+                el.className == "" && // only plain links, not buttons
+                el.href.startsWith(document.location.origin) && // to XTools
+                new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
+                el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
+            }
         // And then add a listener
         ).on("click", (ev) => {
             let el = $(ev.target);
