@@ -44,7 +44,7 @@
 {| class="wikitable sortable"
 |+ {{ msg('top-wikiprojects') }}
 ! {{ msg('wikiproject') }} !! {{ msg('count') }}
-{% for wikiproject, count in te.projectTotals(ns) %}
+{% for wikiproject, count in totals %}
 |-
 | {{ wikiproject }} || {{ count|num_format }}
 {% endfor %}
