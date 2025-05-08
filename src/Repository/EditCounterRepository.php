@@ -325,7 +325,7 @@ class EditCounterRepository extends Repository
                         log_timestamp AS `timestamp`, log_type AS `type`
                     FROM $loggingTable
                     WHERE log_actor = :actorId
-                    ORDER BY log_timestamp DESC LIMIT 1
+                    ORDER BY -log_timestamp LIMIT 1
                 ) UNION (";
         }
 
