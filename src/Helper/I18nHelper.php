@@ -291,6 +291,17 @@ class I18nHelper
     }
 
     /**
+     * Check if we have a file for a language code.
+     * @param string langCode
+     * @return bool
+     */
+    private function checkLanguageFile($langCode): bool
+    {
+        $path = $this->projectDir . '/i18n';
+        return file_exists("$path/$langCode.json");
+    }
+
+    /**
      * Determine the interface language, either from the current request or session.
      * @return string
      */
@@ -299,9 +310,9 @@ class I18nHelper
         $queryLang = $this->getRequest()->query->get('uselang');
         $sessionLang = $this->requestStack->getSession()->get('lang');
 
-        if ('' !== $queryLang && null !== $queryLang) {
+        if ('' !== $queryLang && null !== $queryLang && $this->checkLanguageFile($queryLang)) {
             return $queryLang;
-        } elseif ('' !== $sessionLang && null !== $sessionLang) {
+        } elseif ('' !== $sessionLang && null !== $sessionLang && $this->checkLanguageFile($sessionLang)) {
             return $sessionLang;
         }
 
