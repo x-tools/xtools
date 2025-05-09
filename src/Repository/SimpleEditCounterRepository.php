@@ -90,7 +90,12 @@ class SimpleEditCounterRepository extends Repository
                 SELECT 'groups' AS source, ug_group AS value
                     FROM $userGroupsTable
                     JOIN $userTable ON user_id = ug_user
-                    WHERE user_name = :username";
+                    WHERE user_name = :username
+                UNION
+                SELECT 'creations' as source, COUNT(*) AS value
+                    FROM $revisionTable
+                    WHERE rev_actor = :actorId
+                    AND rev_parent_id = 0";
 
         return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),

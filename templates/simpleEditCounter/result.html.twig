@@ -78,6 +78,10 @@
                                 <td>{{ wiki.pageLinkRaw('Special:DeletedContributions/' ~ user.username, project, sec.deletedEditCount|num_format) }}</td>
                             </tr>
                         {% endif %}
+                        <tr>
+                            <td>{{ msg('pages-created') }}</td>
+                            <td>{{ sec.creationCount }}</td>
+                        </tr>
                     {% endif %}
                 </table>
             </div>
