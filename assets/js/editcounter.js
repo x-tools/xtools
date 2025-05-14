@@ -246,8 +246,6 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                     stacked: true,
                     ticks: {
                         // Note: this has no effect in log scale.
-                        // We could force it using 1, but then the difference
-                        // Between lines is barely visible, I tried.
                         beginAtZero: true,
                         // with linear, next line is redundant
                         // with log, it prevents a log(0) infinite loop
