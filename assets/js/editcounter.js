@@ -249,6 +249,10 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                         // We could force it using 1, but then the difference
                         // Between lines is barely visible, I tried.
                         beginAtZero: true,
+                        // with linear, next line is redundant
+                        // with log, it prevents a log(0) infinite loop
+                        // fixed two minor chartjs versions later (2.7.2)
+                        min: (type == "logarithmic" ? 1 : 0),
                         reverse: i18nRTL,
                         callback: function (value) {
                             if (Math.floor(value) === value) {
@@ -290,12 +294,6 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
     createchart();
     // Add checkbox listeners
     $(function () {
-        // First, don't add them if there already are some.
-        // ChartJS ''really'' doesn't like instancing two charts
-        // on the same canvas at the same time.
-        if (!$.isEmptyObject($._data($('.use-log-scale')[0]))) {
-            return;
-        }
         $('.use-log-scale')
             .prop('checked', false)
             .on('click', function () {
