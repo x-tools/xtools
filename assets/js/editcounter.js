@@ -261,7 +261,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                     },
                     afterBuildTicks: function (axis) {
                         // For logarithmic scale, default ticks are too close and overlap.
-                        if (type == "logarithmic" || false) {
+                        if (type == "logarithmic") {
                             let newticks = [];
                             axis.ticks.forEach((x,i) => {
                                 // So we enforce 1.5* distance.
