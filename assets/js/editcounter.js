@@ -293,7 +293,9 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
         // First, don't add them if there already are some.
         // ChartJS ''really'' doesn't like instancing two charts
         // on the same canvas at the same time.
-        if (!$.isEmptyObject($._data($('.use-log-scale')[0]))) return;
+        if (!$.isEmptyObject($._data($('.use-log-scale')[0]))) {
+            return;
+        }
         $('.use-log-scale')
             .prop('checked', false)
             .on('click', function () {
