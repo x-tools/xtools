@@ -214,7 +214,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
         type: 'horizontalBar',
         data: {
             labels: getYAxisLabels(id, datasets),
-            datasets: datasets
+            datasets: datasets,
         },
         options: {
             tooltips: {
@@ -288,7 +288,12 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
     });
     // Initialise it, linear by default
     createchart();
+    // Add checkbox listeners
     $(function () {
+        // First, don't add them if there already are some.
+        // ChartJS ''really'' doesn't like instancing two charts
+        // on the same canvas at the same time.
+        if (!$.isEmptyObject($._data($('.use-log-scale')[0]))) return;
         $('.use-log-scale')
             .prop('checked', false)
             .on('click', function () {
