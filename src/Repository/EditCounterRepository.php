@@ -591,7 +591,7 @@ class EditCounterRepository extends Repository
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 5000";
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchFirstColumn();
-        $results['average_size'] = array_sum($results)/count($results);
+        $results['average_size'] = count($results) > 0 ? array_sum($results)/count($results) : 0;
         $isSmall = fn($n) => abs(intval($n)) < 20;
         $isLarge = fn($n) => abs(intval($n)) > 1000;
         $results['small_edits'] = count(array_filter($results, $isSmall));
