@@ -510,6 +510,7 @@
 	"unregistered-edits-tooltip": "Modifications effectuées par des comptes temporaires ou des adresses IP",
 	"unregistered-edits-percentage": "% de modifications sans utilisateur",
 	"unreverted-edits": "Modifications non révoquées",
+    "use-log-scale": "Utiliser une échelle logarithmique",
 	"user": "Utilisateur",
 	"user-groups": "Groupes d’utilisateurs",
 	"user-id": "Identifiant de l’utilisateur",

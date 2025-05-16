@@ -507,6 +507,7 @@
 	"unregistered-edits-tooltip": "Tooltip message explaining that unregistered edits are edits made by users who are not logged in.",
 	"unregistered-edits-percentage": "Label showing the percentage of edits made by logged out users. Try to make this message brief, if possible.",
 	"unreverted-edits": "Label for number of edits that were not reverted in an article.",
+	"use-log-scale": "Label for the checkbox that shows the year/month counts charts in logarithmic scale rather than linear.",
 	"user": "Label for the user that the statistics are about.\n{{Identical|User}}",
 	"user-groups": "Label for the list of 'groups' that a user belongs to.",
 	"user-id": "Registration id of a user (short term)",

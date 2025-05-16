@@ -488,6 +488,7 @@
 	"unregistered-edits-tooltip": "Edits made by temporary accounts or IPs",
 	"unregistered-edits-percentage": "Unregistered edits %",
 	"unreverted-edits": "Unreverted edits",
+	"use-log-scale": "Use logarithmic scale",
 	"user": "User",
 	"user-groups": "User groups",
 	"user-id": "User ID",
