@@ -133,6 +133,7 @@
 	"name": "ЦӀар",
 	"next": "Хадуб",
 	"not-opted-in-login": "жанире лӀугьине",
+	"num-revisions-since": "$1 {{PLURAL:$2|ревизия|ревизия}} $3-даса нахъе",
 	"original-size": "Оригиналаб роцен",
 	"other": "Цогидаб",
 	"others": "Цогидал",

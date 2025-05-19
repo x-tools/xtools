@@ -487,6 +487,7 @@
 	"unregistered-edits-tooltip": "Edicións realizadas por contas temporais ou enderezos IP",
 	"unregistered-edits-percentage": "% de edicións feitas por un usuario sen rexistrar",
 	"unreverted-edits": "Edicións non revertidas",
+	"use-log-scale": "Usar unha escala logarítmica",
 	"user": "Usuario",
 	"user-groups": "Grupos de usuaria(o)",
 	"user-id": "ID do usuario",

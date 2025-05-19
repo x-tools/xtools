@@ -497,6 +497,7 @@
 	"unregistered-edits-tooltip": "Tilapäisten tunnusten tai IP-osoitteiden tekemät muokkaukset",
 	"unregistered-edits-percentage": "Rekisteröimättömien käyttäjien muokkausten %",
 	"unreverted-edits": "Kumoamattomia muokkauksia",
+	"use-log-scale": "Käytä logaritmista asteikkoa",
 	"user": "Käyttäjä",
 	"user-groups": "Käyttäjäryhmät",
 	"user-id": "Käyttäjätunniste",
