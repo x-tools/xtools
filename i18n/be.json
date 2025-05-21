@@ -4,6 +4,7 @@
 			"Artsiom91",
 			"Kareyac",
 			"Maksim L.",
+			"No Sleep till Krupki",
 			"Plaga med",
 			"ZlyiLev"
 		]
@@ -125,7 +126,7 @@
 	"notice": "Заўвага",
 	"num-blocks": "{{PLURAL:$1|блок|блокі|блокаў}}",
 	"num-bytes": "{{PLURAL:$1|байт|байты|байтаў}}",
-	"num-categories": "{{PLURAL:$1|катэгорыя|катэгорыі|катэгорый}}",
+	"num-categories": "{{PLURAL:$1|1=катэгорыя|катэгорыі}}",
 	"num-days": "{{PLURAL:$1|дзень|дні|дзён}}",
 	"num-deletions": "{{PLURAL:$1|выдаленне|выдаленні|выдаленняў}}",
 	"num-editors": "{{PLURAL:$1|рэдактар|рэдактары|рэдактараў}}",
@@ -191,7 +192,6 @@
 	"total-page-size": "Агульны памер старонкі",
 	"translation-credits": "Пераклады зробленыя на сайтах $1 і $2",
 	"tuesday": "Аўторак",
-	"type": "Тып",
 	"unknown": "Невядома",
 	"user": "Удзельнік",
 	"user-groups": "Групы ўдзельніка",
