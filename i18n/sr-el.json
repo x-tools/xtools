@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"FriedrickMILBarbarossa",
 			"Kizule",
 			"Zoranzoki21"
 		]
@@ -330,7 +331,7 @@
 	"reblock": "Ponovna blokiranja",
 	"recent-activity": "Nedavna aktivnost",
 	"recent-activity-desc": "$2 {{PLURAL:$1|izmena|izmene|izmena}} unutar poslednjih 720 dana",
-	"recreated": "Ponovo napravljeno",
+	"recreated": "ponovo napravljeno",
 	"redirect": "Preusmerenje",
 	"redirects": "Preusmerenja",
 	"redirfilter-all": "Uključi preusmerenja i nepreusmerenja",
@@ -441,7 +442,6 @@
 	"translation-credits": "Prevode pokreću: $1, $2 i $3.",
 	"tsv": "TSV",
 	"tuesday": "Utorak",
-	"type": "Tip",
 	"unapprove": "Neodobravanje",
 	"unblock": "Deblokiranja",
 	"unique-pages-edited": "Uređeno jedinstvenih stranica",
