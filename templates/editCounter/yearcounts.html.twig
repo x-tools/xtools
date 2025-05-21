@@ -81,6 +81,13 @@
             xtools.editcounter.setupMonthYearChart('year', datasets, labels, maxTotal);
         });
     </script>
+    
+    <div class="checkbox log-scale">
+        <label>
+            <input type="checkbox" data-value="log" class="use-log-scale" />
+            {{ msg('use-log-scale') }}
+        </label>
+    </div>
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
