@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
-use App\Helper\I18nHelper;
 use App\Helper\AutomatedEditsHelper;
+use App\Helper\I18nHelper;
 use App\Repository\EditCounterRepository;
 use DateInterval;
 use DatePeriod;
@@ -1073,11 +1073,13 @@ class EditCounter extends Model
         $tags = json_decode($editSizeData['tag_lists']);
         $autoTags = $this->autoEditsHelper->getTags($this->project);
         return count( // Number
-            array_filter($tags, // of revisions
-                fn($a) => $a !== null && // with tags
+            array_filter(
+                $tags, // of revisions
+                fn($a) => null !== $a && // with tags
                 count( // where the number of tags
-                    array_filter($a,
-                        fn($t) => in_array($t,  $autoTags) // that mean these edits are auto
+                    array_filter(
+                        $a,
+                        fn($t) => in_array($t, $autoTags) // that mean these edits are auto
                     )
                 ) > 0 // is greater than 0
             )

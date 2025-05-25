@@ -366,7 +366,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): Response {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -415,7 +414,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): Response {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -465,7 +463,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): Response {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -514,7 +511,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): Response {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -564,7 +560,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): Response {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -646,7 +641,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): JsonResponse {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -694,7 +688,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): JsonResponse {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -752,7 +745,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): JsonResponse {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
@@ -814,7 +806,6 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack,
         AutomatedEditsHelper $autoEditsHelper
-
     ): JsonResponse {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
