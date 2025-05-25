@@ -61,6 +61,7 @@
 	"auto-contribs-use-tool": "Label for dropdown that limits results to edits made by the selected (semi-)automated tool. The dropdown is located immediately after the label.",
 	"auto-edits": "(semi-)automated edits with known tools like Huggle",
 	"auto-edits-bot": "Message shown at the top of the AutoEdits tool for users who are a bot, explaining that all edits made by the bot may be automated, even if XTools says they are not.",
+    "auto-edits-tagged": "Label for the very approximate count of tagged (semi-)automated edits in the last 5000 edits in the Edit Counter.",
 	"auto-edits-counts-desc": "In the AutoEdits tool, this message explains how the totals of individual tools (shown in the '(semi-)automated edits' section) may be different from the total shown in the 'Summary' section. $1 is a link to the 'Summary' section with the message 'auto-edits-counts-grand-total' as the link text.",
 	"auto-edits-counts-desc-grand-total": "The text 'grand total'. This is used as the text for the link in the 'auto-edits-counts-desc' message.",
 	"auto-edits-logged-out": "Message shown when the user attempts to use the AutoEdits tool in sandbox mode, but hasn't logged in.",

@@ -570,7 +570,8 @@ class EditCounterRepository extends Repository
 
         // Prepare the queries and execute them.
         $revisionTable = $project->getTableName('revision');
-        $pageTable = $project->getTableName('page');
+        $ctTable = $project->getTableName('change_tag');
+        $ctdTable = $project->getTableName('change_tag_def');
         $ipcJoin = '';
         $whereClause = 'revs.rev_actor = :actorId';
         $params = ['actorId' => $user->getActorId($project)];
@@ -582,19 +583,26 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT AVG(sizes.size) AS average_size,
-                COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
-                COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
+        $sql = "SELECT AVG(data.size) AS average_size,
+                COUNT(CASE WHEN data.size < 20 THEN 1 END) AS small_edits,
+                COUNT(CASE WHEN data.size > 1000 THEN 1 END) AS large_edits,
+                JSON_ARRAYAGG(data.tags) as tag_lists
                 FROM (
-                    SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
+                    SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size,
+                    (
+                        SELECT JSON_ARRAYAGG(ctd_name)
+                        FROM $ctTable
+                        JOIN $ctdTable
+                        ON ct_tag_id = ctd_id
+                        WHERE ct_rev_id = revs.rev_id
+                    ) AS tags
                     FROM $revisionTable AS revs
-                    JOIN $pageTable ON revs.rev_page = page_id
                     $ipcJoin
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     WHERE $whereClause
                     ORDER BY revs.rev_timestamp DESC
                     LIMIT 5000
-                ) sizes";
+                ) data";
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
 
         // Cache and return.
