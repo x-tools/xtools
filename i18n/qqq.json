@@ -353,6 +353,7 @@
 	"pattern-input-desc": "Description of the syntax that should be used for the 'Inclusion pattern' and 'Exclusion pattern' fields in the Largest Pages tool. $1 is the character that should be used for a wildcard.",
 	"pc-accept": "Name of MediaWiki action to accept a pending change. On some wikis this may be referred to as 'flagged revision'. When in doubt, use a direct translation of 'accept'.\n{{Identical|Accept}}",
 	"pc-reject": "Name of MediaWiki action to reject a pending change. On some wikis this may be referred to as 'flagged revision'. When in doubt, use a direct translation of 'reject'.\n{{Identical|Reject}}",
+	"pending": "Label for pending edits (from the FlaggedRevs extension). Try to keep this label short",
 	"percent-of-edit-count": "In the AutoEdits tool, this is the heading for the column that shows the percentage that a tool was used compared to the user's total edit count.",
 	"percent-of-tools": "In the AutoEdits tool, this is the heading for the column that shows the percentage that a tool was used compared to all other tools that were used.",
 	"percentage": "Label for the a percentage value.\n{{Identical|Percentage}}",

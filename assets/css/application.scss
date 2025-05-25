@@ -724,3 +724,7 @@ a.help-icon {
 .reverted-edit {
     background: #fcf8e3 !important;
 }
+
+.pending-edit:not(.reverted-edit) {
+    background:#fffdf2 !important;
+}
