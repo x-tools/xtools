@@ -167,7 +167,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds, $tagExcludesIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -249,7 +249,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds, $tagExcludesIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -268,8 +268,10 @@ class AutoEditsRepository extends UserRepository
         }
 
         $condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-        $condTag = '' != $tagIds ? "AND NOT EXISTS (SELECT 1 FROM $tagTable
-            WHERE ct_rev_id = revs.rev_id AND ct_tag_id IN ($tagIds))" : '';
+        $condTag = '' != $tagIds ? "AND NOT EXISTS (
+            SELECT 1 FROM $tagTable
+            WHERE ct_rev_id = revs.rev_id
+            AND ct_tag_id IN ($tagIds))" : '';
 
         $sql = "SELECT
                     page_title,
@@ -338,7 +340,7 @@ class AutoEditsRepository extends UserRepository
         }
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, $tool);
+        [$regex, $tagIds, $tagExcludesIds] = $this->getToolRegexAndTags($project, false, $tool);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -355,7 +357,12 @@ class AutoEditsRepository extends UserRepository
 
         if ('' != $tagIds) {
             $tagJoin = "LEFT OUTER JOIN $tagTable ON (ct_rev_id = revs.rev_id)";
-            $condsTool[] = "ct_tag_id IN ($tagIds)";
+            $condsTool[] = $tool ? "(ct_tag_id IN ($tagIds)
+                AND NOT EXISTS (
+                    SELECT 1 from $tagTable
+                    WHERE ct_rev_id = revs.rev_id
+                    AND (ct_tag_id IN ($tagExcludesIds))
+                ))" : "ct_tag_id IN ($tagIds)";
         }
 
         // IP range handling.
@@ -567,8 +574,10 @@ class AutoEditsRepository extends UserRepository
      * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
      * @param int|string|null $namespace Tools only used in given namespace ID, or 'all' for all namespaces.
-     * @return array In the format: ['combined|regex', '1,2,3'] where the second element is a
-     *   comma-separated list of the tag IDs, ready to be used in SQL.
+     * @return array In the format: ['combined|regex', '1,2,3', '4,5,6'] where the second element is a
+     *   comma-separated list of the tag IDs, ready to be used in SQL, and the third with the same format
+     *   is the tag_excludes IDs (only makes sense if $tool is not null, as else it's the exclusions
+     *   of _all_ tools).
      */
     private function getToolRegexAndTags(
         Project $project,
@@ -579,6 +588,7 @@ class AutoEditsRepository extends UserRepository
         $tools = $this->getTools($project);
         $regexes = [];
         $tagIds = [];
+        $tagExcludesIds = [];
 
         if ('' != $tool) {
             $tools = [$tools[$tool]];
@@ -602,11 +612,16 @@ class AutoEditsRepository extends UserRepository
             if (isset($values['tags'])) {
                 $tagIds = array_merge($tagIds, $this->getTagIdsFromNames($project, $values['tags']));
             }
+            if (isset($values['tag_excludes'])) {
+                $tagExcludesIds = array_merge($tagExcludesIds, $this->getTagIdsFromNames($project, $values['tag_excludes']));
+            }
+
         }
 
         return [
             implode('|', $regexes),
             implode(',', $tagIds),
+            implode(',', $tagExcludesIds),
         ];
     }
 
@@ -668,15 +683,20 @@ class AutoEditsRepository extends UserRepository
         $tagsList = implode(',', $tagIds);
         $tagExcludes = $this->getTools($project)[$tool]['tag_excludes'] ?? [];
         $excludesSql = '';
+        $tagTable = $project->getTableName('change_tag');
 
-        if ($tagExcludes && 1 === count($tagIds)) {
+        if ($tagExcludes) {
             // Get tag IDs, filtering out those for which no ID exists (meaning there is no local tag for that tool).
             $excludesList = implode(',', array_filter(array_map(function ($tagName) use ($project) {
                 return $this->getTags($project)[$tagName] ?? null;
             }, $tagExcludes)));
 
             if (strlen($excludesList)) {
-                $excludesSql = "AND ct_tag_id NOT IN ($excludesList)";
+                $excludesSql = "AND NOT EXISTS(
+                    SELECT 1
+                    FROM $tagTable
+                    WHERE (ct_rev_id = rev_id
+                    AND ct_tag_id IN ($excludesList)))";
             }
         }
 
