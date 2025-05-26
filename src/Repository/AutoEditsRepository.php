@@ -167,7 +167,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds, $tagExcludesIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -249,7 +249,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds, $tagExcludesIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -613,9 +613,11 @@ class AutoEditsRepository extends UserRepository
                 $tagIds = array_merge($tagIds, $this->getTagIdsFromNames($project, $values['tags']));
             }
             if (isset($values['tag_excludes'])) {
-                $tagExcludesIds = array_merge($tagExcludesIds, $this->getTagIdsFromNames($project, $values['tag_excludes']));
+                $tagExcludesIds = array_merge(
+                    $tagExcludesIds,
+                    $this->getTagIdsFromNames($project, $values['tag_excludes'])
+                );
             }
-
         }
 
         return [
