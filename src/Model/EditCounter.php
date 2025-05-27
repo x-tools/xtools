@@ -459,7 +459,8 @@ class EditCounter extends Model
     public function countPagesProtected(): int
     {
         $logCounts = $this->getLogCounts();
-        return $logCounts['protect-protect'] ?? 0;
+        return $logCounts['protect-protect']
+            + $logCounts['stable-config'];
     }
 
     /**
@@ -469,7 +470,9 @@ class EditCounter extends Model
     public function countPagesReprotected(): int
     {
         $logCounts = $this->getLogCounts();
-        return $logCounts['protect-modify'] ?? 0;
+        return $logCounts['protect-modify']
+            + $logCounts['stable-modify']
+            + $logCounts['stable-move_stable'];
     }
 
     /**
@@ -479,7 +482,8 @@ class EditCounter extends Model
     public function countPagesUnprotected(): int
     {
         $logCounts = $this->getLogCounts();
-        return $logCounts['protect-unprotect'] ?? 0;
+        return $logCounts['protect-unprotect']
+            + $logCounts['stable-reset'];
     }
 
     /**
