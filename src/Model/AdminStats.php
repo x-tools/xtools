@@ -236,9 +236,9 @@ class AdminStats extends Model
     public function getTotalsRow(): array
     {
         $totalsRow = [];
-        foreach($this->adminStats as $username => $object) {
-            foreach($object as $key => $value) {
-                if ($key !== 'username' && $key !== 'user-groups') {
+        foreach ($this->adminStats as $object) {
+            foreach ($object as $key => $value) {
+                if ('username' !== $key && 'user-groups' !== $key) {
                     if (isset($totalsRow[$key])) {
                         $totalsRow[$key] += $value;
                     } else {
