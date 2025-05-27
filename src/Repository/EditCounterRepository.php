@@ -210,6 +210,10 @@ class EditCounterRepository extends Repository
             'pagetriage-curation-reviewed',
             'pagetriage-curation-reviewed-redirect',
             'pagetriage-curation-reviewed-article',
+            'stable-config',
+            'stable-reset',
+            'stable-modify',
+            'stable-move_stable',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
