@@ -230,6 +230,27 @@ class AdminStats extends Model
     }
 
     /**
+     * Get the "totals" row.
+     * @return array containing as keys the counts.
+     */
+    public function getTotalsRow(): array
+    {
+        $totalsRow = [];
+        foreach($this->adminStats as $username => $object) {
+            foreach($object as $key => $value) {
+                if ($key !== 'username' && $key !== 'user-groups') {
+                    if (isset($totalsRow[$key])) {
+                        $totalsRow[$key] += $value;
+                    } else {
+                        $totalsRow[$key] = $value;
+                    }
+                }
+            }
+        }
+        return $totalsRow;
+    }
+
+    /**
      * Get the total number of users in the relevant user group.
      * @return int
      */
