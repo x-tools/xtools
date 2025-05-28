@@ -316,7 +316,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
     let bars = 11;
     // First sanitize input, to get array.
-    let total = Object.keys(data).length - 3;
+    let total = Object.keys(data).length - 3; // -3 to exclude small edits, large edits and average
     data.length = total;
     data = Array.from(data)
     // Then make datasets
@@ -343,9 +343,9 @@ xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
         }
     });
     // The labels for intervals
-    let labels = ["0-10"]
-    .concat(Array.from(new Array(bars-2), (_,i) => (10*2**i)+"-"+(10*2**(i+1))))
-    .concat([">"+(10*2**(bars-2))]);
+    let bounds = [0].concat(Array.from(new Array(bars), (_,i) => 10*2**i));
+    let labels = Array.from(new Array(bars), (_,i) => (new Intl.NumberFormat(i18nLang)).formatRange(bounds[i], bounds[i+1]));
+    labels.push(">"+bounds[bars].toLocaleString(i18nLang));
 
     window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
         type: 'bar',
@@ -384,7 +384,7 @@ xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
                         color: xtools.application.chartGridColor
                     },
                     ticks: {
-                        callback: Math.abs,
+                        callback: (n) => Math.abs(n).toLocaleString(i18nLang),
                     },
                 }],
                 xAxes: [{
