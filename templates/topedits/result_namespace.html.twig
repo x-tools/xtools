@@ -22,6 +22,7 @@
     {% for ns, pages in te.topEdits %}
         {% set showPageAssessment = project.hasPageAssessments(ns) %}
         {% set content %}
+        <p>{{ te.numPagesNamespace(ns) }} {{ msg('pages')|lower }}.</p>
         <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
             <thead><tr>
                 <th>
