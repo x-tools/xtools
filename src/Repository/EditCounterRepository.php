@@ -570,6 +570,7 @@ class EditCounterRepository extends Repository
 
         // Prepare the queries and execute them.
         $revisionTable = $project->getTableName('revision');
+        $pageTable = $project->getTableName('page');
         $ctTable = $project->getTableName('change_tag');
         $ctdTable = $project->getTableName('change_tag_def');
         $ipcJoin = '';
@@ -597,6 +598,7 @@ class EditCounterRepository extends Repository
                         WHERE ct_rev_id = revs.rev_id
                     ) AS tags
                     FROM $revisionTable AS revs
+                    JOIN $pageTable ON revs.rev_page = page_id
                     $ipcJoin
                     LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     WHERE $whereClause
