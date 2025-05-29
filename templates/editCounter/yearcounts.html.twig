@@ -39,7 +39,8 @@
 
     {# Set height of chart based on how many years (horizontal rows) are being reported. #}
     {# the pointer events is to not capture legend clicks #}
-    <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.yearCounts.yearLabels|length + 1) }}px">
+    {# float-left to avoid issues with the external legend and the checkbox #}
+    <div style="float:left;position:relative; pointer-events:none; height:{{ 30 * (ec.yearCounts.yearLabels|length + 1) }}px">
         <canvas id="yearcounts-canvas" style="pointer-events:all;"></canvas>
     </div>
 
