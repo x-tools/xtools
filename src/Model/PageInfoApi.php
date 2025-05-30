@@ -465,7 +465,7 @@ class PageInfoApi extends Model
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
         $botData = $this->repository->getBotData($this->page, $this->start, $this->end, $limit);
-        while ($bot = $botData->fetchAssociative()) {
+        foreach ($botData as $bot) {
             $this->bots[$bot['username']] = [
                 'count' => (int)$bot['count'],
                 'current' => '1' === $bot['current'],
