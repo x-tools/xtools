@@ -375,9 +375,9 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                             let hours = dataset.map((day) => day.data)
                                 .flat()
                                 .filter((datum) => datum.y == 8-index);
-                            return hours.reduce(function (a, b) {
+                            return (hours.reduce(function (a, b) {
                                 return a + parseInt(b.value, 10);
-                            }, 0);
+                            }, 0)).toLocaleString(i18nLang);
                         }
                     },
                     position: i18nRTL ? 'left' : 'right'
@@ -402,9 +402,9 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                                 let hours = dataset.map((day) => day.data)
                                     .flat()
                                     .filter((datum) => datum.x == value);
-                                res.push(hours.reduce(function (a, b) {
+                                res.push((hours.reduce(function (a, b) {
                                     return a + parseInt(b.value, 10);
-                                }, 0));
+                                }, 0)).toLocaleString(i18nLang));
                             }
                             if (value % 2 === 0) {
                                 res.push(value + ":00");
@@ -426,7 +426,7 @@ xtools.editcounter.setupTimecard = function (timeCardDatasets, days) {
                     },
                     label: function (item) {
                         var numEdits = [timeCardDatasets[item.datasetIndex].data[item.index].value];
-                        return`${numEdits} ${$.i18n('num-edits', [numEdits])}`;
+                        return`${numEdits.toLocaleString(i18nLang)} ${$.i18n('num-edits', [numEdits])}`;
                     }
                 }
             }
