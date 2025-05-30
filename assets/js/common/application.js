@@ -140,13 +140,17 @@ xtools.application.setupToggleTable = function (dataSource, chartObj, valueKey, 
         // must use .attr instead of .prop as sorting script will clone DOM elements
         if ($(this).attr('data-disabled') === 'true') {
             toggleTableData[key] = dataSource[key];
-            chartObj.data.datasets[0].data[index] = (
-                parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10)
-            );
+            if (chartObj) {
+                chartObj.data.datasets[0].data[index] = (
+                    parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10)
+                );
+            }
             $(this).attr('data-disabled', 'false');
         } else {
             delete toggleTableData[key];
-            chartObj.data.datasets[0].data[index] = null;
+            if (chartObj) {
+                chartObj.data.datasets[0].data[index] = null;
+            }
             $(this).attr('data-disabled', 'true');
         }
 
@@ -159,7 +163,9 @@ xtools.application.setupToggleTable = function (dataSource, chartObj, valueKey, 
         // update stats
         updateCallback(toggleTableData, key, index);
 
-        chartObj.update();
+        if (chartObj) {
+            chartObj.update();
+        }
     });
 };
 
