@@ -197,7 +197,7 @@ function getPercentage(numerator, denominator)
  * @param {Number} maxTotal Maximum value of year/month totals.
  * @param {Boolean} showLegend Whether to show the legend above the chart.
  */
-xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTotal, showLegend) {
+xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTotal) {
     /** @type {Array} Labels for each namespace. */
     var namespaces = datasets.map(function (dataset) {
         return dataset.label;
@@ -284,7 +284,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                 }]
             },
             legend: {
-                display: showLegend
+                display: false,
             }
         }
     });
