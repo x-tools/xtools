@@ -9,6 +9,11 @@
 {% block ecBody %}
 
 {% if ec.yearTotals|length > 0 %}
+
+{% if not is_sub_request %}
+    {{ include('editCounter/externallegend.html.twig') }}
+{% endif %}
+
     <table class="sr-only">
         <thead>
             <tr>
@@ -32,10 +37,12 @@
         </tbody>
     </table>
 
-    {# Set height of chart based on how many years (horizontal rows) and namespaces are being reported. #}
-    <div style="position:relative; height:{% if is_sub_request %}{{ (25 * ec.yearCounts.yearLabels|length) + 30 }}px{% else %}{{ 25 * ( ec.yearCounts.yearLabels|length + ( (ec.yearCounts.totals|keys|length / 3)|round(1, "ceil") ) ) }}px{% endif %}">
-        <canvas id="yearcounts-canvas"></canvas>
+    {# Set height of chart based on how many years (horizontal rows) are being reported. #}
+    {# the pointer events is to not capture legend clicks #}
+    <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.yearCounts.yearLabels|length + 1) }}px">
+        <canvas id="yearcounts-canvas" style="pointer-events:all;"></canvas>
     </div>
+
     <script type="text/javascript">
         $(function() {
             /** @type {Array} The labels for the y-axis. */
@@ -56,10 +63,19 @@
             {% endfor %}
             ];
 
-            var showLegend = {% if is_sub_request %}false{% else %}true{% endif %};
-            xtools.editcounter.setupMonthYearChart('year', datasets, labels, maxTotal, showLegend);
+            var showLegend = false;
+            window.namespaces = {{ project.namespaces|json_encode()|raw }};
+            window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
+            xtools.editcounter.setupMonthYearChart('year', datasets, labels, maxTotal);
         });
     </script>
+    
+    <div class="checkbox log-scale">
+        <label>
+            <input type="checkbox" data-value="log" class="use-log-scale" />
+            {{ msg('use-log-scale') }}
+        </label>
+    </div>
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
