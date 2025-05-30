@@ -45,35 +45,23 @@
 
     <script type="text/javascript">
         $(function() {
-            /** @type {Array} To be passed into Chart.js */
-            var datasets = [];
-
             /** @type {Array} The labels for the y-axis. */
             var labels = {{ ec.monthCounts.yearLabels|json_encode|raw }};
 
             /** @type {Number} Max value of the year totals */
-            var maxTotal = 0;
+            var maxTotal = {{ max(ec.yearCounts.totals|map(x => max(x))) }};
 
+            /** @type {Array} To be passed into Chart.js */
+            var datasets = [
             // Format data for use in charts.
             {% for nsId,namespaceData in ec.yearCounts.totals %}
-                var dataset = {
+                {
                     label: "{{ nsName(nsId, project.namespaces) }}",
                     backgroundColor: "{{ color(nsId) }}",
-                    data: []
-                };
-
-                {% for year,yearData in namespaceData %}
-                    dataset.data.push({{ yearData }});
-
-                    // Determine maximum value for the totals. This is needed
-                    //   so that we know how much spacing to add in the labels.
-                    if ({{ yearData }} > maxTotal) {
-                        maxTotal = {{ yearData }};
-                    }
-                {%- endfor -%}
-
-                datasets.push(dataset);
+                    data: Object.values({{ namespaceData|json_encode()|raw }}),
+                },
             {% endfor %}
+            ];
 
             var showLegend = false;
             window.namespaces = {{ project.namespaces|json_encode()|raw }};
