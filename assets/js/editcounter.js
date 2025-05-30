@@ -307,6 +307,98 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 };
 
 /**
+ * Setup edit size histogram as a vertical bar chart
+ * from the PHP EditSizeData.
+ * @param {Object} data JSON object returned by getAllEditSizes.
+ * @param {Array} colors CSS colors for additions, removals, and same-size, in that order.
+ * @param {Array} barLabels i18n'd bar labels for additions, removals and same-size, in that order.
+ */
+xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
+    let bars = 11;
+    // First sanitize input, to get array.
+    let total = Object.keys(data).length - 3; // -3 to exclude small edits, large edits and average
+    data.length = total;
+    data = Array.from(data)
+    // Then make datasets
+    let datasetPos = {};
+    datasetPos.backgroundColor = colors[0];
+    datasetPos.label = barLabels[0];
+    let datasetNeg = {};
+    datasetNeg.backgroundColor = colors[1];
+    datasetNeg.label = barLabels[1];
+    let datasetZero = {};
+    datasetZero.backgroundColor = colors[2];
+    datasetZero.label = barLabels[2];
+    // Setup counts.
+    datasetPos.data =  new Array(bars).fill(0);
+    datasetNeg.data =  new Array(bars).fill(0);
+    datasetZero.data = new Array(bars).fill(0);
+    data.forEach((x) => {
+        if (x == 0) {
+            datasetZero.data[0] += 1;
+        } else {
+            // That's the slice index
+            let index = Math.ceil(Math.min(11, Math.max(0, Math.log(Math.abs(x)/10)/Math.log(2))));
+            ( x < 0 ? datasetNeg : datasetPos ).data[index] += ( x < 0 ? -1 : 1);
+        }
+    });
+    // The labels for intervals
+    let bounds = [0].concat(Array.from(new Array(bars), (_,i) => 10*2**i));
+    let labels = Array.from(new Array(bars), (_,i) => (new Intl.NumberFormat(i18nLang)).formatRange(bounds[i], bounds[i+1]));
+    labels.push(">"+bounds[bars].toLocaleString(i18nLang));
+
+    window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                // The order matters; zero must appear first to be below pos
+                datasetNeg,
+                datasetZero,
+                datasetPos,
+            ],
+        },
+        options: {
+            tooltips: {
+                mode: 'nearest',
+                intersect: true,
+                callbacks: {
+                    label: function (tooltip) {
+                        // the Math.abs' serve to show the internally negative removal counts as positive
+                        percentage = getPercentage(Math.abs(tooltip.yLabel), total);
+
+                        return Math.abs(tooltip.yLabel).toLocaleString(i18nLang) + ' ' +
+                            '(' + percentage + ')';
+                    },
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: "top",
+            },
+            scales: {
+                yAxes: [{
+                    stacked: true,
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    },
+                    ticks: {
+                        callback: (n) => Math.abs(n).toLocaleString(i18nLang),
+                    },
+                }],
+                xAxes: [{
+                    stacked: true,
+                    gridLines: {
+                        color: xtools.application.chartGridColor
+                    }
+                }],
+            },
+        }
+    });
+};
+
+/**
  * Builds the timecard chart and adds a listener for the 'local time' option.
  * @param {Array} timeCardDatasets
  * @param {Object} days
