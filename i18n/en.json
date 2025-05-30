@@ -334,6 +334,7 @@
 	"pattern-input-desc": "A pattern can be any text where $1 is a wildcard.",
 	"pc-accept": "Pending change accept",
 	"pc-reject": "Pending change unaccept",
+	"pending": "Pending",
 	"percent-of-edit-count": "% of edit count",
 	"percent-of-tools": "% of tools",
 	"percentage": "Percentage",
