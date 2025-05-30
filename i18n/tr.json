@@ -496,6 +496,7 @@
 	"unregistered-edits-tooltip": "Geçici hesaplar veya IP'ler tarafından yapılan düzenlemeler",
 	"unregistered-edits-percentage": "Kayıtlı olmayan düzenlemeler %",
 	"unreverted-edits": "Geri alınmayan düzenlemeler",
+	"use-log-scale": "Logaritmik ölçek kullanın",
 	"user": "Kullanıcı",
 	"user-groups": "Kullanıcı grupları",
 	"user-id": "Kullanıcı kimliği:",
