@@ -221,6 +221,7 @@
 	"namespaces-desc": "$2 {{PLURAL:$1|redigering|redigeringer}} til artikelområdet",
 	"neutral": "Neutral",
 	"next": "Næste",
+	"no": "Nej",
 	"no-contribs": "Ingen bidrag fundet",
 	"no-exist": "$1 findes ikke",
 	"no-result": "Ingen matchende resultater for: $1",
@@ -239,6 +240,7 @@
 	"num-days": "{{PLURAL: $1|dag|dage}}",
 	"num-deletions": "{{PLURAL:$1|sletning|sletninger}}",
 	"num-editors": "{{PLURAL:$1|bidragsyder|bidragsydere}}",
+	"num-edits": "{{PLURAL:$1|redigering|redigeringer}}",
 	"num-hours": "{{PLURAL: $1|time|timer}}",
 	"num-minutes": "{{PLURAL: $1|minut|minutter}}",
 	"num-months": "{{PLURAL: $1|måned|måneder}}",
@@ -288,7 +290,7 @@
 	"patrol": "Patruljering",
 	"patrollers": "Patruljanter",
 	"patrols": "Patruljer",
-	"patrols-desc": "$2 {{PLURAL:$1|artikel|artikler}} patruljeret",
+	"patrols-desc": "$2 {{PLURAL:$1|side|sider}} patruljeret",
 	"percent-of-edit-count": "% af redigeringsantal",
 	"percent-of-tools": "% af værktøjer",
 	"percentage": "Procentdel",
@@ -441,5 +443,6 @@
 	"xtools-slogan": "Opfyld din datasult",
 	"xtools-title": "X!'s værktøjer",
 	"year": "År",
-	"year-counts": "Årstæller"
+	"year-counts": "Årstæller",
+	"yes": "Ja"
 }

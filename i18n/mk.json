@@ -488,6 +488,7 @@
 	"unregistered-edits-tooltip": "Уредувања од привремени сметки или IP-адреси",
 	"unregistered-edits-percentage": "% на непријавени",
 	"unreverted-edits": "Невратени уредувања",
+	"use-log-scale": "Користи логаритамска скала",
 	"user": "Корисник",
 	"user-groups": "Кориснички групи",
 	"user-id": "Корисничка назнака",
