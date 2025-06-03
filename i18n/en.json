@@ -144,6 +144,7 @@
 	"error-login": "Login failed! Please try again.",
 	"error-login-required": "For performance reasons, the requested data is only available to logged-in users.",
 	"error-login-required-link": "Please login to continue.",
+	"error-lost-connection": "The database connection was lost. It was likely stopped by the server, which indicates that too much data was requested.",
 	"error-pageinfo-api": "Unable to fetch revision data.",
 	"error-pagepile-too-large": "Sorry, there are too many pages to export to PagePile. You can manually create a PagePile, or try narrowing down the result set by limiting to a specific namespace or time frame.",
 	"error-param": "'$1' is not a valid value for the '$2' parameter",
