@@ -297,6 +297,7 @@ class PageInfoRepository extends AutoEditsRepository
 
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
+        $revWithoutExtension = $project->getTableName('revision', ''); // Needed because userindex is missing some revdeleted rows
         $userTable = $project->getTableName('user');
         $pageTable = $project->getTableName('page');
         $actorTable = $project->getTableName('actor');
@@ -333,7 +334,7 @@ class PageInfoRepository extends AutoEditsRepository
                     (
                         SELECT rev_timestamp AS modified_at,
                                rev_id AS modified_rev_id
-                        FROM $revTable
+                        FROM $revWithoutExtension
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
                         AND rev_id = page_latest
