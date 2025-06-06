@@ -158,6 +158,16 @@
                             </td>
                         </tr>
                     {% endif %}
+                    {% if ai.subpageCount > 0 %}
+                        <tr>
+                            <td>{{ msg('subpages') }}</td>
+                            <td>
+                                {{
+                                    wiki.pageLinkRaw("Special:PrefixIndex/" ~ page.title, project, ai.subpageCount|num_format)
+                                }}
+                            </td>
+                        </tr>
+                    {% endif %}
                 </tbody></table>
             </div>
 
