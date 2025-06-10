@@ -1069,18 +1069,4 @@ class EditCounter extends Model
             return 0;
         }
     }
-
-    /**
-     * Get the sizes of the user's past 5000 edits.
-     * return int[] Array of sizes in bytes.
-     */
-    public function getAllEditSizes(): array
-    {
-        $editSizeData = $this->getEditSizeData();
-        if (isset($editSizeData)) {
-            return $editSizeData;
-        } else {
-            return [];
-        }
-    }
 }

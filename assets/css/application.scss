@@ -647,6 +647,12 @@ section > .panel-body {
         max-width: 150px;
     }
 
+    .sizechart-container {
+        position:relative;
+        height:200px;
+        min-width:650px;
+    }
+
     .chart-wrapper {
         display: flex;
         float: left;
