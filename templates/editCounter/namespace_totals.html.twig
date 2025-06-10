@@ -9,47 +9,7 @@
 {% block ecBody %}
 
 {% if ec.namespaceTotals|length > 0 %}
-    <table class="table table-bordered table-hover table-striped namespaces-table toggle-table">
-        <thead>
-            {% for key in ['namespace', 'count'] %}
-                <th>
-                    <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
-                        {{ msg(key)|ucfirst }}
-                        <span class="glyphicon glyphicon-sort"></span>
-                    </span>
-                </th>
-            {% endfor %}
-        </thead>
-        <tbody>
-            {% set availableNamespaces = [] %}
-            {% for nsId, value in ec.namespaceTotals %}
-                {% set availableNamespaces = availableNamespaces|merge([nsId]) %}
-                <tr>
-                    <td class="sort-entry--namespace" data-value="{{ nsId }}">
-                        <span class="tools-toggle toggle-table--toggle" data-index="{{ loop.index0 }}" data-key="{{ nsId }}">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            <span class="color-icon" style="background:{{ color(nsId) }}"></span>
-                        </span>
-                        {{ nsName(nsId, project.namespaces) }}
-                    </td>
-                    <td class="sort-entry--count" data-value="{{ value }}">
-                        <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:nsId}) }}">{{ value|num_format }}</a>
-                        ({{ value|percent_format(ec.liveRevisionsFromNamespaces) }})
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th class="namespaces--namespaces">
-                    {{ ec.namespaceTotals|length|num_format }} {{ msg('num-namespaces', [ec.namespaceTotals|length]) }}
-                </th>
-                <th class="namespaces--count">
-                    {{ ec.liveRevisionsFromNamespaces|num_format }}
-                </th>
-            </tr>
-        </tfoot>
-    </table>
+	{{ include('editCounter/externallegend.html.twig') }}
     <div class="chart-wrapper namespaces-chart-wrapper toggle-table--chart">
         {##
          # Set the size of the chart to be relative to the number of tools.
