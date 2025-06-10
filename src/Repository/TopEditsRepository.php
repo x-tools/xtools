@@ -279,8 +279,6 @@ class TopEditsRepository extends UserRepository
                 $filteredResult[] = $object;
             }
         }
-        $this->logger->error(json_encode($result));
-        $this->logger->error(json_encode($filteredResult));
 
         // Cache and return.
         return $this->setCache($cacheKey, $filteredResult);
