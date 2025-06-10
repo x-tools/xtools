@@ -218,7 +218,7 @@ class TopEditsRepository extends UserRepository
     ): array {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_all');
-        if ($this->cache->hasItem($cacheKey) && false) {
+        if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
