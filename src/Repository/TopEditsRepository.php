@@ -218,7 +218,7 @@ class TopEditsRepository extends UserRepository
     ): array {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_all');
-        if ($this->cache->hasItem($cacheKey)) {
+        if ($this->cache->hasItem($cacheKey) && false) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
@@ -251,8 +251,6 @@ class TopEditsRepository extends UserRepository
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
-                        ,@rn := if(@ns = b.page_namespace, @rn + 1, 1) AS row_number
-                        ,@ns := b.page_namespace AS dummy
                     FROM
                     (
                         SELECT page_namespace, page_is_redirect, rev_page, count(rev_page) AS count
@@ -266,13 +264,26 @@ class TopEditsRepository extends UserRepository
                     JOIN (SELECT @ns := NULL, @rn := 0) AS vars
                     ORDER BY b.page_namespace ASC, b.count DESC
                 ) AS c
-                JOIN $pageTable e ON e.page_id = c.rev_page
-                WHERE c.row_number <= $limit";
+                JOIN $pageTable e ON e.page_id = c.rev_page";
         $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $params);
         $result = $resultQuery->fetchAllAssociative();
+        $namespaceCounts = [];
+        $filteredResult = [];
+        foreach ($result as $object) {
+            if (isset($namespaceCounts[$object['namespace']])) {
+                $namespaceCounts[$object['namespace']] += 1;
+            } else {
+                $namespaceCounts[$object['namespace']] = 1;
+            }
+            if ($namespaceCounts[$object['namespace']] <= $limit) {
+                $filteredResult[] = $object;
+            }
+        }
+        $this->logger->error(json_encode($result));
+        $this->logger->error(json_encode($filteredResult));
 
         // Cache and return.
-        return $this->setCache($cacheKey, $result);
+        return $this->setCache($cacheKey, $filteredResult);
     }
 
     /**
