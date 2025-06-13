@@ -10,7 +10,8 @@
 ! {{ msg(key) }}
 {% endfor %}
 {% for key in as.actions %}
-! {{ msg(key)|ucfirst }}
+! {{ msg(key)|ucfirst }}{% if key == 're-block' %}<sup>1</sup>{% elseif key == 're-protect' %}<sup>2</sup>{% endif %}
+
 {% endfor %}
 |-
 {% for user in as.stats %}
@@ -25,3 +26,6 @@
 |-
 {% endfor %}
 |}
+<sup>1</sup> {{ msg('re-block-desc') }}
+
+<sup>2</sup> {{ msg('re-protect-desc') }}
