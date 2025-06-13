@@ -531,7 +531,7 @@
         <script type="text/javascript">
             $(function() {
                 xtools.editcounter.setupSizeHistogram(
-                    {{ ec.editSizeData|json_encode()|raw }},
+                    {{ ec.editSizeData.sizes|json_encode()|raw }},
                     ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
                     ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
                 );
