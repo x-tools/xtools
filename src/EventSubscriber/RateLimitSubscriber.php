@@ -36,16 +36,6 @@ class RateLimitSubscriber implements EventSubscriberInterface
         'showAction',
     ];
 
-    /**
-     * Maximum number of requests to the same URI with different interface languages.
-     */
-    public const MAX_CRAWLER_COUNT = 3;
-
-    /**
-     * Duration in which the max number of requests to the same URI with different interface languages is allowed.
-     */
-    public const MAX_CRAWLER_TIME = 'PT1M';
-
     protected CacheItemPoolInterface $cache;
     protected I18nHelper $i18n;
     protected LoggerInterface $crawlerLogger;
@@ -202,33 +192,14 @@ class RateLimitSubscriber implements EventSubscriberInterface
 
         $useLang = $useLangMatches[1];
 
-        // Requesting a language that's different than that of the target project.
-        if (1 === preg_match("/[=\/]$useLang.wik/", $this->uri)) {
+        // If requesting the same language as the target project, ignore.
+        // FIXME: This has side-effects (T384711#10759078)
+        if (1 === preg_match("/[=\/]$useLang.?wik/", $this->uri)) {
             return;
         }
 
-        // We're trying to check if everything BUT the uselang has remained unchanged.
-        $cacheUri = str_replace('uselang='.$useLang, '', $this->uri);
-        $cacheKey = 'ratelimit.crawler.'.sha1($this->userAgent.$cacheUri);
-        $cacheItem = $this->cache->getItem($cacheKey);
-
-        // If increment value already in cache, or start with 1.
-        $count = $cacheItem->isHit() ? (int)$cacheItem->get() + 1 : 1;
-
-        // Check if limit has been exceeded, and if so, add a log entry.
-        if ($count > 3) {
-            $this->crawlerLogger->info('Possible crawler detected');
-        }
-
-        // Reset the clock on every request.
-        $cacheItem->set($count)
-            ->expiresAfter(new DateInterval(self::MAX_CRAWLER_TIME));
-        $this->cache->save($cacheItem);
-
-        // If we've got a lot of hits, let's go ahead and assume it's a crawler and give a 429.
-        if ($count > self::MAX_CRAWLER_COUNT) {
-            $this->denyAccess('Web crawler detected');
-        }
+        // Require login.
+        throw new AccessDeniedHttpException('error-login-required');
     }
 
     /**

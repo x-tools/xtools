@@ -584,28 +584,28 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT AVG(data.size) AS average_size,
-                COUNT(CASE WHEN data.size < 20 THEN 1 END) AS small_edits,
-                COUNT(CASE WHEN data.size > 1000 THEN 1 END) AS large_edits,
-                JSON_ARRAYAGG(data.tags) as tag_lists
-                FROM (
-                    SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size,
-                    (
-                        SELECT JSON_ARRAYAGG(ctd_name)
-                        FROM $ctTable
-                        JOIN $ctdTable
-                        ON ct_tag_id = ctd_id
-                        WHERE ct_rev_id = revs.rev_id
-                    ) AS tags
-                    FROM $revisionTable AS revs
-                    JOIN $pageTable ON revs.rev_page = page_id
-                    $ipcJoin
-                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE $whereClause
-                    ORDER BY revs.rev_timestamp DESC
-                    LIMIT 5000
-                ) data";
+        $sql = "SELECT JSON_ARRAYAGG(CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS sizes,
+                JSON_ARRAYAGG(
+                    SELECT JSON_ARRAYAGG(ctd_name)
+                    FROM $ctTable
+                    JOIN $ctdTable
+                    ON ct_tag_id = ctd_id
+                    WHERE ct_rev_id = revs.rev_id
+                ) AS tag_lists
+                FROM $revisionTable AS revs
+                JOIN $pageTable ON revs.rev_page = page_id
+                $ipcJoin
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE $whereClause
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 5000";
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
+        $results['sizes'] = json_decode($results['sizes']);
+        $results['average_size'] = count($results['sizes']) > 0 ? array_sum($results['sizes'])/count($results['sizes']) : 0;
+        $isSmall = fn($n) => abs(intval($n)) < 20;
+        $isLarge = fn($n) => abs(intval($n)) > 1000;
+        $results['small_edits'] = count(array_filter($results['sizes'], $isSmall));
+        $results['large_edits'] = count(array_filter($results['sizes'], $isLarge));
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
