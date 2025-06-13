@@ -283,7 +283,8 @@ class EditCounter extends Model
     public function countPagesMoved(): int
     {
         $logCounts = $this->getLogCounts();
-        return $logCounts['move-move'] ?? 0;
+        return ($logCounts['move-move'] ?? 0) +
+            ($logCounts['move-move_redir'] ?? 0);
     }
 
     /**
