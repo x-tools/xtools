@@ -45,6 +45,9 @@ class TopEditsTest extends TestAdapter
             ->willReturn(['namespaces' => [0 => 'Main', 3 => 'User_talk']]);
         $this->projectRepo->method('getOne')
             ->willReturn(['url' => 'https://en.wikipedia.org']);
+        $this->projectRepo->method('pageHasContent')
+            ->with($this->project, 2, 'Test user/EditCounterOptIn.js')
+            ->willReturn(true);
         $this->project->setRepository($this->projectRepo);
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->user = new User($this->userRepo, 'Test user');
