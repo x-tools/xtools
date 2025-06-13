@@ -643,8 +643,14 @@ section > .panel-body {
     padding-top: 20px;
     position: relative;
 
-    canvas {
+    canvas:not(#sizechart-canvas) {
         max-width: 150px;
+    }
+
+    .sizechart-container {
+        position:relative;
+        height:200px;
+        min-width:650px;
     }
 
     .chart-wrapper {
