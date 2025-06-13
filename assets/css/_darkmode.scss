@@ -328,4 +328,10 @@ $tooltip-shadow: #333;
     }
   }
 
+  .footer-branding,
+  .home-link,
+  .splash-logo {
+    filter:invert(1) hue-rotate(180deg);
+  }
+
 }
