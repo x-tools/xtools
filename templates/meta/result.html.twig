@@ -147,7 +147,7 @@
                             callbacks: {
                                 label: function(tooltipItem) {
                                     var toolName = datasets[tooltipItem.datasetIndex].label;
-                                    return toolName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                    return toolName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString(i18nLang);
                                 }
                             },
                             bodyFontSize: 14,
@@ -166,10 +166,10 @@
                         }, 0);
                         var toolsCount = Object.keys(newData).length;
                         $('.tools--tools').text(
-                            toolsCount.toLocaleString() + " " +
+                            toolsCount.toLocaleString(i18nLang) + " " +
                             $.i18n('num-tools', toolsCount)
                         );
-                        $('.tools--count').text(total.toLocaleString());
+                        $('.tools--count').text(total.toLocaleString(i18nLang));
                     });
                 });
             });
@@ -308,7 +308,7 @@
                             callbacks: {
                                 label: function(tooltipItem) {
                                     var endpointName = datasets[tooltipItem.datasetIndex].label;
-                                    return endpointName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString();
+                                    return endpointName + ': ' + (new Number(tooltipItem.yLabel)).toLocaleString(i18nLang);
                                 }
                             },
                             bodyFontSize: 14,
