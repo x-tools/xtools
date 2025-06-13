@@ -605,7 +605,9 @@ class EditCounterRepository extends Repository
                 ) data";
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
         $results['sizes'] = json_decode($results['sizes']);
-        $results['average_size'] = count($results['sizes']) > 0 ? array_sum($results['sizes'])/count($results['sizes']) : 0;
+        $results['average_size'] = count($results['sizes']) > 0
+            ? array_sum($results['sizes'])/count($results['sizes'])
+            : 0;
         $isSmall = fn($n) => abs(intval($n)) < 20;
         $isLarge = fn($n) => abs(intval($n)) > 1000;
         $results['small_edits'] = count(array_filter($results['sizes'], $isSmall));
