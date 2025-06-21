@@ -672,7 +672,7 @@ function displayWaitingNoticeOnSubmission(undo)
         $('.form-submit').prop('disabled', false);
         $('.form-submit').text($.i18n('submit')).prop('disabled', false);
         if (loadingTimerId) {
-            clearTimerInterval(loadingTimerId);
+            clearInterval(loadingTimerId);
             loadingTimerId = null;
         }
     } else {
