@@ -107,7 +107,7 @@ function setupCategoryInput(api, ns)
                     results = query.prefixsearch.map(function (elem) {
                         var title = elem.title.replace(new RegExp('^' + nsName + ':'), '');
                         return {
-                            id: title.score(),
+                            id: title.replace(/ /g, '_'),
                             text: title
                         };
                     });
