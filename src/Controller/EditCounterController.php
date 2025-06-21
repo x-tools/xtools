@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Model\EditCounter;
 use App\Model\GlobalContribs;
 use App\Model\UserRights;
@@ -92,7 +93,8 @@ class EditCounterController extends XtoolsController
     protected function setUpEditCounter(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): void {
         // Whether we're making a subrequest (the view makes a request to another action).
         // Subrequests to the same controller do not re-instantiate a new controller, and hence
@@ -119,7 +121,8 @@ class EditCounterController extends XtoolsController
             $this->i18n,
             $this->userRights,
             $this->project,
-            $this->user
+            $this->user,
+            $autoEditsHelper
         );
     }
 
@@ -242,15 +245,17 @@ class EditCounterController extends XtoolsController
      * @param EditCounterRepository $editCounterRepo
      * @param UserRightsRepository $userRightsRepo
      * @param RequestStack $requestStack
+     * @param AutomatedEditsHelper $autoEditsHelper
      * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
     public function resultAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ) {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         if (1 === count($this->sections)) {
             // Redirect to dedicated route.
@@ -297,9 +302,10 @@ class EditCounterController extends XtoolsController
         UserRightsRepository $userRightsRepo,
         GlobalContribsRepository $globalContribsRepo,
         EditRepository $editRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $globalContribs = new GlobalContribs(
             $globalContribsRepo,
@@ -358,9 +364,10 @@ class EditCounterController extends XtoolsController
     public function namespaceTotalsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
@@ -405,9 +412,10 @@ class EditCounterController extends XtoolsController
     public function timecardAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
@@ -453,9 +461,10 @@ class EditCounterController extends XtoolsController
     public function yearCountsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
@@ -500,9 +509,10 @@ class EditCounterController extends XtoolsController
     public function monthCountsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
@@ -548,9 +558,10 @@ class EditCounterController extends XtoolsController
     public function rightsChangesAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): Response {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = [
             'xtTitle' => $this->user->getUsername(),
@@ -628,9 +639,10 @@ class EditCounterController extends XtoolsController
     public function logCountsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         return $this->getFormattedApiResponse([
             'log_counts' => $this->editCounter->getLogCounts(),
@@ -674,9 +686,10 @@ class EditCounterController extends XtoolsController
     public function namespaceTotalsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         return $this->getFormattedApiResponse([
             'namespace_totals' => (object)$this->editCounter->namespaceTotals(),
@@ -730,9 +743,10 @@ class EditCounterController extends XtoolsController
     public function monthCountsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         $ret = $this->editCounter->monthCounts();
 
@@ -790,9 +804,10 @@ class EditCounterController extends XtoolsController
     public function timecardApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AutomatedEditsHelper $autoEditsHelper
     ): JsonResponse {
-        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
+        $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack, $autoEditsHelper);
 
         return $this->getFormattedApiResponse([
             'timecard' => $this->editCounter->timeCard(),
