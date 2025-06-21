@@ -636,6 +636,12 @@ function setupAutocompletion()
     }
 }
 
+/*
+ * Loading timer id if one is running.
+ * Used to prevent concurrent timers.
+ */
+let loadingTimerId;
+
 /**
  * Create a new loading timer interval.
  * Uses #submit_timer.
@@ -665,6 +671,10 @@ function displayWaitingNoticeOnSubmission(undo)
         $('.form-control').prop('readonly', false);
         $('.form-submit').prop('disabled', false);
         $('.form-submit').text($.i18n('submit')).prop('disabled', false);
+        if (loadingTimerId) {
+            clearTimerInterval(loadingTimerId);
+            loadingTimerId = null;
+        }
     } else {
         $('#content form').on('submit', function () {
             // Remove focus from any active element
@@ -678,15 +688,10 @@ function displayWaitingNoticeOnSubmission(undo)
                 .html($.i18n('loading') + " <span id='submit_timer'></span>");
 
             // Add the counter.
-            createTimerInterval();
+            loadingTimerId = createTimerInterval();
         });
     }
 }
-
-/**
- * Contains the current link loading timer, or null if there isn't one.
- */
-let linkTimer = null;
 
 /*
  * Resets a link out of loading.
@@ -694,8 +699,8 @@ let linkTimer = null;
 function clearLinkTimer()
 {
     // clear the timer proper
-    clearInterval(linkTimer);
-    linkTimer = null;
+    clearInterval(loadingTimerId);
+    loaingTimerId = null;
     // change the link's label back
     let old = $("#submit_timer").parent()[0];
     $(old).html(old.initialtext);
@@ -725,10 +730,10 @@ function setupLinkLoadingNotices(undo)
             let el = $(ev.target);
             el.prop("initialtext", el.html());
             el.html($.i18n('loading') + ' <span id=\'submit_timer\'></span>');
-            if (linkTimer) {
+            if (loadingTimerId) {
                 clearLinkTimer();
             }
-            linkTimer = createTimerInterval();
+            loadingTimerId = createTimerInterval();
         });
     }
 }
