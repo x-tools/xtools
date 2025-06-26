@@ -87,7 +87,7 @@ class PagesController extends XtoolsController
      * @return Pages
      * @codeCoverageIgnore
      */
-    protected function setUpPages(PagesRepository $pagesRepo, string $redirects, string $deleted): Pages
+    protected function setUpPages(PagesRepository $pagesRepo, string $redirects, string $deleted, bool $countsOnly = false): Pages
     {
         if ($this->user->isIpRange()) {
             $this->params['username'] = $this->user->getUsername();
@@ -103,7 +103,8 @@ class PagesController extends XtoolsController
             $deleted,
             $this->start,
             $this->end,
-            $this->offset
+            $this->offset,
+            $countsOnly,
         );
     }
 
@@ -139,6 +140,12 @@ class PagesController extends XtoolsController
         string $redirects = Pages::REDIR_NONE,
         string $deleted = Pages::DEL_ALL
     ) {
+        $countsOnly = filter_var(
+            $this->request->query->get('countsOnly', 'false'),
+            FILTER_VALIDATE_BOOLEAN,
+        ) && (
+            $this->request->query->get('format', 'html') === 'html'
+        );
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
         // out to XtoolsController, but this is the only tool in the suite
@@ -149,10 +156,11 @@ class PagesController extends XtoolsController
                 'redirects' => Pages::REDIR_NONE,
                 'deleted' => $deleted,
                 'offset' => $this->offset,
+                'countsOnly' => $countsOnly,
             ]));
         }
 
-        $pages = $this->setUpPages($pagesRepo, $redirects, $deleted);
+        $pages = $this->setUpPages($pagesRepo, $redirects, $deleted, $countsOnly);
         $pages->prepareData();
 
         $ret = [
@@ -160,6 +168,7 @@ class PagesController extends XtoolsController
             'xtTitle' => $this->user->getUsername(),
             'summaryColumns' => $pages->getSummaryColumns(),
             'pages' => $pages,
+            'countsOnly' => $countsOnly,
         ];
 
         if ('PagePile' === $this->request->query->get('format')) {
