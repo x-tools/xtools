@@ -87,8 +87,12 @@ class PagesController extends XtoolsController
      * @return Pages
      * @codeCoverageIgnore
      */
-    protected function setUpPages(PagesRepository $pagesRepo, string $redirects, string $deleted, bool $countsOnly = false): Pages
-    {
+    protected function setUpPages(
+        PagesRepository $pagesRepo,
+        string $redirects,
+        string $deleted,
+        bool $countsOnly = false
+    ): Pages {
         if ($this->user->isIpRange()) {
             $this->params['username'] = $this->user->getUsername();
             $this->throwXtoolsException($this->getIndexRoute(), 'error-ip-range-unsupported');
@@ -144,7 +148,7 @@ class PagesController extends XtoolsController
             $this->request->query->get('countsOnly', 'false'),
             FILTER_VALIDATE_BOOLEAN,
         ) && (
-            $this->request->query->get('format', 'html') === 'html'
+            'html' === $this->request->query->get('format', 'html')
         );
         // Check for legacy values for 'redirects', and redirect
         // back with correct values if need be. This could be refactored
