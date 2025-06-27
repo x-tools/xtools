@@ -498,6 +498,7 @@
 
 {% if ec.countLiveRevisions %}
     <div class="basic-info-charts col-lg-12 clearfix">
+        {### Deleted edits ###}
         {% if not(user.isIpRange) %}
             {{
                 chart.pie_chart('deleted_edits',
@@ -514,6 +515,7 @@
                 )
             }}
         {% endif %}
+        {### Edit size histogram ###}
         <div class="pull-left">{{ msg('num-edits-size-interval') }}*
         <div class="sizechart-container">
             <canvas id="sizechart-canvas"></canvas>
@@ -522,12 +524,33 @@
         <script type="text/javascript">
             $(function() {
                 xtools.editcounter.setupSizeHistogram(
-                    {{ ec.editSizeData|json_encode()|raw }},
+                    {{ ec.editSizeData.sizes|json_encode()|raw }},
                     ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
                     ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
                 );
             });
         </script>
+        {### ProofreadPage quality changes ###}
+        {% if project.hasProofreadPage %}
+            {% set qualityChanges = ec.countQualityChanges %}
+            {% if qualityChanges.total > 1 %}
+                <div class="pull-left">
+                    {{ msg('proofreadpage-qualitychanges') }}*
+                    {{
+                        chart.pie_chart('prp_qualitychanges',
+                            [0, 1, 2, 3, 4]|map((i) => {
+                                label: msg('proofreadpage-quality' ~ i),
+                                value: qualityChanges[i],
+                                percentage: ((qualityChanges[i] / qualityChanges.total) * 100),
+                                color: color([11, 0, 4, 2, 1][i])
+                            }),
+                            true,
+                            'qualitychangechart'
+                        )
+                    }}
+                </div>
+            {% endif %}
+        {% endif %}
         <div class="footnotes">
             * {{ msg('data-limit', [5000, 5000|num_format]) }}
         </div>

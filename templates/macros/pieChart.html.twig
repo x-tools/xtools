@@ -9,10 +9,10 @@
             {% for entry in data %}
                 {% set labels = labels | merge([entry.label]) %}
                 {% set values = values | merge([entry.value]) %}
-                {% set colors = colors | merge([chartColor(loop.index0)]) %}
+                {% set colors = colors | merge([entry.color ?? chartColor(loop.index0)]) %}
                 {% if legend %}
                 <div>
-                    <span class="color-icon" style="background:{{ chartColor(loop.index0) }}"></span>
+                    <span class="color-icon" style="background:{{ entry.color ?? chartColor(loop.index0) }}"></span>
                     <span class="legend-label{% if entry.tooltip is defined %} help-text{% endif %}"{% if entry.tooltip is defined %} title="{{ entry.tooltip }}"{% endif %}>{{ entry.label }}</span>
                     <span class="legend-value" {% if isRTL() %}dir="rtl"{% endif %}>
                         &middot;

@@ -1057,6 +1057,39 @@ class EditCounter extends Model
     }
 
     /**
+     * Get the ProofreadPage tagged quality changes in the last 5000 edits.
+     * @return int[] With keys 0, 1, 2, 3, 4, and 'total'.
+     */
+    public function countQualityChanges(): array
+    {
+        $tagLists = $this->getEditSizeData()['tag_lists'];
+        $res = [
+            0 => 0,
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            'total' => 0,
+        ];
+        foreach ($tagLists as $list) {
+            if (null !== $list) {
+                $found = false;
+                foreach ($list as $tag) {
+                    if (preg_match('/^proofreadpage\-quality[0-4]$/', $tag)) {
+                        $res[intval(substr($tag, -1))] += 1;
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    $res['total'] += 1;
+                }
+            }
+        }
+        return $res;
+    }
+
+    /**
      * Get the average size of the user's past 5000 edits.
      * @return float Size in bytes.
      */
