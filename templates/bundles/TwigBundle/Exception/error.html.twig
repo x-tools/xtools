@@ -21,12 +21,13 @@
         {% else %}
             {% set message = 'unknown' %}
         {% endif %}
-
         {% if exception.class is defined and exception.class == 'BadGatewayException' %}
             {# We ignore 502s as we can't fix them, so there's no need to add a link to report it as a bug. #}
             <p>{{ msg(message, [exception.msgParams]) }}</p>
-        {% elseif msgExists(message, [exception.code]) %}
-            <p><strong>{{ msg(message, [exception.code]) }}</strong></p>
+        {% elseif exception.headers is defined and (not exception.headers is empty) and msgExists(message, [exception.headers[0]]) %}
+            <p><strong>{{ msg(message, [exception.headers[0]]) }}</strong></p>
+        {% elseif msgExists(message) %}
+            <p><strong>{{ msg(message) }}</strong></p>
         {% elseif exception.code == 999 %}
             {# This is a server-built message ready to be displayed that can safely use raw() #}
             <p>{{ message|raw }}</p>
