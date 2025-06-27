@@ -39,7 +39,8 @@
 
     {# Set height of chart based on how many months (horizontal rows) are being reported. #}
     {# the pointer events is to not capture legend clicks #}
-    <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.monthCounts.monthLabels|length + 1) }}px">
+    {# float-left to avoid issues with the external legend and the checkbox #}
+    <div style="float:left;position:relative; pointer-events:none; height:{{ 30 * (ec.monthCounts.monthLabels|length + 1) }}px">
         <canvas id="monthcounts-canvas" style="pointer-events:all;"></canvas>
     </div>
 
