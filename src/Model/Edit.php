@@ -345,7 +345,9 @@ class Edit extends Model
         ?Page $page = null,
         bool $useUnnormalizedPageTitle = false
     ): string {
-        $summary = htmlspecialchars($summary, ENT_NOQUOTES);
+        // The html_entity_decode makes & and &amp; display the same
+        // But that is MW behaviour
+        $summary = htmlspecialchars(html_entity_decode($summary), ENT_NOQUOTES);
 
         // First link raw URLs. Courtesy of https://stackoverflow.com/a/11641499/604142
         $summary = preg_replace(
