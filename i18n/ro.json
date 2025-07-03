@@ -73,6 +73,7 @@
 	"blame-as-of-desc": "Utilizați acest lucru pentru a efectua o căutare în versiunile mai vechi ale articolului.",
 	"blame-query-desc": "Interogarea de căutare ar trebui să includă orice wikitext ascuns.",
 	"block": "Blocări",
+	"block-current-count": "Blocări actuale",
 	"block-log": "Jurnal de blocări",
 	"block-longest": "Cea mai lungă blocare",
 	"blocks": "Blocări",
