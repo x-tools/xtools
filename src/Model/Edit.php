@@ -345,6 +345,8 @@ class Edit extends Model
         ?Page $page = null,
         bool $useUnnormalizedPageTitle = false
     ): string {
+        // The html_entity_decode makes & and &amp; display the same
+        // But that is MW behaviour
         $summary = htmlspecialchars(html_entity_decode($summary), ENT_NOQUOTES);
 
         // First link raw URLs. Courtesy of https://stackoverflow.com/a/11641499/604142
@@ -362,10 +364,12 @@ class Edit extends Model
             $sectionTitle = $sectionMatch[1][0];
 
             // Must have underscores for the link to properly go to the section.
-            $sectionTitleLink = htmlspecialchars(str_replace(' ', '_', $sectionTitle));
+            // Have to decode twice; once for the entities added with htmlspecialchars;
+            // And one for user entities (which are decoded in mw section ids).
+            $sectionTitleLink = html_entity_decode(html_entity_decode(str_replace(' ', '_', $sectionTitle)));
 
             $sectionWikitext = "<a target='_blank' href='$pageUrl#$sectionTitleLink'>&rarr;</a>" .
-                "<em class='text-muted'>" . htmlspecialchars($sectionTitle) . ":</em> ";
+                "<em class='text-muted'>" . $sectionTitle . ":</em> ";
             $summary = str_replace($sectionMatch[0][0], $sectionWikitext, $summary);
         }
 
