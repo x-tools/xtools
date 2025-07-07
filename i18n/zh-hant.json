@@ -294,6 +294,7 @@
 	"num-deletions": "{{PLURAL:$1|刪除}}",
 	"num-editors": "{{PLURAL:$1|編輯者}}",
 	"num-edits": "{{PLURAL:$1|編輯數}}",
+	"num-edits-size-interval": "此大小變化間隔內的編輯次數（以位元組為單位）",
 	"num-hours": "{{PLURAL:$1|小時}}",
 	"num-minutes": "{{PLURAL:$1|分鐘}}",
 	"num-months": "{{PLURAL:$1|個月}}",
