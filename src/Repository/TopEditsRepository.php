@@ -272,7 +272,7 @@ class TopEditsRepository extends UserRepository
         $result = $resultQuery->fetchAllAssociative();
 
         // Cache and return.
-        return $this->setCache($cacheKey, $filteredResult);
+        return $this->setCache($cacheKey, $result);
     }
 
     /**
