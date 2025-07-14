@@ -50,7 +50,7 @@ class Pages extends Model
      * @param int|false $offset Unix timestamp. Used for pagination.
      * @param bool $countsOnly Whether to only get the counts
      */
-    public function __construct (
+    public function __construct(
         PagesRepository $repository,
         Project $project,
         User $user,
