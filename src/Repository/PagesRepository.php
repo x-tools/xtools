@@ -120,8 +120,9 @@ class PagesRepository extends UserRepository
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
             $conditions['paSelects'] = ', pa_class';
+            $conditions['paWhere'] = "AND pa_class != ''";
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
-            $conditions['paJoin'] = "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
+            $conditions['paJoin'] = "LEFT OUTER JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
@@ -234,6 +235,7 @@ class PagesRepository extends UserRepository
                 $conditions['namespaceRev'].
                 $conditions['redirects'].
                 $revDateConditions.
+                $conditions['paWhere'].
             $conditions['revPageGroupBy'];
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
@@ -318,12 +320,13 @@ class PagesRepository extends UserRepository
                     SELECT DISTINCT page_id, IFNULL(pa_class, '') AS pa_class
                     FROM $pageTable
                     JOIN $revisionTable ON page_id = rev_page
-                    LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id
+                    LEFT OUTER JOIN $pageAssessmentsTable ON rev_page = pa_page_id
                     WHERE ".$conditions['whereRev']."
                     AND rev_parent_id = '0'".
                     $conditions['namespaceRev'].
                     $conditions['redirects'].
                     $revDateConditions."
+                    AND pa_class != ''
                     GROUP BY page_id
                 ) a
                 GROUP BY pa_class";
