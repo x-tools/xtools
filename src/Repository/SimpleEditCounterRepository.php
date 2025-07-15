@@ -80,7 +80,15 @@ class SimpleEditCounterRepository extends Repository
                     $arNamespaceWhereSql
                     $arDateConditions
                 UNION
-                SELECT 'rev' AS source, COUNT(*) AS value
+                SELECT 'rev' AS source,
+                    CONCAT(COUNT(*), \";\",
+                    COUNT(
+                        CASE rev_parent_id
+                        WHEN 0
+                        THEN 1
+                        ELSE NULL
+                        END
+                    )) AS value
                     FROM $revisionTable
                     $revNamespaceJoinSql
                     WHERE rev_actor = :actorId
@@ -90,15 +98,7 @@ class SimpleEditCounterRepository extends Repository
                 SELECT 'groups' AS source, ug_group AS value
                     FROM $userGroupsTable
                     JOIN $userTable ON user_id = ug_user
-                    WHERE user_name = :username
-                UNION
-                SELECT 'creations' as source, COUNT(*) AS value
-                    FROM $revisionTable
-                    $revNamespaceJoinSql
-                    WHERE rev_actor = :actorId
-                    $revNamespaceWhereSql
-                    $revDateConditions
-                    AND rev_parent_id = 0";
+                    WHERE user_name = :username";
 
         return $this->executeProjectsQuery($project, $sql, [
             'username' => $user->getUsername(),

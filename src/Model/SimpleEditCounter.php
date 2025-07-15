@@ -101,13 +101,12 @@ class SimpleEditCounter extends Model
                     $this->data['deleted_edit_count'] = (int)$row['value'];
                     break;
                 case 'rev':
-                    $this->data['live_edit_count'] = (int)$row['value'];
+                    $values = explode(';', $row['value']);
+                    $this->data['live_edit_count'] = (int)$values[0];
+                    $this->data['creation_count'] = (int)$values[1];
                     break;
                 case 'groups':
                     $this->data['user_groups'][] = $row['value'];
-                    break;
-                case 'creations':
-                    $this->data['creation_count'] = (int)$row['value'];
                     break;
             }
         }
