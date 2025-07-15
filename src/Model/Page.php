@@ -376,50 +376,7 @@ class Page extends Model
     }
 
     /**
-     * Get Wikidata errors for this page
-     * @return string[][] See getErrors() for format
-     */
-    public function getWikidataErrors(): array
-    {
-        $errors = [];
-
-        if (empty($this->getWikidataId())) {
-            return [];
-        }
-
-        $wikidataInfo = $this->repository->getWikidataInfo($this);
-
-        $terms = array_map(function ($entry) {
-            return $entry['term'];
-        }, $wikidataInfo);
-
-        $lang = $this->getLang();
-
-        if (!in_array('label', $terms)) {
-            $errors[] = [
-                'prio' => 2,
-                'name' => 'Wikidata',
-                'notice' => "Label for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Label'>Help:Label</a>",
-            ];
-        }
-
-        if (!in_array('description', $terms)) {
-            $errors[] = [
-                'prio' => 3,
-                'name' => 'Wikidata',
-                'notice' => "Description for language <em>$lang</em> is missing", // FIXME: i18n
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
-            ];
-        }
-
-        return $errors;
-    }
-
-    /**
-     * Get Wikidata and CheckWiki errors, if present
+     * Get CheckWiki errors, if present
      * @return string[][] List of errors in the format:
      *    [[
      *         'prio' => int,
@@ -430,12 +387,7 @@ class Page extends Model
      */
     public function getErrors(): array
     {
-        // Includes label and description
-        $wikidataErrors = $this->getWikidataErrors();
-
-        $checkWikiErrors = $this->getCheckWikiErrors();
-
-        return array_merge($wikidataErrors, $checkWikiErrors);
+        return $this->getCheckWikiErrors();
     }
 
     /**

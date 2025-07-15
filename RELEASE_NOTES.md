@@ -1,5 +1,18 @@
 # Release Notes #
 
+## 3.21.1 ##
+- EditCounter (T236087): Add edit size histogram to the general stats.
+- EditCounter (T392731): Improve performance of chart dataset creation.
+- PageInfo (T180629): Make the "Top Editors" pie charts and legends mobile-friendly.
+- PageInfo (T398932): Remove checks for Wikidata errors.
+- Pages (T218466): Add "(recreated)" marker to wikitext output.
+- TopEdits (T396423): Escape reserved keyword following MariaDB 10.7 upgrade.
+- TopEdits (T396494): Don't run any queries if the data isn't going to be shown.
+- (T272851): Allow ampersands in the page title input fields.
+- (T316176): Fix bug with double loading timers
+- (T327579): Improve display of SVGs in dark mode.
+- Localization updates.
+
 ## 3.21.0 ##
 - EditCounter (T391824): Fix issue with counting infinite reblocks.
 - EditCounter (T391824): Update to support multiblocks, only showing the
