@@ -228,7 +228,7 @@ class PageInfoRepository extends AutoEditsRepository
     public function getSubpageCount(Page $page): int
     {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_subpagecount');
-        if ($this->cache->hasItem($cacheKey) && false) {
+        if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
