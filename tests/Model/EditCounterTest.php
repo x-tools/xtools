@@ -80,7 +80,6 @@ class EditCounterTest extends TestAdapter
                 // intentionally does not include 'protect-protect'
                 'protect-modify' => 5,
                 'protect-unprotect' => 6,
-                
                 'delete-revision' => 7,
                 'upload-upload' => 8,
                 // intentionally does not include 'delete-event'
