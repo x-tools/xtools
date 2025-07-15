@@ -329,7 +329,7 @@ class I18nHelper
             $tempLang = 'en';
         }
 
-        return $tempLang
+        return $tempLang;
     }
 
     /**
