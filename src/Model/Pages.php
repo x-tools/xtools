@@ -305,7 +305,7 @@ class Pages extends Model
      */
     public function getWikiprojectCounts(): array
     {
-        if ($this->getNumPages() > $this->resultsPerPage() || true) {
+        if ($this->getNumPages() > $this->resultsPerPage()) {
             $counts = $this->repository->getWikiprojectCounts(
                 $this->project,
                 $this->user,
