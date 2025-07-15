@@ -94,7 +94,10 @@ class SimpleEditCounterRepository extends Repository
                 UNION
                 SELECT 'creations' as source, COUNT(*) AS value
                     FROM $revisionTable
+                    $revNamespaceJoinSql
                     WHERE rev_actor = :actorId
+                    $revNamespaceWhereSql
+                    $revDateConditions
                     AND rev_parent_id = 0";
 
         return $this->executeProjectsQuery($project, $sql, [
