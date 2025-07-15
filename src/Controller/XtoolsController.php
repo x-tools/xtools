@@ -269,6 +269,13 @@ abstract class XtoolsController extends AbstractController
 
         // Check if the request is to a restricted API endpoint, where the target user has to opt-in to statistics.
         $this->checkRestrictedApiEndpoint();
+
+        // Give the i18n helper access to flashes.
+        $this->i18n->setFlash(
+            function (string $type, $msg) {
+                return $this->addFlash($type, $msg);
+            }
+        );
     }
 
     /**
