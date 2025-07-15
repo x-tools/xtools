@@ -251,7 +251,7 @@ class TopEditsRepository extends UserRepository
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
-                        ,@rn := if(@ns = b.page_namespace, @rn + 1, 1) AS row_number
+                        ,@rn := if(@ns = b.page_namespace, @rn + 1, 1) AS `row_number`
                         ,@ns := b.page_namespace AS dummy
                     FROM
                     (
@@ -267,7 +267,7 @@ class TopEditsRepository extends UserRepository
                     ORDER BY b.page_namespace ASC, b.count DESC
                 ) AS c
                 JOIN $pageTable e ON e.page_id = c.rev_page
-                WHERE c.row_number <= $limit";
+                WHERE c.`row_number` <= $limit";
         $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $params);
         $result = $resultQuery->fetchAllAssociative();
 

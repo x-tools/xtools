@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class I18nHelper
 {
     private string $projectDir;
+    private \Closure $addFlash;
     protected ContainerInterface $container;
     protected Intuition $intuition;
     protected IntlDateFormatter $dateFormatter;
@@ -59,6 +60,11 @@ class I18nHelper
             throw new Exception("Language directory doesn't exist: $path");
         }
 
+        // Have to initialise these two here, because getIntuitionLang
+        // uses an Intuition helper to validate lang codes.
+        $intuition = new Intuition('xtools');
+        $this->intuition = $intuition;
+
         $useLang = $this->getIntuitionLang();
 
         // Save the language to the session.
@@ -68,7 +74,6 @@ class I18nHelper
         }
 
         // Set up Intuition, using the selected language.
-        $intuition = new Intuition('xtools');
         $intuition->registerDomain('xtools', $path);
         $intuition->setLang(strtolower($useLang));
 
@@ -152,6 +157,16 @@ class I18nHelper
         return array_filter($fallbacks, function ($lang) use ($i18nPath) {
             return is_file($i18nPath.$lang.'.json');
         });
+    }
+
+    /**
+     * Set the function used to add flashes.
+     * (As that comes from the controller.)
+     * @param function $addFlash
+     */
+    public function setFlash(\Closure $addFlash): void
+    {
+        $this->addFlash = $addFlash;
     }
 
     /******************** MESSAGE HELPERS ********************/
@@ -310,14 +325,22 @@ class I18nHelper
         $queryLang = $this->getRequest()->query->get('uselang');
         $sessionLang = $this->requestStack->getSession()->get('lang');
 
-        if ('' !== $queryLang && null !== $queryLang && $this->checkLanguageFile($queryLang)) {
-            return $queryLang;
-        } elseif ('' !== $sessionLang && null !== $sessionLang && $this->checkLanguageFile($sessionLang)) {
-            return $sessionLang;
+        // English as the default
+        $tempLang = 'en';
+        if ('' !== $queryLang && null !== $queryLang) {
+            $tempLang = $queryLang;
+        } elseif ('' !== $sessionLang && null !== $sessionLang) {
+            $tempLang = $sessionLang;
         }
 
-        // English as default.
-        return 'en';
+        // Intuition::getLangName returns '' only for invalid language codes
+        if ('' === $this->intuition->getLangName($tempLang)) {
+            // Flash content is already escaped automatically.
+            ($this->addFlash)('notice', 'No translations found for language '.$tempLang.', switching to en.');
+            $tempLang = 'en';
+        }
+
+        return $tempLang
     }
 
     /**
