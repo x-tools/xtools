@@ -184,6 +184,10 @@ class TopEdits extends Model
      */
     public function prepareData(): void
     {
+        if (!$this->project->userHasOptedIn($this->user)) {
+            $this->topEdits = [];
+            return;
+        }
         if (isset($this->page)) {
             $this->topEdits = $this->getTopEditsPage();
         } else {

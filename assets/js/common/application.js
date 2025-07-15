@@ -138,13 +138,17 @@ xtools.application.setupToggleTable = function (dataSource, chartObj, valueKey, 
         // must use .attr instead of .prop as sorting script will clone DOM elements
         if ($(this).attr('data-disabled') === 'true') {
             toggleTableData[key] = dataSource[key];
-            chartObj.data.datasets[0].data[index] = (
-                parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10)
-            );
+            if (chartObj) {
+                chartObj.data.datasets[0].data[index] = (
+                    parseInt(valueKey ? toggleTableData[key][valueKey] : toggleTableData[key], 10)
+                );
+            }
             $(this).attr('data-disabled', 'false');
         } else {
             delete toggleTableData[key];
-            chartObj.data.datasets[0].data[index] = null;
+            if (chartObj) {
+                chartObj.data.datasets[0].data[index] = null;
+            }
             $(this).attr('data-disabled', 'true');
         }
 
@@ -157,7 +161,9 @@ xtools.application.setupToggleTable = function (dataSource, chartObj, valueKey, 
         // update stats
         updateCallback(toggleTableData, key, index);
 
-        chartObj.update();
+        if (chartObj) {
+            chartObj.update();
+        }
     });
 };
 
@@ -626,7 +632,21 @@ function setupAutocompletion()
             })
         });
     }
+    let allowAmpersand = (e) => {
+        if (e.key == "&") {
+            $(e.target).blur().focus();
+        }
+    };
+    $pageInput.on("keydown", allowAmpersand);
+    $userInput.on("keydown", allowAmpersand);
+
 }
+
+/*
+ * Loading timer id if one is running.
+ * Used to prevent concurrent timers.
+ */
+let loadingTimerId;
 
 /**
  * For any form submission, this disables the submit button and replaces its text with
@@ -642,6 +662,10 @@ function displayWaitingNoticeOnSubmission(undo)
         $('.form-control').prop('readonly', false);
         $('.form-submit').prop('disabled', false);
         $('.form-submit').text($.i18n('submit')).prop('disabled', false);
+        if (loadingTimerId) {
+            clearInterval(loadingTimerId);
+            loadingTimerId = null;
+        }
     } else {
         $('#content form').on('submit', function () {
             // Remove focus from any active element
@@ -656,7 +680,7 @@ function displayWaitingNoticeOnSubmission(undo)
 
             // Add the counter.
             var startTime = Date.now();
-            setInterval(function () {
+            loadingTimerId = setInterval(function () {
                 var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
                 var minutes = Math.floor(elapsedSeconds / 60);
                 var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
