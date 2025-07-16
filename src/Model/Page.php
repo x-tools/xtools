@@ -304,13 +304,13 @@ class Page extends Model
      * @param false|int $end
      * @return array
      */
-    public function getRevisions(?User $user = null, $start = false, $end = false): array
+    public function getRevisions(?User $user = null, $start = false, $end = false, ?int $limit = null, ?int $numRevisions = null): array
     {
         if (isset($this->revisions)) {
             return $this->revisions;
         }
 
-        $this->revisions = $this->repository->getRevisions($this, $user, $start, $end);
+        $this->revisions = $this->repository->getRevisions($this, $user, $start, $end, $limit, $numRevisions);
 
         return $this->revisions;
     }
