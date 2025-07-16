@@ -118,7 +118,7 @@ class TopEditsRepository extends UserRepository
                     SELECT pa_class
                     FROM $paTable
                     WHERE pa_page_id = page_id
-                    AND pa_class != 'Unknown'
+                    AND pa_class != ''
                     LIMIT 1
                 ) AS pa_class"
             : '';
@@ -244,6 +244,7 @@ class TopEditsRepository extends UserRepository
                     SELECT pa_class
                     FROM $pageAssessmentsTable
                     WHERE pa_page_id = e.page_id
+                    AND pa_class != ''
                     LIMIT 1
                 ) AS pa_class"
             : '';
