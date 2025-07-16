@@ -171,15 +171,6 @@
             </td>
         </tr>
         <tr>
-            <td>{{ msg('auto-edits-tagged') }}*</td>
-            <td>
-                {{ ec.countAutoEdits|num_format }}
-                {% if ec.countLast5000 %}
-                    &middot;
-                    ({{ ((ec.countAutoEdits / ec.countLast5000) * 100)|percent_format }} )
-                {% endif %}
-            </td>
-        <tr>
             <td>{{ msg('small-edits') }}*</td>
             <td>
                 {{ ec.countSmallEdits|num_format }}
@@ -531,7 +522,7 @@
         <script type="text/javascript">
             $(function() {
                 xtools.editcounter.setupSizeHistogram(
-                    {{ ec.editSizeData.sizes|json_encode()|raw }},
+                    {{ ec.editSizeData|json_encode()|raw }},
                     ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
                     ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
                 );
