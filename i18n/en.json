@@ -43,6 +43,7 @@
 	"auto-contribs-use-tool": "Show only edits using the tool:",
 	"auto-edits": "(Semi-)automated edits",
 	"auto-edits-bot": "This user is a bot. All edits may be automated. Statistics shown here are based on edits made using known tools.",
+    "auto-edits-tagged": "Tagged (semi-)automated edits",
 	"auto-edits-counts-desc": "Some tool usage overlaps (e.g. rolling back to a revision that is a redirect counts as Rollback and as Redirect), so the total of edits made with each tool may differ from the $1.",
 	"auto-edits-counts-desc-grand-total": "grand total",
 	"auto-edits-logged-out": "You must login to use the sandbox configuration. Using production configuration instead.",
