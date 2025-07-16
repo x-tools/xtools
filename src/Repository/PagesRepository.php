@@ -116,11 +116,15 @@ class PagesRepository extends UserRepository
             $this->getUserConditions('' !== $start.$end)
         );
 
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
-            $conditions['paSelects'] = ', pa_class';
-            $conditions['paWhere'] = "AND pa_class != ''";
+            $conditions['paSelects'] = ", (SELECT pa_class
+                        FROM `enwiki_p`.`page_assessments`
+                        WHERE rev_page = pa_page_id
+                        AND pa_class != ''
+                        LIMIT 1
+                    ) AS pa_class";
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
             $conditions['paJoin'] = "LEFT OUTER JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
@@ -235,7 +239,6 @@ class PagesRepository extends UserRepository
                 $conditions['namespaceRev'].
                 $conditions['redirects'].
                 $revDateConditions.
-                $conditions['paWhere'].
             $conditions['revPageGroupBy'];
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
@@ -316,17 +319,25 @@ class PagesRepository extends UserRepository
         );
         $revDateConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT pa_class AS `class`, COUNT(pa_class) AS `count` FROM (
-                    SELECT DISTINCT page_id, IFNULL(pa_class, '') AS pa_class
+        $paNamespaces = $project->getPageAssessments()::SUPPORTED_NAMESPACES;
+        $paNamespaces = '(' . implode(',', array_map('strval', $paNamespaces)) . ')';
+
+        $sql = "SELECT pa_class AS `class`, COUNT(page_id) AS `count` FROM (
+                    SELECT page_id,
+                    (SELECT pa_class
+                        FROM `enwiki_p`.`page_assessments`
+                        WHERE rev_page = pa_page_id
+                        AND pa_class != ''
+                        LIMIT 1
+                    ) AS pa_class
                     FROM $pageTable
                     JOIN $revisionTable ON page_id = rev_page
-                    LEFT OUTER JOIN $pageAssessmentsTable ON rev_page = pa_page_id
                     WHERE ".$conditions['whereRev']."
-                    AND rev_parent_id = '0'".
+                    AND rev_parent_id = '0'
+                    AND (page_namespace in $paNamespaces)".
                     $conditions['namespaceRev'].
                     $conditions['redirects'].
                     $revDateConditions."
-                    AND pa_class != ''
                     GROUP BY page_id
                 ) a
                 GROUP BY pa_class";
