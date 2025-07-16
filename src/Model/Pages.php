@@ -283,12 +283,14 @@ class Pages extends Model
             );
         } else {
             $counts = [];
-            foreach ($this->pages as $nsPages) {
-                foreach ($nsPages as $page) {
-                    if (!isset($counts[$page['assessment']['class'] ?? 'Unknown'])) {
-                        $counts[$page['assessment']['class'] ?? 'Unknown'] = 1;
-                    } else {
-                        $counts[$page['assessment']['class'] ?? 'Unknown']++;
+            foreach ($this->pages as $ns => $nsPages) {
+                if ($this->project->hasPageAssessments($ns)) {
+                    foreach ($nsPages as $page) {
+                        if (!isset($counts[$page['assessment']['class'] ?: 'Unknown'])) {
+                            $counts[$page['assessment']['class'] ?: 'Unknown'] = 1;
+                        } else {
+                            $counts[$page['assessment']['class'] ?: 'Unknown']++;
+                        }
                     }
                 }
             }
@@ -470,7 +472,7 @@ class Pages extends Model
                 unset($pageData['recreated']);
             }
 
-            if ($this->project->hasPageAssessments()) {
+            if ($this->project->hasPageAssessments($pageData['namespace'])) {
                 $attrs = $this->project
                     ->getPageAssessments()
                     ->getClassAttrs($row['pa_class'] ?: 'Unknown');
