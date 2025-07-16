@@ -44,7 +44,6 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'paJoin' => '',
             'revPageGroupBy' => '',
         ];
         $conditions = array_merge(
@@ -106,7 +105,6 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'paJoin' => '',
             'revPageGroupBy' => '',
         ];
 
@@ -120,13 +118,12 @@ class PagesRepository extends UserRepository
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
             $conditions['paSelects'] = ", (SELECT pa_class
-                        FROM `enwiki_p`.`page_assessments`
+                        FROM $pageAssessmentsTable
                         WHERE rev_page = pa_page_id
                         AND pa_class != ''
                         LIMIT 1
                     ) AS pa_class";
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
-            $conditions['paJoin'] = "LEFT OUTER JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
@@ -191,7 +188,7 @@ class PagesRepository extends UserRepository
      * Inner SQL for getting or counting pages created by the user.
      * @param Project $project
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
-     *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
+     *     'paSelectsArchive', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
      * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
@@ -232,8 +229,7 @@ class PagesRepository extends UserRepository
             SELECT $revSelects ".$conditions['paSelects'].",
                 NULL AS was_redirect
             FROM $pageTable
-            JOIN $revisionTable ON page_id = rev_page ".
-            $conditions['paJoin']."
+            JOIN $revisionTable ON page_id = rev_page
             WHERE ".$conditions['whereRev']."
                 AND rev_parent_id = '0'".
                 $conditions['namespaceRev'].
@@ -325,7 +321,7 @@ class PagesRepository extends UserRepository
         $sql = "SELECT pa_class AS `class`, COUNT(page_id) AS `count` FROM (
                     SELECT page_id,
                     (SELECT pa_class
-                        FROM `enwiki_p`.`page_assessments`
+                        FROM $pageAssessmentsTable
                         WHERE rev_page = pa_page_id
                         AND pa_class != ''
                         LIMIT 1
