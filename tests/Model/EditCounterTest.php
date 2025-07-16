@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
-use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Model\EditCounter;
 use App\Model\Project;
@@ -59,8 +58,7 @@ class EditCounterTest extends TestAdapter
             $this->i18n,
             $this->createMock(UserRights::class),
             $this->project,
-            $this->user,
-            $this->createMock(AutomatedEditsHelper::class)
+            $this->user
         );
         $this->editCounter->setRepository($this->editCounterRepo);
     }

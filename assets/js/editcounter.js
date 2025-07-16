@@ -316,7 +316,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
 xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
     let bars = 11;
     // First sanitize input, to get array.
-    let total = Object.keys(data).length;
+    let total = Object.keys(data).length - 3; // -3 to exclude small edits, large edits and average
     data.length = total;
     data = Array.from(data)
     // Then make datasets
