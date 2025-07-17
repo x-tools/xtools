@@ -87,7 +87,7 @@
                     {% endif %}
                 </tbody>
             </table>
-            {% if showPageAssessment %}
+            {% if showPageAssessment and not(is_sub_request) and te.namespace is not same as('all') %}
                 {% set totals = te.projectTotals(ns) %}
                 {% if totals|keys|length > 0 %}
                     <table class="table table-bordered table-hover table-striped">
