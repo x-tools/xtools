@@ -319,11 +319,8 @@ class Pages extends Model
             foreach ($this->pages as $nsPages) {
                 foreach ($nsPages as $page) {
                     foreach ($page['assessment']['projects'] as $project) {
-                        if (!isset($counts[$project])) {
-                            $counts[$project] = 1;
-                        } else {
-                            $counts[$project]++;
-                        }
+                        $counts[$project] ??= 0;
+                        $counts[$project]++;
                     }
                 }
             }
