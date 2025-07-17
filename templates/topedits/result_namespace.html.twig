@@ -24,7 +24,7 @@
         {% set content %}
         <p>{{ te.numPagesAnyNamespace(ns)|num_format }} {{ msg('pages')|lower }}.</p>
         <div class="side-to-side">
-            <table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
+            <div><table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
                 <thead><tr>
                     <th>
                         <span class="sort-link sort-link--edits" data-column="edits">
@@ -86,11 +86,11 @@
                         </tr>
                     {% endif %}
                 </tbody>
-            </table>
+            </table></div>
             {% if showPageAssessment and not(is_sub_request) and te.namespace is not same as('all') %}
                 {% set totals = te.projectTotals(ns) %}
                 {% if totals|keys|length > 0 %}
-                    <table class="table table-bordered table-hover table-striped">
+                    <div><table class="table table-bordered table-hover table-striped">
                         <caption class="text-center">{{ msg('top-wikiprojects') }}</caption>
                         <thead><tr>
                             <th>
@@ -118,7 +118,7 @@
                                 </tr>
                             {% endfor %}
                         </tbody>
-                    </table>
+                    </table></div>
                 {% endif %}
             {% endif %}
         </div>

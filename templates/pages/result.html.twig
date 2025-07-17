@@ -165,7 +165,7 @@
                     {% set totals = pages.wikiprojectCounts %}
                     {% if totals|keys|length > 0 %}
                     <div class="side-to-side">
-                        <table class="table table-bordered table-hover table-striped">
+                        <div><table class="table table-bordered table-hover table-striped">
                             <caption class="text-center">{{ msg('top-wikiprojects') }}</caption>
                             <thead><tr>
                                 <th>
@@ -193,9 +193,9 @@
                                     </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
+                        </table></div>
                         {% endif %}
-                        <table class="table table-bordered table-hover table-striped">
+                        <div><table class="table table-bordered table-hover table-striped">
                             <caption class="text-center">{{ msg('assessments') }}</caption>
                             <thead><tr>
                                 <th>
@@ -227,7 +227,7 @@
                                     </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
+                        </table></div>
                     </div>
                 {% endif %}
             {% endif %}
