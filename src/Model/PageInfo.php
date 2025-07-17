@@ -486,7 +486,7 @@ class PageInfo extends PageInfoApi
     {
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
-        // Third parameter is ignored if $limit is null.
+        // numRevisions is ignored if $limit is null.
         $revs = $this->page->getRevisions(
             null,
             $this->start,
