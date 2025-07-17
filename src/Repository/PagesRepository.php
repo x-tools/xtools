@@ -44,7 +44,6 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'paJoin' => '',
             'revPageGroupBy' => '',
         ];
         $conditions = array_merge(
@@ -106,7 +105,6 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'paJoin' => '',
             'revPageGroupBy' => '',
         ];
 
@@ -116,12 +114,16 @@ class PagesRepository extends UserRepository
             $this->getUserConditions('' !== $start.$end)
         );
 
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
-            $conditions['paSelects'] = ', pa_class';
+            $conditions['paSelects'] = ", (SELECT pa_class
+                        FROM $pageAssessmentsTable
+                        WHERE rev_page = pa_page_id
+                        AND pa_class != ''
+                        LIMIT 1
+                    ) AS pa_class";
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
-            $conditions['paJoin'] = "LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id";
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
@@ -186,7 +188,7 @@ class PagesRepository extends UserRepository
      * Inner SQL for getting or counting pages created by the user.
      * @param Project $project
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
-     *     'paSelectsArchive', 'paJoin', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
+     *     'paSelectsArchive', 'whereRev', 'whereArc', 'namespaceRev', 'namespaceArc',
      *     'redirects' and 'revPageGroupBy'.
      * @param string $deleted One of the Pages::DEL_ constants.
      * @param int|false $start Start date as Unix timestamp.
@@ -227,8 +229,7 @@ class PagesRepository extends UserRepository
             SELECT $revSelects ".$conditions['paSelects'].",
                 NULL AS was_redirect
             FROM $pageTable
-            JOIN $revisionTable ON page_id = rev_page ".
-            $conditions['paJoin']."
+            JOIN $revisionTable ON page_id = rev_page
             WHERE ".$conditions['whereRev']."
                 AND rev_parent_id = '0'".
                 $conditions['namespaceRev'].
@@ -314,13 +315,22 @@ class PagesRepository extends UserRepository
         );
         $revDateConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT pa_class AS `class`, COUNT(pa_class) AS `count` FROM (
-                    SELECT DISTINCT page_id, IFNULL(pa_class, '') AS pa_class
+        $paNamespaces = $project->getPageAssessments()::SUPPORTED_NAMESPACES;
+        $paNamespaces = '(' . implode(',', array_map('strval', $paNamespaces)) . ')';
+
+        $sql = "SELECT pa_class AS `class`, COUNT(page_id) AS `count` FROM (
+                    SELECT page_id,
+                    (SELECT pa_class
+                        FROM $pageAssessmentsTable
+                        WHERE rev_page = pa_page_id
+                        AND pa_class != ''
+                        LIMIT 1
+                    ) AS pa_class
                     FROM $pageTable
                     JOIN $revisionTable ON page_id = rev_page
-                    LEFT JOIN $pageAssessmentsTable ON rev_page = pa_page_id
                     WHERE ".$conditions['whereRev']."
-                    AND rev_parent_id = '0'".
+                    AND rev_parent_id = '0'
+                    AND (page_namespace in $paNamespaces)".
                     $conditions['namespaceRev'].
                     $conditions['redirects'].
                     $revDateConditions."

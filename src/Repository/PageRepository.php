@@ -258,41 +258,6 @@ class PageRepository extends Repository
     }
 
     /**
-     * Get basic wikidata on the page: label and description.
-     * @param Page $page
-     * @return string[][] In the format:
-     *    [[
-     *         'term' => string such as 'label',
-     *         'term_text' => string (value for 'label'),
-     *     ], ... ]
-     */
-    public function getWikidataInfo(Page $page): array
-    {
-        if (empty($page->getWikidataId())) {
-            return [];
-        }
-
-        $wikidataId = ltrim($page->getWikidataId(), 'Q');
-        $lang = $page->getProject()->getLang();
-        $wdp = 'wikidatawiki_p';
-
-        $sql = "SELECT wby_name AS term, wbx_text AS term_text
-                FROM $wdp.wbt_item_terms
-                JOIN $wdp.wbt_term_in_lang ON wbit_term_in_lang_id = wbtl_id
-                JOIN $wdp.wbt_type ON wbtl_type_id = wby_id
-                JOIN $wdp.wbt_text_in_lang ON wbtl_text_in_lang_id = wbxl_id
-                JOIN $wdp.wbt_text ON wbxl_text_id = wbx_id
-                WHERE wbit_item_id = :wikidataId
-                AND wby_name IN ('label', 'description')
-                AND wbxl_language = :lang";
-
-        return $this->executeProjectsQuery('wikidatawiki', $sql, [
-            'lang' => $lang,
-            'wikidataId' => $wikidataId,
-        ])->fetchAllAssociative();
-    }
-
-    /**
      * Get or count all wikidata items for the given page,
      *     not just languages of sister projects
      * @param Page $page

@@ -244,6 +244,22 @@ class TopEdits extends Model
     }
 
     /**
+     * Get the total number of pages edited in a given namespace.
+     * @param int $ns
+     * @return int|null
+     */
+    public function getNumPagesAnyNamespace(int $ns): ?int
+    {
+        return (int)$this->repository->countEditsNamespace(
+            $this->project,
+            $this->user,
+            $ns,
+            $this->start,
+            $this->end
+        );
+    }
+
+    /**
      * Get the top edits to the given page.
      * @return Edit[]
      */
