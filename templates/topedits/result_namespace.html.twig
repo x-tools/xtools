@@ -110,7 +110,7 @@
                             {% for wikiproject, count in totals %}
                                 <tr>
                                     <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                                        {{ wikiproject }}
+                                        {{ wiki.pageLinkRaw(te.wikiprojectPrefix ~ wikiproject, project, wikiproject|ucfirst) }}
                                     </td>
                                     <td class="sort-entry--count" data-value="{{ count }}">
                                         {{ count|num_format }}

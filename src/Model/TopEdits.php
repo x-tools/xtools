@@ -184,6 +184,18 @@ class TopEdits extends Model
     }
 
     /**
+     * Get this project's prefix for WikiProjects' pages.
+     * Used to link.
+     * @return string
+     */
+    public function getWikiprojectPrefix(): string
+    {
+        return $this->project
+            ->getPageAssessments()
+            ->getConfig()['wikiproject_prefix'];
+    }
+
+    /**
      * Get the average time between edits (in days).
      * @return float
      */
