@@ -274,6 +274,16 @@ class Project extends Model
     }
 
     /**
+     * Get if this Wiki has the ProofreadPage extension.
+     * @return bool
+     */
+    public function hasProofreadPage(): bool
+    {
+        $extensions = $this->getInstalledExtensions();
+        return in_array('ProofreadPage', $extensions);
+    }
+
+    /**
      * Whether the project has temporary accounts enabled.
      * @return bool
      */
