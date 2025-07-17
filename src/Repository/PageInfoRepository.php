@@ -7,7 +7,6 @@ namespace App\Repository;
 use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Page;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use PDO;
@@ -99,10 +98,15 @@ class PageInfoRepository extends AutoEditsRepository
      * @param false|int $end
      * @param ?int $limit
      * @param bool $count Return a count rather than the full set of rows.
-     * @return ResultStatement resolving with keys 'count', 'username' and 'current'.
+     * @return array with rows with keys 'count', 'username' and 'current'.
      */
-    public function getBotData(Page $page, $start, $end, ?int $limit, bool $count = false): ResultStatement
+    public function getBotData(Page $page, $start, $end, ?int $limit, bool $count = false): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_bot_data');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getitem($cacheKey)->get();
+        }
+
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
         $userGroupsTable = $project->getTableName('user_groups');
@@ -150,7 +154,9 @@ class PageInfoRepository extends AutoEditsRepository
                 WHERE ug_group = 'bot' $datesConditions
                 $groupBy";
 
-        return $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()]);
+        $statement = $this->executeProjectsQuery($project, $sql, ['pageId' => $page->getId()])
+            ->fetchAllAssociative();
+        return $this->setCache($cacheKey, $statement);
     }
 
     /**
@@ -297,6 +303,8 @@ class PageInfoRepository extends AutoEditsRepository
 
         $project = $page->getProject();
         $revTable = $project->getTableName('revision');
+        // Needed because userindex is missing some revdeleted rows
+        $revWithoutExtension = $project->getTableName('revision', '');
         $userTable = $project->getTableName('user');
         $pageTable = $project->getTableName('page');
         $actorTable = $project->getTableName('actor');
@@ -333,7 +341,7 @@ class PageInfoRepository extends AutoEditsRepository
                     (
                         SELECT rev_timestamp AS modified_at,
                                rev_id AS modified_rev_id
-                        FROM $revTable
+                        FROM $revWithoutExtension
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
                         AND rev_id = page_latest

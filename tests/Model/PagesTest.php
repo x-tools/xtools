@@ -37,7 +37,6 @@ class PagesTest extends TestAdapter
         $this->project->method('getPageAssessments')
             ->willReturn($pa);
         $this->project->method('hasPageAssessments')
-            ->with(0)
             ->willReturn(true);
         $this->project->method('getNamespaces')
             ->willReturn([0 => 'Main', 1 => 'Talk', 3 => 'User_talk']);
