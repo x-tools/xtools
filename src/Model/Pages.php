@@ -318,17 +318,19 @@ class Pages extends Model
             $counts = [];
             foreach ($this->pages as $nsPages) {
                 foreach ($nsPages as $page) {
-                    if (!isset($counts[$page['assessment']['project']])) {
-                        $counts[$page['assessment']['project']] = 1;
-                    } else {
-                        $counts[$page['assessment']['project']]++;
+                    foreach ($page['assessment']['projects'] as $project) {
+                        if (!isset($counts[$project])) {
+                            $counts[$project] = 1;
+                        } else {
+                            $counts[$project]++;
+                        }
                     }
                 }
             }
         }
 
         arsort($counts);
-
+        $counts = array_slice($counts, 0, 10);
         return $counts;
     }
 
@@ -483,6 +485,7 @@ class Pages extends Model
                         ->getBadgeURL($row['pa_class'] ?: 'Unknown'),
                     'color' => $attrs['color'],
                     'category' => $attrs['category'],
+                    'projects' => json_decode($row['pap_project_title'] ?? '{}'),
                 ];
             }
 

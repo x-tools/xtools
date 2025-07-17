@@ -170,7 +170,7 @@ class TopEdits extends Model
             // May be null or nonexistent for assessment-less pages
             $titles = $row["pap_project_title"] ?? "{}";
             // Had to use json to pass multiple values in SQL select
-            foreach (JSON_decode($titles) as $projectName) {
+            foreach (json_decode($titles) as $projectName) {
                 if (!array_key_exists($projectName, $projectTotals)) {
                     $projectTotals[$projectName] = $num;
                 } else {

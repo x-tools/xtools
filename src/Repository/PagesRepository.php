@@ -117,13 +117,21 @@ class PagesRepository extends UserRepository
         $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
-            $conditions['paSelects'] = ", (SELECT pa_class
-                        FROM $pageAssessmentsTable
-                        WHERE rev_page = pa_page_id
-                        AND pa_class != ''
-                        LIMIT 1
-                    ) AS pa_class";
-            $conditions['paSelectsArchive'] = ', NULL AS pa_class';
+            $paProjectsTable = $project->getTableName('page_assessments_projects');
+            $conditions['paSelects'] = ",
+                (SELECT pa_class
+                    FROM $pageAssessmentsTable
+                    WHERE rev_page = pa_page_id
+                    AND pa_class != ''
+                    LIMIT 1
+                ) AS pa_class,
+                (SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $pageAssessmentsTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = page_id
+                ) AS pap_project_title";
+            $conditions['paSelectsArchive'] = ', NULL AS pa_class, NULL as pap_project_title';
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
