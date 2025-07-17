@@ -486,13 +486,13 @@ class PageInfo extends PageInfoApi
     {
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
-        // Third parameter is ignored if $limit is null.
-        $revStmt = $this->page->getRevisionsStmt(
+        // numRevisions is ignored if $limit is null.
+        $revs = $this->page->getRevisions(
             null,
-            $limit,
-            $this->getNumRevisions(),
             $this->start,
-            $this->end
+            $this->end,
+            $limit,
+            $this->getNumRevisions()
         );
         $revCount = 0;
 
@@ -518,7 +518,7 @@ class PageInfo extends PageInfoApi
             'maxDeletion' => null,
         ];
 
-        while ($rev = $revStmt->fetchAssociative()) {
+        foreach ($revs as $rev) {
             /** @var Edit $edit */
             $edit = $this->repository->getEdit($this->page, $rev);
 

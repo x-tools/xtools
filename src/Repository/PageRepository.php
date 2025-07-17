@@ -103,16 +103,24 @@ class PageRepository extends Repository
      * @param User|null $user Specify to get only revisions by the given user.
      * @param false|int $start
      * @param false|int $end
+     * @param int|null $limit
+     * @param int|null $numRevisions
      * @return string[] Each member with keys: id, timestamp, length.
      */
-    public function getRevisions(Page $page, ?User $user = null, $start = false, $end = false): array
-    {
+    public function getRevisions(
+        Page $page,
+        ?User $user = null,
+        $start = false,
+        $end = false,
+        ?int $limit = null,
+        ?int $numRevisions = null
+    ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
+        $stmt = $this->getRevisionsStmt($page, $user, $limit, $numRevisions, $start, $end);
         $result = $stmt->fetchAllAssociative();
 
         // Cache and return.
