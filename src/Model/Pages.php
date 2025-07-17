@@ -485,7 +485,7 @@ class Pages extends Model
                         ->getBadgeURL($row['pa_class'] ?: 'Unknown'),
                     'color' => $attrs['color'],
                     'category' => $attrs['category'],
-                    'projects' => json_decode($row['pap_project_title'] ?? '{}'),
+                    'projects' => json_decode($row['pap_project_title'] ?? '[]'),
                 ];
             }
 
