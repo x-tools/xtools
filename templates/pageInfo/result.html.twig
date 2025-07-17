@@ -455,7 +455,9 @@
         {# ======================== AUTHORSHIP ======================== #}
         {% if showAuthorship %}
             <script>
-                xtools.pageinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
+                $(function() {
+                    xtools.pageinfo.endDate = {% if ai.end %}"{{ ai.endDate }}"{% else %}null{% endif %};
+                });
             </script>
             {% set content %}
                 <div class="textshares-container" data-project="{{ project.domain }}" data-page="{{ page.title }}">
