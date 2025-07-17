@@ -15,6 +15,7 @@
 ==== {{ nsName(ns, project.namespaces) }} ====
 
 {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+{{ te.numPagesNamespace(ns) }} {{ msg('pages')|lower }}.
 {| class="wikitable sortable"
 ! {{ msg('edits')|ucfirst }}
 ! {{ msg('page-title') }}
