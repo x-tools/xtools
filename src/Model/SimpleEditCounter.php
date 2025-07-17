@@ -23,6 +23,7 @@ class SimpleEditCounter extends Model
         'live_edit_count' => 0,
         'user_groups' => [],
         'global_user_groups' => [],
+        'creation_count' => 0,
     ];
 
     /**
@@ -100,7 +101,9 @@ class SimpleEditCounter extends Model
                     $this->data['deleted_edit_count'] = (int)$row['value'];
                     break;
                 case 'rev':
-                    $this->data['live_edit_count'] = (int)$row['value'];
+                    $values = explode(';', $row['value']);
+                    $this->data['live_edit_count'] = (int)$values[0];
+                    $this->data['creation_count'] = (int)$values[1];
                     break;
                 case 'groups':
                     $this->data['user_groups'][] = $row['value'];
@@ -138,6 +141,15 @@ class SimpleEditCounter extends Model
     public function getDeletedEditCount(): int
     {
         return $this->data['deleted_edit_count'];
+    }
+
+    /**
+     * Get number of page creations
+     * @return int
+     */
+    public function getCreationCount() : int
+    {
+        return $this->data['creation_count'];
     }
 
     /**

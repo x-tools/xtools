@@ -195,6 +195,7 @@ class EditCounterRepository extends Repository
             'protect-unprotect',
             'rights-rights',
             'move-move',
+            'move-move_redir',
             'delete-delete',
             'delete-revision',
             'delete-restore',
