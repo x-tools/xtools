@@ -310,6 +310,22 @@
                                 ({{ ai.topTenCount|percent_format(ai.numRevisionsProcessed) }})
                             </td>
                         </tr>
+                        <tr>
+                            <td class="stat-list--new-group">{{ msg('mobile-edits') }}</td>
+                            <td class="stat-list--new-group">
+                                {{ ai.mobileCount|num_format }}
+                                &middot;
+                                ({{ ai.mobileCount|percent_format(ai.numRevisionsProcessed) }})
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('visual-edits') }}</td>
+                            <td>
+                                {{ ai.visualCount|num_format }}
+                                &middot;
+                                ({{ ai.visualCount|percent_format(ai.numRevisionsProcessed) }})
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
