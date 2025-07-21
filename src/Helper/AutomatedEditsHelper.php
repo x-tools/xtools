@@ -40,14 +40,15 @@ class AutomatedEditsHelper
      * Get the first tool that matched the given edit summary and tags.
      * @param string $summary Edit summary
      * @param Project $project
-     * @param string[]|null $tags
+     * @param string[] $tags
      * @return string[]|null Tool entry including key for 'name', or false if nothing was found
      */
-    public function getTool(string $summary, Project $project, ?array $tags = []): ?array
+    public function getTool(string $summary, Project $project, array $tags = []): ?array
     {
         foreach ($this->getTools($project) as $tool => $values) {
             if ((isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) ||
-                (isset($values['tags']) && count(array_intersect($values['tags'], $tags)) > 0)) {
+                (isset($values['tags']) && count(array_intersect($values['tags'], $tags)) > 0)
+            ) {
                 return array_merge([
                     'name' => $tool,
                 ], $values);

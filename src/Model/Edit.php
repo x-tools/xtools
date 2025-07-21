@@ -94,7 +94,7 @@ class Edit extends Model
         $this->comment = $attrs['comment'] ?? '';
 
         // Had to be JSON to put multiple values in 1 column.
-        $this->tags = JSON_decode($attrs['tags'] ?? '[]');
+        $this->tags = json_decode($attrs['tags'] ?? '[]');
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
             $this->sha = $attrs['rev_sha1'] ?? $attrs['sha'];
@@ -469,7 +469,7 @@ class Edit extends Model
 
     /**
      * List of tag names for the edit.
-     * Only filled in in PageInfo.
+     * Only filled in by PageInfo.
      * @return string[]
      */
     public function getTags(): array

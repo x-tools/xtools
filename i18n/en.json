@@ -242,6 +242,7 @@
 	"minor-edits-tooltip": "Edits where the user marked the edit as minor. These are not necessarily small edits.",
 	"minor-edits-with-summaries": "Minor edits with summaries",
 	"mobile-edits": "Mobile edits",
+	"mobile-edits-tooltip": "Edits made from mobile devices",
 	"monday": "Monday",
 	"month": "Month",
 	"month-counts": "Month counts",

@@ -311,21 +311,27 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="stat-list--new-group">{{ msg('mobile-edits') }}</td>
                             <td class="stat-list--new-group">
-                                {{ ai.mobileCount|num_format }}
+                                <span class="mobile-edits-tooltip" title="{{ msg('mobile-edits-tooltip') }}">
+                                    {{ msg('mobile-edits') }}
+                                </span>
+                            </td>
+                            <td class="stat-list--new-group">
+                                {{ wiki.pageLinkRaw( page.title, project, ai.mobileCount|num_format, 'action=history&tagfilter=mobile+edit' ) }}
                                 &middot;
                                 ({{ ai.mobileCount|percent_format(ai.numRevisionsProcessed) }})
                             </td>
                         </tr>
-                        <tr>
-                            <td>{{ msg('visual-edits') }}</td>
-                            <td>
-                                {{ ai.visualCount|num_format }}
-                                &middot;
-                                ({{ ai.visualCount|percent_format(ai.numRevisionsProcessed) }})
-                            </td>
-                        </tr>
+                        {% if project.hasVisualEditor %}
+                            <tr>
+                                <td>{{ msg('visual-edits') }}</td>
+                                <td>
+                                    {{ wiki.pageLinkRaw( page.title, project, ai.visualCount|num_format, 'action=history&tagfilter=visualeditor' ) }}
+                                    &middot;
+                                    ({{ ai.visualCount|percent_format(ai.numRevisionsProcessed) }})
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

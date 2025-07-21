@@ -71,6 +71,11 @@
         margin-top: 5px;
     }
 
+    .mobile-edits-tooltip {
+        cursor: help;
+        border-bottom:thin dotted gray;
+    }
+
     .month-counts-table {
         .stripes-column {
             // effectively sets a min-height, but allows .strips to have percentage height
