@@ -302,15 +302,22 @@ class Page extends Model
      * @param User|null $user Specify to get only revisions by the given user.
      * @param false|int $start
      * @param false|int $end
+     * @param int|null $limit
+     * @param int|null $numRevisions
      * @return array
      */
-    public function getRevisions(?User $user = null, $start = false, $end = false): array
-    {
+    public function getRevisions(
+        ?User $user = null,
+        $start = false,
+        $end = false,
+        ?int $limit = null,
+        ?int $numRevisions = null
+    ): array {
         if (isset($this->revisions)) {
             return $this->revisions;
         }
 
-        $this->revisions = $this->repository->getRevisions($this, $user, $start, $end);
+        $this->revisions = $this->repository->getRevisions($this, $user, $start, $end, $limit, $numRevisions);
 
         return $this->revisions;
     }
