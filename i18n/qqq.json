@@ -213,6 +213,7 @@
 	"how-calculated": "Link to further documentation for the admin score tool",
 	"import": "Name of a MediaWiki log action, used as header of a column in the table of log action counts for a user.\n{{Identical|Import}}",
 	"importance": "Label for the importance assessment of an article.\n{{Identical|Importance}}",
+	"impossible-logs": "Explanation shown when rights logs contain a removal without a corresponding addition.",
 	"inclusion-pattern": "Description for the 'Inclusion pattern' field in the Largest Pages tool.",
 	"invalid-date": "Error shown when an invalid date is provided.",
 	"invalid-project": "Error shown when an invalid project is entered. $1 the project domain such as en.wikipedia.org",
