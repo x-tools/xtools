@@ -156,6 +156,46 @@ class TopEdits extends Model
     }
 
     /**
+     * Get the WikiProject totals.
+     * @param int Namespace ID.
+     * @return string[]|int
+     */
+    public function getProjectTotals(int $ns) : array
+    {
+        $projectTotals = [];
+        // List of pages for this namespace
+        $rows = $this->topEdits[$ns];
+        foreach ($rows as $row) {
+            $num = $row["count"];
+            // May be null or nonexistent for assessment-less pages
+            $titles = $row["pap_project_title"] ?? "{}";
+            // Had to use json to pass multiple values in SQL select
+            foreach (json_decode($titles) as $projectName) {
+                if (!array_key_exists($projectName, $projectTotals)) {
+                    $projectTotals[$projectName] = $num;
+                } else {
+                    $projectTotals[$projectName] += $num;
+                }
+            }
+        }
+        arsort($projectTotals);
+        $projectTotals = array_slice($projectTotals, 0, 10);
+        return $projectTotals;
+    }
+
+    /**
+     * Get this project's prefix for WikiProjects' pages.
+     * Used to link.
+     * @return string
+     */
+    public function getWikiprojectPrefix(): string
+    {
+        return $this->project
+            ->getPageAssessments()
+            ->getConfig()['wikiproject_prefix'];
+    }
+
+    /**
      * Get the average time between edits (in days).
      * @return float
      */
