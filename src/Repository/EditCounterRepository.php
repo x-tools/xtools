@@ -591,12 +591,13 @@ class EditCounterRepository extends Repository
                 WHERE $whereClause
                 ORDER BY revs.rev_timestamp DESC
                 LIMIT 5000";
-        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchFirstColumn();
-        $results['average_size'] = count($results) > 0 ? array_sum($results)/count($results) : 0;
+        $data = $this->executeProjectsQuery($project, $sql, $params)->fetchFirstColumn();
+        $results = $data;
+        $results['average_size'] = count($data) > 0 ? array_sum($data)/count($data) : 0;
         $isSmall = fn($n) => abs(intval($n)) < 20;
         $isLarge = fn($n) => abs(intval($n)) > 1000;
-        $results['small_edits'] = count(array_filter($results, $isSmall));
-        $results['large_edits'] = count(array_filter($results, $isLarge));
+        $results['small_edits'] = count(array_filter($data, $isSmall));
+        $results['large_edits'] = count(array_filter($data, $isLarge));
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
