@@ -44,7 +44,7 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'revPageGroupBy' => '',
+            'revPageGroupBy' => 'GROUP BY rev_page',
         ];
         $conditions = array_merge(
             $conditions,
@@ -102,10 +102,11 @@ class PagesRepository extends UserRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        // always group by rev_page, to address merges where 2 revisions with rev_parent_id=0
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'revPageGroupBy' => '',
+            'revPageGroupBy' => 'GROUP BY rev_page',
         ];
 
         $conditions = array_merge(
@@ -124,7 +125,6 @@ class PagesRepository extends UserRepository
                         LIMIT 1
                     ) AS pa_class";
             $conditions['paSelectsArchive'] = ', NULL AS pa_class';
-            $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
         $wasRedirect = $this->getWasRedirectClause($redirects, $deleted);
