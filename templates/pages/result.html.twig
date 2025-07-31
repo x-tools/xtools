@@ -163,7 +163,6 @@
                 {% endif %}
                 {% if project.hasPageAssessments(pages.namespace) and pages.deleted != 'deleted' %}
                     {% set totals = pages.wikiprojectCounts %}
-                    {{ totals|json_encode }}
                     <div class="side-to-side">
                         {% if totals|length > 0 %}
                         <div><table class="table table-bordered table-hover table-striped">
