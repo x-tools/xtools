@@ -315,19 +315,23 @@ class Pages extends Model
                 $this->redirects
             );
         } else {
-            $counts = [];
+            $counts_tmp = [];
             foreach ($this->pages as $nsPages) {
                 foreach ($nsPages as $page) {
                     foreach ($page['assessment']['projects'] as $project) {
-                        $counts[$project] ??= 0;
-                        $counts[$project]++;
+                        $counts_tmp[$project] ??= 0;
+                        $counts_tmp[$project]++;
                     }
                 }
             }
+            arsort($counts_tmp);
+            $counts_tmp = array_slice($counts_tmp, 0, 10);
+            $counts = [];
+            foreach ($counts_tmp as $project => $count) {
+                $counts[] = [ "pap_project_title" => $project, "count" => $count ];
+            }
         }
 
-        arsort($counts);
-        $counts = array_slice($counts, 0, 10);
         return $counts;
     }
 
