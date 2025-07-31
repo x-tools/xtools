@@ -407,17 +407,8 @@ class PagesRepository extends UserRepository
                 ORDER BY `count` DESC
                 LIMIT 10";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace);
-
-        // index => [name, count]
-        $result = $resultQuery->fetchAllNumeric();
-        // convert that to: name => count
-        $totals = [];
-        foreach ($result as [$name, $count]) {
-            $totals[$name] = $count;
-        }
-        // sort by count decreasing
-        arsort($totals);
+        $totals = $this->executeQuery($sql, $project, $user, $namespace)
+            ->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $totals);
