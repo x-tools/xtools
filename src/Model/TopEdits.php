@@ -181,7 +181,7 @@ class TopEdits extends Model
                 // Had to use json to pass multiple values in SQL select
                 foreach (json_decode($titles) as $projectName) {
                     $counts_tmp[$projectName] ??= 0;
-                    $counts_tmp[$projectName]+= num;
+                    $counts_tmp[$projectName] += $num;
                 }
             }
             arsort($counts_tmp);
