@@ -312,7 +312,9 @@ class Pages extends Model
                 $this->project,
                 $this->user,
                 $this->namespace,
-                $this->redirects
+                $this->redirects,
+                $this->start,
+                $this->end,
             );
         } else {
             $counts_tmp = [];

@@ -89,7 +89,7 @@
             </table></div>
             {% if showPageAssessment and not(is_sub_request) and te.namespace is not same as('all') %}
                 {% set totals = te.projectTotals(ns) %}
-                {% if totals|keys|length > 0 %}
+                {% if totals|length > 0 %}
                     <div><table class="table table-bordered table-hover table-striped">
                         <caption class="text-center">{{ msg('top-wikiprojects') }}</caption>
                         <thead><tr>
@@ -107,13 +107,13 @@
                             </th>
                         </tr></thead>
                         <tbody>
-                            {% for wikiproject, count in totals %}
+                            {% for row in totals %}
                                 <tr>
-                                    <td class="sort-entry--wikiproject" data-value="{{ wikiproject }}">
-                                        {{ wikiproject }}
+                                    <td class="sort-entry--wikiproject" data-value="{{ row.pap_project_title }}">
+                                        {{ row.pap_project_title }}
                                     </td>
-                                    <td class="sort-entry--count" data-value="{{ count }}">
-                                        {{ count|num_format }}
+                                    <td class="sort-entry--count" data-value="{{ row.count }}">
+                                        {{ row.count|num_format }}
                                     </td>
                                 </tr>
                             {% endfor %}

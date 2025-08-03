@@ -368,7 +368,7 @@ class PagesRepository extends UserRepository
      * @param string $redirects One of the Pages::REDIR_ constants.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
-     * @return array Keys are the WikiProject names, values are the counts.
+     * @return array Each element is an array with keys pap_project_title and count.
      */
     public function getWikiprojectCounts(
         Project $project,
@@ -394,7 +394,7 @@ class PagesRepository extends UserRepository
         );
         $revDateConditions = $this->getDateConditions($start, $end);
 
-        $sql = "SELECT pap_project_title,count(pap_project_title) as `count`
+        $sql = "SELECT pap_project_title, count(pap_project_title) as `count`
                 FROM $pageTable
                 LEFT JOIN $revisionTable ON page_id = rev_page
                 JOIN $pageAssessmentsTable ON page_id = pa_page_id
