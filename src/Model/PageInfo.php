@@ -83,6 +83,12 @@ class PageInfo extends PageInfoApi
     /** @var int Number of edits to the page that were reverted with the subsequent edit. */
     protected int $revertCount = 0;
 
+    /** @var int Number of edits to the page that were tagged as mobile edits. */
+    protected int $mobileCount = 0;
+
+    /** @var int Number of edits to the page that were tagged as visual edits. */
+    protected int $visualCount = 0;
+
     /** @var int[] The "edits per <time>" counts. */
     protected array $countHistory = [
         'day' => 0,
@@ -311,6 +317,24 @@ class PageInfo extends PageInfoApi
     }
 
     /**
+     * Get the number of mobile edits.
+     * @return int
+     */
+    public function getMobileCount(): int
+    {
+        return $this->mobileCount;
+    }
+
+    /**
+     * Get the number of visual edits.
+     * @return int
+     */
+    public function getVisualCount(): int
+    {
+        return $this->visualCount;
+    }
+
+    /**
      * Get the number of edits to the page that were reverted with the subsequent edit.
      * @return int
      */
@@ -524,6 +548,14 @@ class PageInfo extends PageInfoApi
 
             if (0 !== $edit->getDeleted()) {
                 $this->numDeletedRevisions++;
+            }
+
+            if (in_array('mobile edit', $edit->getTags())) {
+                $this->mobileCount++;
+            }
+
+            if (in_array('visualeditor', $edit->getTags())) {
+                $this->visualCount++;
             }
 
             if (0 === $revCount) {
