@@ -122,6 +122,16 @@ class TopEditsRepository extends UserRepository
                     LIMIT 1
                 ) AS pa_class"
             : '';
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+        $paProjectsSelect = $hasPageAssessments
+            ? ", (
+                    SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $paTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = page_id
+                ) AS pap_project_title"
+            : '';
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -137,7 +147,9 @@ class TopEditsRepository extends UserRepository
         $sql = "SELECT page_namespace AS `namespace`, page_title,
                     page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
                     $paSelect
+                    $paProjectsSelect
                 FROM $pageTable
+
                 JOIN $revisionTable ON page_id = rev_page
                 $ipcJoin
                 WHERE $whereClause
@@ -201,6 +213,66 @@ class TopEditsRepository extends UserRepository
     }
 
     /**
+     * Get the 10 Wikiprojects within which the user has the most edits.
+     * @param Project $project
+     * @param User $user
+     * @param int $ns
+     * @param int|false $start
+     * @param int|false $end
+     */
+    public function getProjectTotals(
+        Project $project,
+        User $user,
+        int $ns,
+        $start = false,
+        $end = false
+    ): array {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'top_edits_wikiprojects');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $revDateConditions = $this->getDateConditions($start, $end);
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $pageAssessmentsTable = $project->getTableName('page_assessments');
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+
+        $ipcJoin = '';
+        $whereClause = 'rev_actor = :actorId';
+        $params = [];
+        if ($user->isIpRange()) {
+            $ipcTable = $project->getTableName('ip_changes');
+            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
+        }
+
+        $sql = "SELECT pap_project_title, SUM(`edit_count`) AS `count`
+                FROM (
+                    SELECT page_id, COUNT(page_id) AS `edit_count`
+                    FROM $revisionTable
+                    $ipcJoin
+                    JOIN $pageTable ON page_id = rev_page
+                    WHERE $whereClause
+                    AND page_namespace = :namespace
+                    $revDateConditions
+                    GROUP BY page_id
+                ) a
+                JOIN $pageAssessmentsTable ON pa_page_id = page_id
+                JOIN $paProjectsTable ON pa_project_id = pap_project_id
+                GROUP BY pap_project_title
+                ORDER BY `count` DESC
+                LIMIT 10";
+
+        $totals = $this->executeQuery($sql, $project, $user, $ns)
+            ->fetchAllAssociative();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $totals);
+    }
+
+    /**
      * Get the top edits by a user across all namespaces.
      * @param Project $project
      * @param User $user
@@ -236,6 +308,17 @@ class TopEditsRepository extends UserRepository
                     LIMIT 1
                 ) AS pa_class"
             : '';
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+        $paProjectsSelect = $hasPageAssessments
+            ? ", (
+                    SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $pageAssessmentsTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = e.page_id
+                ) AS pap_project_title"
+            : '';
+
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -248,7 +331,7 @@ class TopEditsRepository extends UserRepository
         }
 
         $sql = "SELECT c.page_namespace AS `namespace`, e.page_title,
-                    c.page_is_redirect AS `redirect`, c.count $paSelect
+                    c.page_is_redirect AS `redirect`, c.count $paSelect $paProjectsSelect
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count

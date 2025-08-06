@@ -6,7 +6,8 @@
 			"Mguix",
 			"Quel.soler",
 			"Sma1997",
-			"Tiputini"
+			"Tiputini",
+			"Yupik"
 		]
 	},
 	"abusefilter": "Filtre d’abusos",
@@ -300,6 +301,7 @@
 	"tool-globalcontribs": "Contribucions globals",
 	"translation-credits": "Traduccions són gentilesa de $1 i $2.",
 	"user": "Usuari",
+	"username": "Nom d'usuari",
 	"words": "Paraules",
 	"xtools-advert": "Generat mitjançant $1 el $2",
 	"year": "Any",

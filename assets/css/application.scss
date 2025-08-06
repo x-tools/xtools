@@ -734,3 +734,12 @@ a.help-icon {
 .pending-edit:not(.reverted-edit) {
     background:#fffdf2 !important;
 }
+
+.side-to-side > div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.side-to-side {
+    clear: both;
+}
