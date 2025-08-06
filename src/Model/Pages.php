@@ -302,6 +302,42 @@ class Pages extends Model
     }
 
     /**
+     * Get the number of pages the user created by WikiProject.
+     * @return array Keys are the WikiProject name, values are the counts.
+     */
+    public function getWikiprojectCounts(): array
+    {
+        if ($this->getNumPages() > $this->resultsPerPage()) {
+            $counts = $this->repository->getWikiprojectCounts(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->redirects,
+                $this->start,
+                $this->end,
+            );
+        } else {
+            $counts_tmp = [];
+            foreach ($this->pages as $nsPages) {
+                foreach ($nsPages as $page) {
+                    foreach ($page['assessment']['projects'] as $project) {
+                        $counts_tmp[$project] ??= 0;
+                        $counts_tmp[$project]++;
+                    }
+                }
+            }
+            arsort($counts_tmp);
+            $counts_tmp = array_slice($counts_tmp, 0, 10);
+            $counts = [];
+            foreach ($counts_tmp as $project => $count) {
+                $counts[] = [ "pap_project_title" => $project, "count" => $count ];
+            }
+        }
+
+        return $counts;
+    }
+
+    /**
      * Number of results to show, depending on the namespace.
      * @param bool $all Whether to get *all* results. This should only be used for
      *     export options. HTTP and JSON should paginate.
@@ -452,6 +488,7 @@ class Pages extends Model
                         ->getBadgeURL($row['pa_class'] ?: 'Unknown'),
                     'color' => $attrs['color'],
                     'category' => $attrs['category'],
+                    'projects' => json_decode($row['pap_project_title'] ?? '[]'),
                 ];
             }
 

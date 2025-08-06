@@ -44,7 +44,7 @@ class PagesRepository extends UserRepository
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'revPageGroupBy' => '',
+            'revPageGroupBy' => 'GROUP BY rev_page',
         ];
         $conditions = array_merge(
             $conditions,
@@ -102,10 +102,11 @@ class PagesRepository extends UserRepository
             return $this->cache->getItem($cacheKey)->get();
         }
 
+        // always group by rev_page, to address merges where 2 revisions with rev_parent_id=0
         $conditions = [
             'paSelects' => '',
             'paSelectsArchive' => '',
-            'revPageGroupBy' => '',
+            'revPageGroupBy' => 'GROUP BY rev_page',
         ];
 
         $conditions = array_merge(
@@ -117,13 +118,21 @@ class PagesRepository extends UserRepository
         $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
         if ($hasPageAssessments) {
             $pageAssessmentsTable = $project->getTableName('page_assessments');
-            $conditions['paSelects'] = ", (SELECT pa_class
-                        FROM $pageAssessmentsTable
-                        WHERE rev_page = pa_page_id
-                        AND pa_class != ''
-                        LIMIT 1
-                    ) AS pa_class";
-            $conditions['paSelectsArchive'] = ', NULL AS pa_class';
+            $paProjectsTable = $project->getTableName('page_assessments_projects');
+            $conditions['paSelects'] = ",
+                (SELECT pa_class
+                    FROM $pageAssessmentsTable
+                    WHERE rev_page = pa_page_id
+                    AND pa_class != ''
+                    LIMIT 1
+                ) AS pa_class,
+                (SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $pageAssessmentsTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = page_id
+                ) AS pap_project_title";
+            $conditions['paSelectsArchive'] = ', NULL AS pa_class, NULL as pap_project_title';
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
@@ -348,6 +357,62 @@ class PagesRepository extends UserRepository
 
         // Cache and return.
         return $this->setCache($cacheKey, $assessments);
+    }
+
+    /**
+     * Get the number of pages the user created by WikiProject.
+     * Max 10 projects.
+     * @param Project $project
+     * @param User $user
+     * @param int|string $namespace
+     * @param string $redirects One of the Pages::REDIR_ constants.
+     * @param int|false $start Start date as Unix timestamp.
+     * @param int|false $end End date as Unix timestamp.
+     * @return array Each element is an array with keys pap_project_title and count.
+     */
+    public function getWikiprojectCounts(
+        Project $project,
+        User $user,
+        $namespace,
+        string $redirects,
+        $start = false,
+        $end = false
+    ): array {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created_wikiprojects');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $project->getTableName('page');
+        $revisionTable = $project->getTableName('revision');
+        $pageAssessmentsTable = $project->getTableName('page_assessments');
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+
+        $conditions = array_merge(
+            $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
+            $this->getUserConditions('' !== $start.$end)
+        );
+        $revDateConditions = $this->getDateConditions($start, $end);
+
+        $sql = "SELECT pap_project_title, count(pap_project_title) as `count`
+                FROM $pageTable
+                LEFT JOIN $revisionTable ON page_id = rev_page
+                JOIN $pageAssessmentsTable ON page_id = pa_page_id
+                JOIN $paProjectsTable ON pa_project_id = pap_project_id
+                WHERE ".$conditions['whereRev']."
+                    AND rev_parent_id = '0'".
+                    $conditions['namespaceRev'].
+                    $conditions['redirects'].
+                    $revDateConditions."
+                GROUP BY pap_project_title
+                ORDER BY `count` DESC
+                LIMIT 10";
+
+        $totals = $this->executeQuery($sql, $project, $user, $namespace)
+            ->fetchAllAssociative();
+
+        // Cache and return.
+        return $this->setCache($cacheKey, $totals);
     }
 
     /**
