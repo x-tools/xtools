@@ -16,8 +16,6 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use MediaWiki\OAuthClient\Client;
-use MediaWiki\OAuthClient\ClientConfig;
-use MediaWiki\OAuthClient\Consumer;
 use MediaWiki\OAuthClient\Exception as OAuthException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -52,9 +50,6 @@ abstract class Repository
 
     /** @var RequestStack|null */
     protected ?RequestStack $requestStack;
-    
-    /** @var Consumer|null */
-    protected ?Consumer $consumer;
 
     /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
     public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
@@ -68,7 +63,6 @@ abstract class Repository
      * @param bool $isWMF
      * @param int $queryTimeout
      * @param RequestStack|null $requestStack
-     * @param Consumer|null $consumer
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -78,8 +72,7 @@ abstract class Repository
         ParameterBagInterface $parameterBag,
         bool $isWMF,
         int $queryTimeout,
-        ?RequestStack $requestStack = null,
-        ?Consumer $consumer = null
+        ?RequestStack $requestStack = null
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->cache = $cache;
@@ -89,7 +82,6 @@ abstract class Repository
         $this->isWMF = $isWMF;
         $this->queryTimeout = $queryTimeout;
         $this->requestStack = $requestStack;
-        $this->consumer = $consumer;
     }
 
     /***************
@@ -211,20 +203,19 @@ abstract class Repository
                 'action' => 'query',
                 'format' => 'json',
             ], $params);
-            if (null === $this->requestStack || null === $this->consumer) {
-                $accessToken = false;
+            if (null === $this->requestStack) {
+                $session = false;
             } else {
                 $session = $this->requestStack->getSession();
-                $accessToken = $session->get('oauth_access_token', false);
             }
-            if (false !== $accessToken) {
-                $oauthEndpoint = $project->getUrl(false) . $project->getScript() . '?title=Special:OAuth';
-                $conf = new ClientConfig($oauthEndpoint);
-                $conf->setConsumer($this->consumer);
-                $oauthClient = new Client($conf);
+            if ($session->get('logged_in_user')) {
+                $oauthClient = $this->session->get('oauth_client');
                 $queryString = http_build_query($params);
                 $requestUrl = $project->getApiUrl() . '?' . $queryString;
-                return json_decode($oauthClient->makeOAuthCall($accessToken, $requestUrl));
+                return json_decode($oauthClient->makeOAuthCall(
+                    $this->session->get('oauth_access_token'),
+                    $requestUrl
+                ));
             } else { // Not logged in, default to a not-logged-in query
                 $req = $this->guzzle->request(
                     'GET',
@@ -234,7 +225,7 @@ abstract class Repository
                 $body = $req->getBody()->getContents();
                 return json_decode($body, true);
             }
-        } catch (ConnetException|ServerException|OAuthException $e) {
+        } catch (ConnectException|ServerException|OAuthException $e) {
             throw new BadGatewayException('api-error-wikimedia', ['Wikimedia'], $e);
         }
     }

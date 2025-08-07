@@ -8,7 +8,6 @@ use App\Model\AutoEdits;
 use App\Repository\AutoEditsRepository;
 use App\Repository\EditRepository;
 use DateTime;
-use MediaWiki\OAuthClient\Consumer;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
