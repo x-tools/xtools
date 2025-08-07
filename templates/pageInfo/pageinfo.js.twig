@@ -36,6 +36,5 @@ $(function () {
     ).done(function (result) {
         $result.html(result);
         clearInterval(loadinganimation);
-        mw.hook('wikipage.content').fire($result);
     });
 });
