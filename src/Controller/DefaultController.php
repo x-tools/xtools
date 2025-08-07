@@ -132,39 +132,54 @@ class DefaultController extends XtoolsController
     }
 
     /**
-     * Get an OAuth client, configured to the default project.
+     * Get an OAuth client, configured to the given project
      * (This shouldn't really be in this class, but oh well.)
+     * @param Request $request
+     * @param Project $project
+     * @return Client
+     * @codeCoverageIgnore
+     */
+    protected function getOauthClientSpecific(
+        Request $request,
+        $project
+    ): Client {
+        $endpoint = $project->getUrl(false)
+                    . $project->getScript()
+                    . '?title=Special:OAuth';
+        $conf = new ClientConfig($endpoint);
+        $consumerKey = $this->getParameter('oauth_key');
+        $consumerSecret =  $this->getParameter('oauth_secret');
+        $conf->setConsumer(new Consumer($consumerKey, $consumerSecret));
+        $oauthClient = new Client($conf);
+
+        // Set the callback URL if given. Used to redirect back to target page after logging in.
+        if ($request->query->get('callback')) {
+            $oauthClient->setCallback($request->query->get('callback'));
+        }
+
+        return $oauthClient;
+    }
+
+    /**
+     * Get an OAuth client for the default project
      * @param Request $request
      * @param ProjectRepository $projectRepo
      * @param string $centralAuthProject
      * @return Client
      * @codeCoverageIgnore
      */
-    protected function getOauthClient(
+     protected function getOAuthClient(
         Request $request,
         ProjectRepository $projectRepo,
         string $centralAuthProject
-    ): Client {
+     ): Client {
         if (isset($this->oauthClient)) {
             return $this->oauthClient;
         }
         $defaultProject = $projectRepo->getProject($centralAuthProject);
-        $endpoint = $defaultProject->getUrl(false)
-                    . $defaultProject->getScript()
-                    . '?title=Special:OAuth';
-        $conf = new ClientConfig($endpoint);
-        $consumerKey = $this->getParameter('oauth_key');
-        $consumerSecret =  $this->getParameter('oauth_secret');
-        $conf->setConsumer(new Consumer($consumerKey, $consumerSecret));
-        $this->oauthClient = new Client($conf);
-
-        // Set the callback URL if given. Used to redirect back to target page after logging in.
-        if ($request->query->get('callback')) {
-            $this->oauthClient->setCallback($request->query->get('callback'));
-        }
-
+        $this->oauthClient = $this->getOAuthClientSpecific($defaultProject);
         return $this->oauthClient;
-    }
+     }
 
     /**
      * Log out the user and return to the homepage.

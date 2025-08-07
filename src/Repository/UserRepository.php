@@ -9,7 +9,6 @@ use App\Model\User;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
-use MediaWiki\OAuthClient\Consumer;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -34,7 +33,6 @@ class UserRepository extends Repository
      * @param int $queryTimeout
      * @param ProjectRepository $projectRepo
      * @param RequestStack $requestStack
-     * @param Consumer $consumer
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -45,8 +43,7 @@ class UserRepository extends Repository
         bool $isWMF,
         int $queryTimeout,
         ProjectRepository $projectRepo,
-        RequestStack $requestStack,
-        Consumer $consumer
+        RequestStack $requestStack
     ) {
         $this->projectRepo = $projectRepo;
         parent::__construct(
@@ -57,8 +54,7 @@ class UserRepository extends Repository
             $parameterBag,
             $isWMF,
             $queryTimeout,
-            $requestStack,
-            $consumer
+            $requestStack
         );
     }
 
