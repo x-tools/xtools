@@ -208,13 +208,15 @@ abstract class Repository
                 $session = $this->requestStack->getSession();
             }
             if ($session && $session->get('logged_in_user')) {
-                $oauthClient = $this->session->get('oauth_client');
-                $queryString = http_build_query($params);
+                $oauthClient = $session->get('oauth_client');
+                $queryString = http_build_query($fullParams);
                 $requestUrl = $project->getApiUrl() . '?' . $queryString;
-                return json_decode($oauthClient->makeOAuthCall(
-                    $this->session->get('oauth_access_token'),
+                $body = $oauthClient->makeOAuthCall(
+                    $session->get('oauth_access_token'),
                     $requestUrl
-                ));
+                );
+                $this->logger->error($body);
+                return json_decode($body, true);
             } else { // Not logged in, default to a not-logged-in query
                 $req = $this->guzzle->request(
                     'GET',
@@ -222,6 +224,7 @@ abstract class Repository
                     ['query' => $fullParams]
                 );
                 $body = $req->getBody()->getContents();
+                $this->logger->error("no session");
                 return json_decode($body, true);
             }
         } catch (ConnectException|ServerException|OAuthException $e) {
