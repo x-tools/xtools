@@ -12,10 +12,9 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
-use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\Exception as OAuthException;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -31,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 abstract class Repository
 {
     protected CacheItemPoolInterface $cache;
-    protected GuzzleClient $guzzle;
+    protected Client $guzzle;
     protected LoggerInterface $logger;
     protected ManagerRegistry $managerRegistry;
     protected ParameterBagInterface $parameterBag;
@@ -57,7 +56,7 @@ abstract class Repository
     /**
      * Create a new Repository.
      * @param ManagerRegistry $managerRegistry
-     * @param GuzzleClient $guzzle
+     * @param Client $guzzle
      * @param LoggerInterface $logger
      * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
@@ -67,7 +66,7 @@ abstract class Repository
     public function __construct(
         ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
-        GuzzleClient $guzzle,
+        Client $guzzle,
         LoggerInterface $logger,
         ParameterBagInterface $parameterBag,
         bool $isWMF,
@@ -208,7 +207,7 @@ abstract class Repository
             } else {
                 $session = $this->requestStack->getSession();
             }
-            if ($session->get('logged_in_user')) {
+            if ($session && $session->get('logged_in_user')) {
                 $oauthClient = $this->session->get('oauth_client');
                 $queryString = http_build_query($params);
                 $requestUrl = $project->getApiUrl() . '?' . $queryString;
