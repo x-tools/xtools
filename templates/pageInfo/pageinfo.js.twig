@@ -3,39 +3,43 @@
  * Based on meta.wikimedia.org/wiki/User:Hedonil/XTools
  * Documentation: mediawiki.org/wiki/XTools/PageInfo_gadget
  * Released under GPL 3.0+ license
+ * To change this code, please modify the file on GitHub ( https://github.com/x-tools/xtools/blob/main/templates/pageInfo/pageinfo.js.twig ) and submit a pull request.
  * For updates, please copy and paste from {{ url('PageInfoGadget')|raw }}
  */
-$(function () {
-    if (mw.config.get('wgArticleId') === 0 || // no deleted articles, no special pages
-            mw.config.get('wgCurRevisionId') !== mw.config.get('wgRevisionId') || // only current revision
-            mw.config.get('wgAction') !== 'view') { // only when viewing a page, not editing
-        return;
-    }
+$(() => {
+	if (
+		// no deleted articles, no special pages
+		mw.config.get('wgArticleId') === 0 ||
+		// only current revision
+		mw.config.get('wgCurRevisionId') !== mw.config.get('wgRevisionId') ||
+		// only when viewing a page, not editing
+		mw.config.get('wgAction') !== 'view'
+	) {
+		return;
+	}
 
-    var $result,
-        markup = "<div id='xtools' style='font-size:84%; line-height:1.2em;" +
-        "width:auto;'><span id='xtools_result'>.</span></div>";
-    $(markup).insertBefore('#contentSub');
-    $result = $('#xtools_result');
+	const markup = "<div id='xtools' style='font-size:84%; line-height:1.2em;" +
+		"width:auto;'><span id='xtools_result'>.</span></div>";
+	$(markup).insertBefore('#contentSub');
+	const $result = $('#xtools_result');
 
-    var loadinganimation = window.setInterval(function () {
-        if ($result.html() === '.&nbsp;&nbsp;') {
-            $result.html('&nbsp;.&nbsp;');
-        } else if ($result.html() === '&nbsp;.&nbsp;') {
-            $result.html('&nbsp;&nbsp;.');
-        } else {
-            $result.html('.&nbsp;&nbsp;');
-        }
-    }, 300);
+	const loadingAnimation = window.setInterval(() => {
+		if ($result.html() === '.&nbsp;&nbsp;') {
+			$result.html('&nbsp;.&nbsp;');
+		} else if ($result.html() === '&nbsp;.&nbsp;') {
+			$result.html('&nbsp;&nbsp;.');
+		} else {
+			$result.html('.&nbsp;&nbsp;');
+		}
+	}, 300);
 
-    $.get(
+	$.get(
         '{{ app.request.getSchemeAndHttpHost()|raw }}/api/page/pageinfo/' +
-        mw.config.get('wgServerName') + '/' +
-        mw.config.get('wgPageName').replace(/["?%&+\\]/g, escape) + '?format=html' +
-        '&uselang=' + mw.config.get('wgUserLanguage')
-    ).done(function (result) {
-        $result.html(result);
-        clearInterval(loadinganimation);
-        mw.hook('wikipage.content').fire($result);
-    });
+		mw.config.get('wgServerName') + '/' +
+		mw.config.get('wgPageName').replace(/["?%&+\\]/g, escape) + '?format=html' +
+		'&uselang=' + mw.config.get('wgUserLanguage')
+	).done((result) => {
+		$result.html(result);
+		clearInterval(loadingAnimation);
+	});
 });
