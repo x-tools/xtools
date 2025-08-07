@@ -12,12 +12,14 @@ use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Client as GuzzleClient;
+use MediaWiki\OAuthClient\Client;
+use MediaWiki\OAuthClient\ClientConfig;
+use MediaWiki\OAuthClient\Consumer;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
@@ -28,7 +30,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 abstract class Repository
 {
     protected CacheItemPoolInterface $cache;
-    protected Client $guzzle;
+    protected GuzzleClient $guzzle;
     protected LoggerInterface $logger;
     protected ManagerRegistry $managerRegistry;
     protected ParameterBagInterface $parameterBag;
@@ -45,22 +47,30 @@ abstract class Repository
     /** @var int */
     protected int $queryTimeout;
 
+    /** @var RequestStack */
+    protected RequestStack $requestStack;
+    
+    /** @var Consumer */
+    protected Consumer $consumer;
+
     /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
     public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
 
     /**
      * Create a new Repository.
      * @param ManagerRegistry $managerRegistry
-     * @param Client $guzzle
+     * @param GuzzleClient $guzzle
      * @param LoggerInterface $logger
      * @param ParameterBagInterface $parameterBag
      * @param bool $isWMF
      * @param int $queryTimeout
+     * @param RequestStack $requestStack
+     * @param Consumer $consumer
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
-        Client $guzzle,
+        GuzzleClient $guzzle,
         LoggerInterface $logger,
         ParameterBagInterface $parameterBag,
         bool $isWMF,
@@ -73,6 +83,8 @@ abstract class Repository
         $this->parameterBag = $parameterBag;
         $this->isWMF = $isWMF;
         $this->queryTimeout = $queryTimeout;
+        $this->requestStack = $requestStack;
+        $this->consumer = $consumer;
     }
 
     /***************
@@ -190,13 +202,31 @@ abstract class Repository
     public function executeApiRequest(Project $project, array $params): array
     {
         try {
-            return json_decode($this->guzzle->request('GET', $project->getApiUrl(), [
-                'query' => array_merge([
-                    'action' => 'query',
-                    'format' => 'json',
-                ], $params),
-            ])->getBody()->getContents(), true);
-        } catch (ServerException|ConnectException $e) {
+            $params = array_merge([
+                'action' => 'query',
+                'format' => 'json',
+            ], $params);
+            $session = $this->requestStack->getSession();
+            $accessToken = $session->get('oauth_access_token', false);
+            if (false !== $accessToken) {
+                $oauthEndpoint = $project->getUrl(false) . $project->getScript() . '?title=Special:OAuth';
+                $conf = new ClientConfig($oauthEndpoint);
+                $conf->setConsumer($this->consumer);
+                $oauthClient = new Client($conf);
+                $queryString = http_build_query($params);
+                $requestUrl = $project->getApiUrl() . '?' . $queryString;
+                return json_decode($oauthClient->makeOAuthCall($accessToken, $requestUrl));
+            } else { // Not logged in, default to a not-logged-in query
+                return json_decode(
+                    $this->guzzle->request(
+                        'GET',
+                        $project->getApiUrl(),
+                        $params
+                    )->getBody()->getContents(),
+                    true
+                );
+            }
+        } catch (Exception $e) {
             throw new BadGatewayException('api-error-wikimedia', ['Wikimedia'], $e);
         }
     }

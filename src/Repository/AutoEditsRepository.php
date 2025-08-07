@@ -9,6 +9,7 @@ use App\Model\Project;
 use App\Model\User;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
+use Mediawiki\OAuthClient\Consumer;
 use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -45,6 +46,7 @@ class AutoEditsRepository extends UserRepository
      * @param ProjectRepository $projectRepo
      * @param AutomatedEditsHelper $autoEditsHelper
      * @param RequestStack $requestStack
+     * @param Consumer $consumer
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
@@ -56,7 +58,8 @@ class AutoEditsRepository extends UserRepository
         int $queryTimeout,
         ProjectRepository $projectRepo,
         AutomatedEditsHelper $autoEditsHelper,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        Consumer $consumer
     ) {
         $this->autoEditsHelper = $autoEditsHelper;
         parent::__construct(
@@ -68,7 +71,8 @@ class AutoEditsRepository extends UserRepository
             $isWMF,
             $queryTimeout,
             $projectRepo,
-            $requestStack
+            $requestStack,
+            $consumer
         );
     }
 

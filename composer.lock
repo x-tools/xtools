@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cfeb7e9dd346b980a6b2f2bcd51983c9",
+    "content-hash": "dbf9cab567d5f38a40f033e16acc5720",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -2187,30 +2187,30 @@
         },
         {
             "name": "mediawiki/oauthclient",
-            "version": "1.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wikimedia/mediawiki-oauthclient-php.git",
-                "reference": "ace642e67b8292a5e351c50daca7d3f2b25fa4cb"
+                "reference": "15e81485ecd3566c5fddee23bcbdd9dd93c7886b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wikimedia/mediawiki-oauthclient-php/zipball/ace642e67b8292a5e351c50daca7d3f2b25fa4cb",
-                "reference": "ace642e67b8292a5e351c50daca7d3f2b25fa4cb",
+                "url": "https://api.github.com/repos/wikimedia/mediawiki-oauthclient-php/zipball/15e81485ecd3566c5fddee23bcbdd9dd93c7886b",
+                "reference": "15e81485ecd3566c5fddee23bcbdd9dd93c7886b",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
-                "php": ">=7.2.9",
-                "psr/log": "^1.0"
+                "php": ">=7.4",
+                "psr/log": "^1.0||^2.0||^3.0"
             },
             "require-dev": {
-                "mediawiki/mediawiki-codesniffer": "37.0.0",
-                "mediawiki/minus-x": "1.1.1",
-                "php-parallel-lint/php-console-highlighter": "0.5.0",
-                "php-parallel-lint/php-parallel-lint": "1.3.0",
-                "phpunit/phpunit": "^8.5"
+                "mediawiki/mediawiki-codesniffer": "47.0.0",
+                "mediawiki/minus-x": "1.1.3",
+                "php-parallel-lint/php-console-highlighter": "1.0.0",
+                "php-parallel-lint/php-parallel-lint": "1.4.0",
+                "phpunit/phpunit": "9.6.21"
             },
             "type": "library",
             "autoload": {
@@ -2243,7 +2243,7 @@
                 "issues": "https://phabricator.wikimedia.org/tag/oauth/",
                 "source": "https://github.com/wikimedia/oauthclient-php/"
             },
-            "time": "2021-10-21T13:34:48+00:00"
+            "time": "2025-07-08T12:43:45+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -9975,5 +9975,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.6.0"
 }
