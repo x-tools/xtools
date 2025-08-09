@@ -242,6 +242,36 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Can we find this project's page table?
+     * If not, this project has not been replicated yet,
+     * despite being listed in meta_p.wiki. See T322466.
+     * The implementation is a bit dirty, but we do not
+     * have the permissions for anything better.
+     * @param string $project Database name, without _p.
+     * @return bool
+     */
+    public function hasPageTable(string $project): bool
+    {
+        $cacheKey = $this->getCacheKey($project, "has_page");
+        if ($this->cache->hasItem($cacheKey) && false) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $this->getTableName($project, "page");
+        $sql = "SELECT 1 FROM $pageTable LIMIT 1";
+        try {
+            $this->executeProjectsQuery($project, $sql, [
+                'project' => $project
+            ])->fetchAssociative();
+            $result = true;
+        } catch(\Exception $e) {
+            $result = false;
+        }
+        // Cache for 1h and return
+        return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
+    }
+
+    /**
      * Get metadata about a project, including the 'dbName', 'url' and 'lang'
      *
      * @param string $projectUrl The project's URL.

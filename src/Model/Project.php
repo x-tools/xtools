@@ -116,7 +116,7 @@ class Project extends Model
      */
     public function exists(): bool
     {
-        return !empty($this->getDomain());
+        return !empty($this->getDomain()) && $this->repository->hasPageTable($this->getBasicInfo()['dbName']);
     }
 
     /**
