@@ -261,10 +261,10 @@ class ProjectRepository extends Repository
         $sql = "SELECT 1 FROM $pageTable LIMIT 1";
         try {
             $this->executeProjectsQuery($project, $sql, [
-                'project' => $project
+                'project' => $project,
             ])->fetchAssociative();
             $result = true;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $result = false;
         }
         // Cache for 1h and return
