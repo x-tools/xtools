@@ -32,6 +32,8 @@ class TestAdapter extends WebTestCase
                 'dbName' => 'test_wiki',
                 'lang' => 'en',
             ]);
+        $repo->method('hasPageTable')
+            ->willReturn(true);
         return $repo;
     }
 

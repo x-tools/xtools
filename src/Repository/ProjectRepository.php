@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Model\PageAssessments;
 use App\Model\Project;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDO\Exception as PDOException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
@@ -264,8 +265,11 @@ class ProjectRepository extends Repository
                 'project' => $project,
             ])->fetchAssociative();
             $result = true;
-        } catch (\Exception $e) {
-            $result = false;
+        } catch (PDOException $e) {
+            $code = (int)$e->getCode();
+            $result = 42000 !== $code; // Syntax error/access violation; including specifically missing table
+        } catch (\Exception $e) { // Some other exception--AGF. Notably prevents crash of many tests
+            $result = true;
         }
         // Cache for 1h and return
         return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
