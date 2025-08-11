@@ -2,14 +2,16 @@
 	"@metadata": {
 		"authors": [
 			"JeffreyKim",
-			"Winston Sung"
+			"Ktchankt",
+			"Winston Sung",
+			"Yueman"
 		]
 	},
 	"abusefilter": "濫用過濾器",
 	"accepted-formats": "接受嘅格式",
 	"account-age": "戶口歲數",
 	"account-age-desc": "$2 {{PLURAL:$1|day|日}}舊",
-	"accounts": "帳戶",
+	"accounts": "戶口",
 	"accounts-created": "開咗嘅戶口",
 	"actions": "動作",
 	"actions-as-admin": "管理員操作",
@@ -46,8 +48,10 @@
 	"bot-list": "機械人一覽",
 	"categories": "類",
 	"comma-character": "、",
+	"contributions": "貢獻",
 	"created-by": "開版者",
 	"csv": "CSV",
+	"date": "日子",
 	"date-range": "由$1到$2",
 	"date-to": "到：$1",
 	"delete": "刪除",
