@@ -191,7 +191,6 @@ class TopEdits extends Model
                 $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
             }
         }
-        
         return $projectTotals;
     }
 
