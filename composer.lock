@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e94ab2e289755c4e4008a75508a62bf",
+    "content-hash": "703e2fe31c048f721ed6cf0461c723e3",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -2074,32 +2074,31 @@
         },
         {
             "name": "krinkle/intuition",
-            "version": "v1.2.0",
+            "version": "v2.3.6",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Krinkle/intuition.git",
-                "reference": "dee3883497dae9b7f48c6b3e4faba711367745b1"
+                "url": "https://github.com/wikimedia/labs-tools-intuition.git",
+                "reference": "5871a02c009621cf7c1bc1a240fab30688b9db48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Krinkle/intuition/zipball/dee3883497dae9b7f48c6b3e4faba711367745b1",
-                "reference": "dee3883497dae9b7f48c6b3e4faba711367745b1",
+                "url": "https://api.github.com/repos/wikimedia/labs-tools-intuition/zipball/5871a02c009621cf7c1bc1a240fab30688b9db48",
+                "reference": "5871a02c009621cf7c1bc1a240fab30688b9db48",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0"
+                "php": ">=7.2"
             },
             "require-dev": {
-                "jakub-onderka/php-parallel-lint": "1.0.0",
-                "mediawiki/mediawiki-codesniffer": "22.0.0",
-                "php-coveralls/php-coveralls": "^2.1",
-                "phpunit/phpunit": "^6.5.11"
+                "mediawiki/mediawiki-codesniffer": "32.0.0",
+                "php-coveralls/php-coveralls": "^2.4",
+                "php-parallel-lint/php-parallel-lint": "^1.0.0",
+                "phpunit/phpunit": "^8.5.13"
             },
             "type": "library",
             "autoload": {
                 "files": [
-                    "src/defines.php",
-                    "src/compat.php"
+                    "src/defines.php"
                 ],
                 "psr-0": {
                     "MessagesFunctions": "language/"
@@ -2114,10 +2113,9 @@
             ],
             "description": "Framework for localisation in PHP.",
             "support": {
-                "issues": "https://github.com/Krinkle/intuition/issues",
-                "source": "https://github.com/Krinkle/intuition/tree/release"
+                "source": "https://github.com/wikimedia/labs-tools-intuition/tree/v2.3.6"
             },
-            "time": "2018-11-06T18:04:32+00:00"
+            "time": "2024-03-28T22:32:35+00:00"
         },
         {
             "name": "laminas/laminas-code",
