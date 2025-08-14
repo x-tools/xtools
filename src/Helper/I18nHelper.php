@@ -6,7 +6,7 @@ namespace App\Helper;
 
 use DateTime;
 use IntlDateFormatter;
-use Intuition;
+use Krinkle\Intuition\Intuition;
 use NumberFormatter;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -59,7 +59,14 @@ class I18nHelper
             throw new Exception("Language directory doesn't exist: $path");
         }
 
+        $this->intuition = new Intuition('xtools');
+        $this->intuition->registerDomain('xtools', $path);
+
         $useLang = $this->getIntuitionLang();
+        // Validate the language.
+        if (!$this->intuition->getLangName($useLang)) {
+            $useLang = 'en';
+        }
 
         // Save the language to the session.
         $session = $this->requestStack->getSession();
@@ -67,13 +74,9 @@ class I18nHelper
             $session->set('lang', $useLang);
         }
 
-        // Set up Intuition, using the selected language.
-        $intuition = new Intuition('xtools');
-        $intuition->registerDomain('xtools', $path);
-        $intuition->setLang(strtolower($useLang));
+        $this->intuition->setLang(strtolower($useLang));
 
-        $this->intuition = $intuition;
-        return $intuition;
+        return $this->intuition;
     }
 
     /**
@@ -175,7 +178,7 @@ class I18nHelper
      */
     public function msgExists(?string $message, array $vars = []): bool
     {
-        return $this->getIntuition()->msgExists($message, array_merge(
+        return $message && $this->getIntuition()->msgExists($message, array_merge(
             ['domain' => 'xtools'],
             ['variables' => $vars]
         ));
@@ -298,15 +301,7 @@ class I18nHelper
     {
         $queryLang = $this->getRequest()->query->get('uselang');
         $sessionLang = $this->requestStack->getSession()->get('lang');
-
-        if ('' !== $queryLang && null !== $queryLang) {
-            return $queryLang;
-        } elseif ('' !== $sessionLang && null !== $sessionLang) {
-            return $sessionLang;
-        }
-
-        // English as default.
-        return 'en';
+        return $queryLang ?? $sessionLang ?? 'en';
     }
 
     /**
