@@ -185,12 +185,12 @@ class TopEdits extends Model
                 }
             }
             arsort($counts_tmp);
-            $counts_tmp = array_slice($projectTotals, 0, 10);
+            $counts_tmp = array_slice($counts_tmp, 0, 10);
             $projectTotals = [];
             foreach ($counts_tmp as $project => $count) {
-                $counts[] = [ "pap_project_title" => $project, "count" => $count ];
+                $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
             }
-        }
+        
         return $projectTotals;
     }
 
