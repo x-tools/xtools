@@ -190,6 +190,7 @@ class TopEdits extends Model
             foreach ($counts_tmp as $project => $count) {
                 $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
             }
+        }
         
         return $projectTotals;
     }
