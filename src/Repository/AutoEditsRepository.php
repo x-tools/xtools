@@ -585,7 +585,7 @@ class AutoEditsRepository extends UserRepository
         }
 
         foreach (array_values($tools) as $values) {
-            if ($nonAutoEdits && isset($values['contribs'])) {
+            if (isset($values['contribs'])) { // shown in the tool list but not counted as automated
                 continue;
             }
 
