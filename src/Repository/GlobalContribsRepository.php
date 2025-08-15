@@ -280,6 +280,25 @@ class GlobalContribsRepository extends Repository
                     $whereClause = 'revs.rev_actor = '.$actorIds[$dbName];
                 }
 
+                $thisProject = $this->projectRepo->getProject($dbName);
+                if ($this->caProject->projectHasFlaggedRevs($thisProject)) {
+                    /* If fp_reviewed == 1, this page has flaggedrevs activated but all of its revs are accepted.
+                       If fp_pending_since is null (but fp_reviewed != 1), this page doesn't have flaggedrevs on.
+                       And then >= as fp_pending_since is the timestamp of the oldest unaccepted rev. */
+                    $frSelect = ",
+                        (fp_reviewed != 1 &&
+                        fp_pending_since IS NOT NULL &&
+                        revs.rev_timestamp >= fp_pending_since
+                        ) as is_pending";
+                    $frTable = $this->projectRepo->getTableName($dbName, "flaggedpages");
+                    $frJoin = "
+                        LEFT OUTER JOIN $frTable
+                        ON fp_page_id = revs.rev_page";
+                } else {
+                    $frSelect = "";
+                    $frJoin = "";
+                }
+
                 $slice = $this->getDbList()[$dbName];
                 $queriesBySlice[$slice][] = "
                     SELECT
@@ -307,12 +326,14 @@ class GlobalContribsRepository extends Repository
                             )
                             LIMIT 1
                         ) AS reverted
+                        $frSelect
                     FROM $revisionTable AS revs
                         $ipcJoin
                         JOIN $pageTable AS page ON (rev_page = page_id)
                         JOIN $actorTable ON (actor_id = revs.rev_actor)
                         LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                         LEFT OUTER JOIN $commentTable ON revs.rev_comment_id = comment_id
+                        $frJoin
                     WHERE $whereClause
                         $namespaceCond
                         $revDateConditions";
