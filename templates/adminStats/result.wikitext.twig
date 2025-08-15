@@ -13,6 +13,15 @@
 ! {{ msg(key)|ucfirst }}
 {% endfor %}
 |-
+{% set totals = as.totalsRow %}
+|
+| ''{{ msg('total')}}''
+|
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ totals.total }}}}
+{% for action in as.actions %}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ totals[action] }}}}
+{% endfor %}
+|-
 {% for user in as.stats %}
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ loop.index }}}}
 | [[User:{{ user.username }}|{{ user.username }}]]
