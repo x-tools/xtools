@@ -194,6 +194,7 @@
 	"how-calculated": "How this score is calculated",
 	"import": "Import",
 	"importance": "Importance",
+	"impossible-logs": "Note: removals of a right without corresponding additions are due to rights changes not being logged in very early versions of MediaWiki.",
 	"inclusion-pattern": "Only include pages with titles that match the given pattern.",
 	"invalid-date": "Invalid date",
 	"invalid-project": "$1 is not a valid project",
