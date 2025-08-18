@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * The DefaultController handles the homepage, about pages, and user authentication.
@@ -64,10 +65,12 @@ class DefaultController extends XtoolsController
         Request $request,
         RequestStack $requestStack,
         ProjectRepository $projectRepo,
+        UrlGeneratorInterface $urlGenerator,
         string $centralAuthProject
     ): RedirectResponse {
         try {
-            [ $next, $token ] = $this->getOauthClient($request, $projectRepo, $centralAuthProject)->initiate();
+            [$next, $token] = $this->getOauthClient($request, $projectRepo, $urlGenerator, $centralAuthProject)
+                ->initiate();
         } catch (Exception $oauthException) {
             $this->addFlashMessage('notice', 'error-login');
             return $this->redirectToRoute('homepage');
@@ -84,12 +87,14 @@ class DefaultController extends XtoolsController
      * @Route("/oauthredirector.php", name="old_oauth_callback")
      * @param RequestStack $requestStack
      * @param ProjectRepository $projectRepo
+     * @param UrlGeneratorInterface $urlGenerator
      * @param string $centralAuthProject
      * @return RedirectResponse
      */
     public function oauthCallbackAction(
         RequestStack $requestStack,
         ProjectRepository $projectRepo,
+        UrlGeneratorInterface $urlGenerator,
         string $centralAuthProject
     ): RedirectResponse {
         $request = $requestStack->getCurrentRequest();
@@ -100,7 +105,7 @@ class DefaultController extends XtoolsController
         }
 
         // Complete authentication.
-        $client = $this->getOauthClient($request, $projectRepo, $centralAuthProject);
+        $client = $this->getOauthClient($request, $projectRepo, $urlGenerator, $centralAuthProject);
         $token = $requestStack->getSession()->get('oauth_request_token');
 
         if (!is_a($token, Token::class)) {
@@ -136,6 +141,7 @@ class DefaultController extends XtoolsController
      * (This shouldn't really be in this class, but oh well.)
      * @param Request $request
      * @param ProjectRepository $projectRepo
+     * @param UrlGeneratorInterface $urlGenerator
      * @param string $centralAuthProject
      * @return Client
      * @codeCoverageIgnore
@@ -143,6 +149,7 @@ class DefaultController extends XtoolsController
     protected function getOauthClient(
         Request $request,
         ProjectRepository $projectRepo,
+        UrlGeneratorInterface $urlGenerator,
         string $centralAuthProject
     ): Client {
         if (isset($this->oauthClient)) {
@@ -156,6 +163,13 @@ class DefaultController extends XtoolsController
         $consumerKey = $this->getParameter('oauth_key');
         $consumerSecret =  $this->getParameter('oauth_secret');
         $conf->setConsumer(new Consumer($consumerKey, $consumerSecret));
+        $conf->setUserAgent(
+            'XTools/'.$this->getParameter('app.version').' ('.
+            rtrim(
+                $urlGenerator->generate($this->getIndexRoute(), [], UrlGeneratorInterface::ABSOLUTE_URL),
+                '/'
+            ).' '.$this->getParameter('mailer.to_email').')'
+        );
         $this->oauthClient = new Client($conf);
 
         // Set the callback URL if given. Used to redirect back to target page after logging in.
