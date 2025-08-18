@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class AutomatedEditsHelper
 {
-    protected CacheItemPoolInterface $cache;
     protected SessionInterface $session;
 
     /** @var array The list of tools that are considered reverting. */
@@ -29,11 +28,14 @@ class AutomatedEditsHelper
      * AutomatedEditsHelper constructor.
      * @param RequestStack $requestStack
      * @param CacheItemPoolInterface $cache
+     * @param \GuzzleHttp\Client $guzzle
      */
-    public function __construct(RequestStack $requestStack, CacheItemPoolInterface $cache)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        protected CacheItemPoolInterface $cache,
+        protected \GuzzleHttp\Client $guzzle
+    ) {
         $this->session = $requestStack->getSession();
-        $this->cache = $cache;
     }
 
     /**
@@ -99,7 +101,7 @@ class AutomatedEditsHelper
                 $uri
             ));
         } else {
-            $resp = json_decode(file_get_contents($uri));
+            $resp = json_decode($this->guzzle->get($uri)->getBody()->getContents());
         }
 
         $ret = json_decode($resp->query->pages[0]->revisions[0]->slots->main->content, true);
