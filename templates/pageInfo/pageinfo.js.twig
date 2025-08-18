@@ -35,11 +35,11 @@ $(() => {
 
 	$.get(
         '{{ app.request.getSchemeAndHttpHost()|raw }}/api/page/pageinfo/' +
-		mw.config.get('wgServerName') + '/' +
-		mw.config.get('wgPageName').replace(/["?%&+\\]/g, escape) + '?format=html' +
-		'&uselang=' + mw.config.get('wgUserLanguage')
-	).done((result) => {
-		$result.html(result);
-		clearInterval(loadingAnimation);
-	});
+        mw.config.get('wgServerName') + '/' +
+        mw.config.get('wgPageName').replace(/["?%&+\\]/g, escape) + '?format=html' +
+        '&uselang=' + mw.config.get('wgUserLanguage')
+    ).done(function (result) {
+        $result.html(result);
+        clearInterval(loadinganimation);
+    });
 });

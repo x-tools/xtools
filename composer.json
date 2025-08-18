@@ -15,7 +15,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4"
+            "php": "8.2"
         },
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
@@ -24,47 +24,51 @@
         "sort-packages": true
     },
     "require": {
-        "php": "^7.4",
+        "php": "^8.2",
         "ext-PDO": "*",
         "ext-curl": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "doctrine/common": "^3.1",
-        "doctrine/doctrine-bundle": "^2.2",
-        "doctrine/doctrine-migrations-bundle": "^2.0",
+        "doctrine/common": "~3.1",
+        "doctrine/doctrine-bundle": "~2.2",
+        "doctrine/doctrine-migrations-bundle": "~2.0",
         "eightpoints/guzzle-bundle": "^8.0",
         "jms/serializer-bundle": "^3.4",
-        "krinkle/intuition": "^1.0",
+        "krinkle/intuition": "^2.3",
         "mediawiki/oauthclient": "^1.2",
-        "nelmio/api-doc-bundle": "^4.11",
+        "nelmio/api-doc-bundle": "~4.11",
         "nelmio/cors-bundle": "^2.3",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.16",
         "slevomat/coding-standard": "^8.0",
-        "symfony/asset": "^5.4",
-        "symfony/cache": "^5.3",
-        "symfony/css-selector": "^5.4",
-        "symfony/dom-crawler": "^5.4",
-        "symfony/dotenv": "^5.4",
+        "symfony/asset": "~5.4",
+        "symfony/cache": "~5.4",
+        "symfony/config": "~5.4",
+        "symfony/css-selector": "~5.4",
+        "symfony/dom-crawler": "~5.4",
+        "symfony/dotenv": "~5.4",
         "symfony/flex": "^1.19",
-        "symfony/mailer": "^5.4",
+        "symfony/http-kernel": "~5.4",
+        "symfony/mailer": "~5.4",
         "symfony/monolog-bundle": "^3.3",
-        "symfony/property-access": "^5.4",
-        "symfony/property-info": "^5.4",
-        "symfony/security-csrf": "^5.4",
-        "symfony/serializer": "^5.4",
-        "symfony/web-profiler-bundle": "^5.4",
+        "symfony/property-access": "~5.4",
+        "symfony/property-info": "~5.4",
+        "symfony/routing": "~5.4",
+        "symfony/security-csrf": "~5.4",
+        "symfony/serializer": "~5.4",
+        "symfony/twig-bridge": "~5.4",
+        "symfony/web-profiler-bundle": "~5.4",
         "symfony/webpack-encore-bundle": "^1.16",
-        "symfony/yaml": "^5.4",
+        "symfony/yaml": "~5.4",
         "twig/twig": "^3.0",
-        "wikimedia/ip-utils": "^1.0"
+        "wikimedia/ip-utils": "^5.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^5.4",
+        "symfony/phpunit-bridge": "~5.4",
         "squizlabs/php_codesniffer": "^3.3.0",
         "mediawiki/minus-x": "^1.0.0",
         "dms/phpunit-arraysubset-asserts": "^0.4.0",
-        "symfony/browser-kit": "^5.4"
+        "symfony/browser-kit": "~5.4"
     },
     "scripts": {
         "test": [
