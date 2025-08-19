@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
@@ -44,7 +44,6 @@ abstract class XtoolsController extends AbstractController
     protected CacheItemPoolInterface $cache;
     protected Client $guzzle;
     protected Environment $twig;
-    protected FlashBagInterface $flashBag;
     protected I18nHelper $i18n;
     protected ManagerRegistry $managerRegistry;
     protected ProjectRepository $projectRepo;
@@ -192,7 +191,6 @@ abstract class XtoolsController extends AbstractController
      * @param RequestStack $requestStack
      * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
-     * @param FlashBagInterface $flashBag
      * @param Client $guzzle
      * @param I18nHelper $i18n
      * @param ProjectRepository $projectRepo
@@ -207,7 +205,6 @@ abstract class XtoolsController extends AbstractController
         RequestStack $requestStack,
         ManagerRegistry $managerRegistry,
         CacheItemPoolInterface $cache,
-        FlashBagInterface $flashBag,
         Client $guzzle,
         I18nHelper $i18n,
         ProjectRepository $projectRepo,
@@ -221,7 +218,6 @@ abstract class XtoolsController extends AbstractController
         $this->request = $requestStack->getCurrentRequest();
         $this->managerRegistry = $managerRegistry;
         $this->cache = $cache;
-        $this->flashBag = $flashBag;
         $this->guzzle = $guzzle;
         $this->i18n = $i18n;
         $this->projectRepo = $projectRepo;
@@ -576,8 +572,8 @@ abstract class XtoolsController extends AbstractController
 
             // Clear flash bag for API responses, since they get intercepted in ExceptionListener
             // and would otherwise be shown in subsequent requests.
-            if ($this->isApi) {
-                $this->flashBag->clear();
+            if ($this->isApi && $this->request->getSession() instanceof FlashBagAwareSessionInterface) {
+                $this->request->getSession()->getFlashBag()->clear();
             }
 
             throw new XtoolsHttpException(
