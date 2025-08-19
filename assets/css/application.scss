@@ -739,3 +739,8 @@ a.help-icon {
 .side-to-side {
     clear: both;
 }
+
+.link-loading {
+    pointer-events: none;
+    font-style: italic;
+}
