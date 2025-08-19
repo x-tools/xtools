@@ -168,7 +168,7 @@ class TopEditsRepository extends UserRepository
     }
 
     /**
-     * Count the number of edits in the given namespace.
+     * Count the number of pages edited in the given namespace.
      * @param Project $project
      * @param User $user
      * @param int|string $namespace
@@ -176,7 +176,7 @@ class TopEditsRepository extends UserRepository
      * @param int|false $end End date as Unix timestamp.
      * @return mixed
      */
-    public function countEditsNamespace(Project $project, User $user, $namespace, $start = false, $end = false)
+    public function countPagesNamespace(Project $project, User $user, $namespace, $start = false, $end = false)
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_count_ns');
@@ -187,6 +187,7 @@ class TopEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
+        $nsCondition = is_numeric($namespace) ? 'AND page_namespace = :namespace' : '';
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -203,7 +204,7 @@ class TopEditsRepository extends UserRepository
                 JOIN $revisionTable ON page_id = rev_page
                 $ipcJoin
                 WHERE $whereClause
-                AND page_namespace = :namespace
+                $nsCondition
                 $revDateConditions";
 
         $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
