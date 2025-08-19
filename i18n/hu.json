@@ -10,6 +10,7 @@
 			"Pasztilla",
 			"Tacsipacsi",
 			"Tothasze",
+			"Urbalazs",
 			"Zizzerus"
 		]
 	},
@@ -215,7 +216,7 @@
 	"login": "Bejelentkezés",
 	"logout": "Kijelentkezés",
 	"logout-msg": "Aktuálisan bejelentkezve mint $1",
-	"mainspace": "Kezdőlap",
+	"mainspace": "Fő",
 	"major-edits": "Főbb szerkesztések",
 	"major-edits-with-summaries": "Főbb szerkesztések összefoglalókkal",
 	"manual-edits": "Manuális szerkesztések",
@@ -399,7 +400,7 @@
 	"too-many-edits-redir": "Mutasd $1 helyett.",
 	"too-many-revisions": "Ez a lap több mint $1 {{PLURAL:$2|lapváltozattal}} rendelkezik. Csak az utolsó $1 változat adatai láthatók.",
 	"tool": "Eszköz",
-	"tool-about": "Rólunk",
+	"tool-about": "Névjegy",
 	"tool-adminscore": "Adminpontszám",
 	"tool-adminscore-desc": "Ez a pontszám jelzi a szerkesztő felkészültségét az adminságra",
 	"tool-adminstats": "Adminstatisztika",

@@ -47,7 +47,7 @@ class PageInfoApi extends Model
     /** @var string[]|null Assessments of the page (see Page::getAssessments). */
     protected ?array $assessments;
 
-    /** @var string[] List of Wikidata and Checkwiki errors. */
+    /** @var string[] List of Checkwiki errors. */
     protected array $bugs;
 
     /**
@@ -250,7 +250,7 @@ class PageInfoApi extends Model
     }
 
     /**
-     * Get the list of page's wikidata and Checkwiki errors.
+     * Get the list of page's Checkwiki errors.
      * @see Page::getErrors()
      * @return string[]
      */
@@ -263,7 +263,7 @@ class PageInfoApi extends Model
     }
 
     /**
-     * Get the number of wikidata nad CheckWiki errors.
+     * Get the number of CheckWiki errors.
      * @return int
      */
     public function numBugs(): int
@@ -465,7 +465,7 @@ class PageInfoApi extends Model
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
         $botData = $this->repository->getBotData($this->page, $this->start, $this->end, $limit);
-        while ($bot = $botData->fetchAssociative()) {
+        foreach ($botData as $bot) {
             $this->bots[$bot['username']] = [
                 'count' => (int)$bot['count'],
                 'current' => '1' === $bot['current'],

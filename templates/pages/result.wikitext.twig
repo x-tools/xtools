@@ -29,7 +29,7 @@
 {% set pageTitle = titleWithNs(page.page_title, ns, project.namespaces) %}
 |-
 | {{ index|num_format }}
-| {% if page.redirect %}[{{ wiki.pageUrlRaw(pageTitle, project, 'redirect=no') }} {{ pageTitle }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pageTitle }}]]{% endif %}{% if page.deleted %} &middot; ({{ msg('deleted') }}){% endif %}
+| {% if page.redirect %}[{{ wiki.pageUrlRaw(pageTitle, project, 'redirect=no') }} {{ pageTitle }}] &middot; ({{ msg('redirect') }}){% else %}[[:{{ pageTitle }}]]{% endif %}{% if page.deleted %} &middot; ({{ msg('deleted') }}){% if page.recreated is defined and page.recreated %} &middot; ({{ msg('recreated') }}){% endif %}{% endif %}
 
 | {% if page.deleted %}[{{ wiki.pageUrlRaw('Special:Undelete/' ~ pageTitle, project, 'timestamp=' ~ page.timestamp) }} {{ page.timestamp|date_format }}]{% else %}[[Special:PermaLink/{{ page.rev_id }}|{{ page.timestamp|date_format }}]]{% endif %}
 

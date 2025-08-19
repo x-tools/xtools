@@ -46,14 +46,6 @@ class WebProcessorMonolog
         $record['extra']['useragent'] = $request->headers->get('User-Agent');
         $record['extra']['referer'] = $request->headers->get('referer');
 
-        // Necessary to combat abuse.
-        if (null !== $session->get('logged_in_user')) {
-            $record['extra']['username'] = $session->get('logged_in_user')->username;
-        } else {
-            // Intentionally not included if we have a username, for privacy reasons.
-            $record['extra']['xff'] = $request->headers->get('x-forwarded-for', '');
-        }
-
         return $record;
     }
 }
