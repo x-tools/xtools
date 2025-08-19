@@ -38,12 +38,11 @@ parameters:
     enable.PageInfo: '%env(bool:APP_ENABLE_PAGEINFO)%'
     enable.Pages: '%env(bool:APP_ENABLE_PAGES)%'
     enable.Quote: '%env(bool:APP_ENABLE_QUOTE)%'
-    enable.RfXAnalysis: '%env(bool:APP_ENABLE_RFXANALYSIS)%'
-    enable.RfXVoteCalculator: '%env(bool:APP_ENABLE_RFXVOTECALCULATOR)%'
     enable.SimpleEditCounter: '%env(bool:APP_ENABLE_SIMPLEEDITCOUNTER)%'
     enable.TopEdits: '%env(bool:APP_ENABLE_TOPEDITS)%'
     oauth_key: '%env(OAUTH_KEY)%'
     oauth_secret: '%env(OAUTH_SECRET)%'
+    mailer.to_email: '%env(MAILER_TO_EMAIL)%'
 
 services:
     _defaults:
@@ -109,7 +108,7 @@ services:
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: App\Helper\AutomatedEditsHelper
-        arguments: ['@request_stack', '@cache.app']
+        arguments: ['@request_stack', '@cache.app', 'eight_points_guzzle.client.xtools']
         public: true
     app.i18n_helper:
         class: App\Helper\I18nHelper

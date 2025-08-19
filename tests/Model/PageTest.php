@@ -225,45 +225,6 @@ class PageTest extends TestAdapter
     }
 
     /**
-     * Wikidata errors. With this test getWikidataInfo doesn't return a Description,
-     *     so getWikidataErrors should complain accordingly
-     */
-    public function testWikidataErrors(): void
-    {
-        $this->pageRepo->method('getWikidataInfo')
-            ->with()
-            ->willReturn([
-                [
-                    'term' => 'label',
-                    'term_text' => 'My article',
-                ],
-            ]);
-        $this->pageRepo->method('getPageInfo')
-            ->with()
-            ->willReturn([
-                'pagelanguage' => 'en',
-                'pageprops' => [
-                    'wikibase_item' => 'Q123',
-                ],
-            ]);
-
-        $page = new Page($this->pageRepo, new Project('exampleWiki'), 'Page');
-        $wikidataErrors = $page->getWikidataErrors();
-
-        static::assertArraySubset(
-            [
-                'prio' => 3,
-                'name' => 'Wikidata',
-            ],
-            $wikidataErrors[0]
-        );
-        static::assertStringContainsString(
-            'Description',
-            $wikidataErrors[0]['notice']
-        );
-    }
-
-    /**
      * Test getErros and getCheckWikiErrors.
      */
     public function testErrors(): void
@@ -278,23 +239,9 @@ class PageTest extends TestAdapter
                 'explanation' => 'This is how to fix the error',
             ],
         ];
-        $wikidataErrors = [
-            [
-                'prio' => 3,
-                'name' => 'Wikidata',
-                'notice' => 'Description for language <em>en</em> is missing',
-                'explanation' => "See: <a target='_blank' " .
-                    "href='//www.wikidata.org/wiki/Help:Description'>Help:Description</a>",
-            ],
-        ];
 
         $this->pageRepo->method('getCheckWikiErrors')
             ->willReturn($checkWikiErrors);
-        $this->pageRepo->method('getWikidataInfo')
-            ->willReturn([[
-                'term' => 'label',
-                'term_text' => 'My article',
-            ]]);
         $this->pageRepo->method('getPageInfo')
             ->willReturn([
                 'pagelanguage' => 'en',
@@ -306,10 +253,7 @@ class PageTest extends TestAdapter
         $page->setRepository($this->pageRepo);
 
         static::assertEquals($checkWikiErrors, $page->getCheckWikiErrors());
-        static::assertEquals(
-            array_merge($wikidataErrors, $checkWikiErrors),
-            $page->getErrors()
-        );
+        static::assertEquals($checkWikiErrors, $page->getErrors());
     }
 
     /**

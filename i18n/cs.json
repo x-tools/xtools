@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Alien333",
 			"Draceane",
 			"Dvorapa",
 			"Ilimanaq29",
@@ -340,7 +341,7 @@
 	"see-full-statistics": "Viz celé statistiky",
 	"show": "zobrazit",
 	"size": "Velikost",
-	"size-over-time": "Velikost článku v&nbsp;průběhu času",
+	"size-over-time": "Velikost článku v průběhu času",
 	"small-edits": "Malé editace (<20 bajtů)",
 	"start": "Počáteční datum",
 	"stewards": "Stevardi",
@@ -407,7 +408,6 @@
 	"translation-credits": "Překlady pohání $1, $2 a $3.",
 	"tsv": "TSV",
 	"tuesday": "Úterý",
-	"type": "Typ",
 	"unapprove": "Neschválení",
 	"unblock": "Odblokování",
 	"unique-pages-edited": "Editované stránky",

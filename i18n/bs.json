@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"FriedrickMILBarbarossa",
 			"Nemo bis",
 			"Srdjan m",
 			"Srđan"
@@ -157,6 +158,7 @@
 	"project": "Projekt",
 	"rank": "Rang",
 	"re-blocks": "(Ponovne) blokade",
+	"recreated": "Ponovo napravljeno",
 	"report-issue": "Prijavi problem",
 	"saturday": "Subota",
 	"see-full-page-stats": "Potpuna statistika stranice",

@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Alien333",
 			"Eleassar",
 			"HairyFotr",
 			"Janezdrilc",
@@ -392,7 +393,7 @@
 	"simple-counter-limited-results": "Ta uporabnik je zabeležil izdatno število urejanj. Prikazano je omejeno število zadetkov.",
 	"size": "Velikost",
 	"size-gigabytes": "$1 GB",
-	"size-kilobytes": "$1&nbsp;KB",
+	"size-kilobytes": "$1 KB",
 	"size-megabytes": "$1 MB",
 	"size-over-time": "Velikost napram času",
 	"size-terabytes": "$1 TB",
@@ -479,7 +480,6 @@
 	"translation-credits": "Prevode zagotavljajo $1, $2 in $3.",
 	"tsv": "TSV",
 	"tuesday": "Torek",
-	"type": "Vrsta",
 	"unapprove": "Zavrnitev",
 	"unblock": "Odblokiranja",
 	"unique-pages-edited": "Urejanja strani",

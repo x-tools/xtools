@@ -2,6 +2,7 @@
 	"@metadata": {
 		"authors": [
 			"Adriendelucca",
+			"Alien333",
 			"Dishual",
 			"Fulup",
 			"Gwenn-Ael",
@@ -366,7 +367,7 @@
 	"size-kilobytes": "$1 Kio",
 	"size-megabytes": "$1 Mio",
 	"size-over-time": "Ment ar pennadoù en amzer",
-	"size-terabytes": "$1&nbsp;Tio",
+	"size-terabytes": "$1 Tio",
 	"small-edits": "Kemmoù bihan (<20 okted)",
 	"start": "Deiziad kregiñ",
 	"steward-stats-notice": "Ne ziskouezer nemet ar stewarded o deus graet un ober evel steward da nebeutañ.",
@@ -447,7 +448,6 @@
 	"translation-credits": "Troidigezhioù kinniget gant $1 ha $2.",
 	"tsv": "TSV",
 	"tuesday": "Meurzh",
-	"type": "Seurt",
 	"unapprove": "Dizaprouiñ",
 	"unblock": "Distankañ",
 	"unique-pages-edited": "Pajennoù dibar kemmet",

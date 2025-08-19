@@ -143,11 +143,12 @@ xtools.application.setupContributionsNavListeners = function (endpointFunc, apiT
     $('#contributions_limit').on('change', function (e) {
         var limit = parseInt(e.target.value, 10);
         $('.contributions-container').data('limit', limit);
+        let capitalize = (str) => str[0].toUpperCase() + str.slice(1);
         $('.contributions--prev-text').text(
-            $.i18n('pager-newer-n', limit).capitalize()
+            capitalize($.i18n('pager-newer-n', limit))
         );
         $('.contributions--next-text').text(
-            $.i18n('pager-older-n', limit).capitalize()
+            capitalize($.i18n('pager-older-n', limit))
         );
     });
 };

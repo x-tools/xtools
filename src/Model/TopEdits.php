@@ -156,6 +156,45 @@ class TopEdits extends Model
     }
 
     /**
+     * Get the WikiProject totals.
+     * @param int Namespace ID.
+     * @return string[]|int
+     */
+    public function getProjectTotals(int $ns) : array
+    {
+        if ($this->getNumPagesAnyNamespace($ns) > $this->limit) {
+            $projectTotals = $this->repository->getProjectTotals(
+                $this->project,
+                $this->user,
+                $ns,
+                $this->start,
+                $this->end
+            );
+        } else {
+            $counts_tmp = [];
+            // List of pages for this namespace
+            $rows = $this->topEdits[$ns];
+            foreach ($rows as $row) {
+                $num = $row["count"];
+                // May be null or nonexistent for assessment-less pages
+                $titles = $row["pap_project_title"] ?? "{}";
+                // Had to use json to pass multiple values in SQL select
+                foreach (json_decode($titles) as $projectName) {
+                    $counts_tmp[$projectName] ??= 0;
+                    $counts_tmp[$projectName] += $num;
+                }
+            }
+            arsort($counts_tmp);
+            $counts_tmp = array_slice($counts_tmp, 0, 10);
+            $projectTotals = [];
+            foreach ($counts_tmp as $project => $count) {
+                $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
+            }
+        }
+        return $projectTotals;
+    }
+
+    /**
      * Get the average time between edits (in days).
      * @return float
      */
@@ -184,6 +223,10 @@ class TopEdits extends Model
      */
     public function prepareData(): void
     {
+        if (!$this->project->userHasOptedIn($this->user)) {
+            $this->topEdits = [];
+            return;
+        }
         if (isset($this->page)) {
             $this->topEdits = $this->getTopEditsPage();
         } else {
@@ -234,6 +277,22 @@ class TopEdits extends Model
             $this->project,
             $this->user,
             $this->namespace,
+            $this->start,
+            $this->end
+        );
+    }
+
+    /**
+     * Get the total number of pages edited in a given namespace.
+     * @param int $ns
+     * @return int|null
+     */
+    public function getNumPagesAnyNamespace(int $ns): ?int
+    {
+        return (int)$this->repository->countEditsNamespace(
+            $this->project,
+            $this->user,
+            $ns,
             $this->start,
             $this->end
         );

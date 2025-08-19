@@ -237,7 +237,7 @@
         {% set downloadLink %}
             {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate, 'tools': '1'}, [], 'UserApiAutoEditsCount') }}
         {% endset %}
-        {{ layout.content_block('auto-edits', content, downloadLink) }}
+        {{ layout.content_block('auto-tool-counts', content, downloadLink) }}
 
         {% if ae.editCount == 0 %}
             {% set content %}
