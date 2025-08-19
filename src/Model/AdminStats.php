@@ -236,15 +236,13 @@ class AdminStats extends Model
     public function getTotalsRow(): array
     {
         $totalsRow = [];
-        foreach ($this->adminStats as $object) {
-            foreach ($object as $key => $value) {
-                if ('username' !== $key && 'user-groups' !== $key) {
-                    if (isset($totalsRow[$key])) {
-                        $totalsRow[$key] += $value;
-                    } else {
-                        $totalsRow[$key] = $value;
-                    }
+        foreach ($this->adminStats as $data) {
+            foreach ($data as $action => $count) {
+                if ('username' === $action || 'user-groups' === $action) {
+                    continue;
                 }
+                $totalsRow[$action] ??= 0;
+                $totalsRow[$action] += $count;
             }
         }
         return $totalsRow;
