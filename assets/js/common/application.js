@@ -51,6 +51,7 @@ $(function () {
         setupProjectListener();
         setupAutocompletion();
         displayWaitingNoticeOnSubmission();
+        setupLinkLoadingNotices();
 
         // Allow to add focus to input elements with i.e. ?focus=username
         if ('function' === typeof URL) {
@@ -68,6 +69,7 @@ $(function () {
     window.onpageshow = function (e) {
         if (e.persisted) {
             displayWaitingNoticeOnSubmission(true);
+            setupLinkLoadingNotices(true);
         }
     };
 });
@@ -649,6 +651,21 @@ function setupAutocompletion()
 let loadingTimerId;
 
 /**
+ * Create a new loading timer interval.
+ * Uses #submit_timer.
+ */
+function createTimerInterval()
+{
+    var startTime = Date.now();
+    return setInterval(function () {
+        var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+        var minutes = Math.floor(elapsedSeconds / 60);
+        var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
+        $('#submit_timer').text(minutes + ":" + seconds);
+    }, 1000);
+}
+
+/**
  * For any form submission, this disables the submit button and replaces its text with
  * a loading message and a counting timer.
  * @param {boolean} [undo] Revert the form back to the initial state.
@@ -679,13 +696,55 @@ function displayWaitingNoticeOnSubmission(undo)
                 .html($.i18n('loading') + " <span id='submit_timer'></span>");
 
             // Add the counter.
-            var startTime = Date.now();
-            loadingTimerId = setInterval(function () {
-                var elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
-                var minutes = Math.floor(elapsedSeconds / 60);
-                var seconds = ('00' + (elapsedSeconds - (minutes * 60))).slice(-2);
-                $('#submit_timer').text(minutes + ":" + seconds);
-            }, 1000);
+            loadingTimerId = createTimerInterval();
+        });
+    }
+}
+
+/*
+ * Resets a link out of loading.
+ */
+function clearLinkTimer()
+{
+    // clear the timer proper
+    clearInterval(loadingTimerId);
+    loaingTimerId = null;
+    // change the link's label back
+    let old = $("#submit_timer").parent()[0];
+    $(old).html(old.initialtext);
+    $(old).removeClass("link-loading");
+}
+
+/**
+ * For any links to an XTools query, this replaces the link text with
+ * a loading message and a counting timer.
+ * @param {boolean} [undo] Revert the links back to their initial state
+ *                         This is used on page load to solve an isssue with Safari and Firefox
+ *                         where after browsing back, the "loading" state persists.
+ */
+function setupLinkLoadingNotices(undo)
+{
+    if (undo) {
+        clearLinkTimer();
+    } else {
+        // Get the list of links:
+        $("a").filter(
+            (index, el) =>
+            el.className == "" && // only plain links, not buttons
+            el.href.startsWith(document.location.origin) && // to XTools
+            new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
+            el.target != "_blank" && // that doesn't open in a new tab
+            el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
+        ).on("click", (ev) => {
+            // And then add a listener
+            let el = $(ev.target);
+            el.prop("initialtext", el.html());
+            el.html($.i18n('loading') + ' <span id=\'submit_timer\'></span>');
+            el.addClass("link-loading");
+            if (loadingTimerId) {
+                clearLinkTimer();
+            }
+            loadingTimerId = createTimerInterval();
         });
     }
 }
