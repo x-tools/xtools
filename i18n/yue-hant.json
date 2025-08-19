@@ -2,22 +2,24 @@
 	"@metadata": {
 		"authors": [
 			"JeffreyKim",
-			"Winston Sung"
+			"Ktchankt",
+			"Winston Sung",
+			"Yueman"
 		]
 	},
 	"abusefilter": "濫用過濾器",
 	"accepted-formats": "接受嘅格式",
 	"account-age": "戶口歲數",
-	"account-age-desc": "$2 {{PLURAL:$1|day|日}}舊",
-	"accounts": "帳戶",
+	"account-age-desc": "$2{{PLURAL:$1|日}}前",
+	"accounts": "戶口",
 	"accounts-created": "開咗嘅戶口",
 	"actions": "動作",
 	"actions-as-admin": "管理員操作",
 	"added": "加咗",
 	"added-bytes": "加咗（字節）",
 	"additions": "補充",
-	"admin-stats-notice": "系統只會顯示喺呢段時間內至少採取過一個管理員操作嘅使用者。",
-	"admin-stats-notice2": "部分使用者可能係以前嘅管理員，或者係非管理員，但係有權執行某啲管理員操作。",
+	"admin-stats-notice": "系統只會顯示喺呢段時間內至少採取過一個管理員操作嘅用戶。",
+	"admin-stats-notice2": "有啲用戶可能係以前嘅管理員，或者唔係管理員但係有權執行某啲管理員操作。",
 	"admins": "管理員",
 	"afd": "要刪除嘅文章",
 	"afd-desc": "$2 {{PLURAL:$1|edit|編輯}}去文章刪除頁面",
@@ -46,8 +48,10 @@
 	"bot-list": "機械人一覽",
 	"categories": "類",
 	"comma-character": "、",
+	"contributions": "貢獻",
 	"created-by": "開版者",
 	"csv": "CSV",
+	"date": "日子",
 	"date-range": "由$1到$2",
 	"date-to": "到：$1",
 	"delete": "刪除",
@@ -182,6 +186,7 @@
 	"web-chat": "連接",
 	"wednesday": "禮拜三",
 	"wiki": "Wiki",
+	"top-wikiprojects": "頂級嘅維基項目",
 	"words": "字數",
 	"xtools-title": "XTools",
 	"year": "年"
