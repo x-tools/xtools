@@ -39,16 +39,18 @@ class AutomatedEditsHelper
     }
 
     /**
-     * Get the tool that matched the given edit summary.
-     * This only works for tools defined with regular expressions, not tags.
+     * Get the first tool that matched the given edit summary and tags.
      * @param string $summary Edit summary
      * @param Project $project
+     * @param string[] $tags
      * @return string[]|null Tool entry including key for 'name', or false if nothing was found
      */
-    public function getTool(string $summary, Project $project): ?array
+    public function getTool(string $summary, Project $project, array $tags = []): ?array
     {
         foreach ($this->getTools($project) as $tool => $values) {
-            if (isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) {
+            if ((isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) ||
+                (isset($values['tags']) && count(array_intersect($values['tags'], $tags)) > 0)
+            ) {
                 return array_merge([
                     'name' => $tool,
                 ], $values);
@@ -60,7 +62,6 @@ class AutomatedEditsHelper
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * This only works for tools defined with regular expressions, not tags.
      * @param string $summary Edit summary
      * @param Project $project
      * @return bool

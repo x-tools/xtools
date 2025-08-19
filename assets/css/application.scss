@@ -733,12 +733,14 @@ a.help-icon {
 
 .side-to-side > div {
     display: inline-block;
+    margin: 0 10px 15px 0;
     vertical-align: top;
 }
 
 .side-to-side {
     clear: both;
 }
+
 
 .prp-qualitytext {
     border-radius: 3px;
@@ -759,4 +761,9 @@ a.help-icon {
 }
 .prp-quality4 {
     background-color:#90ff90;
+}
+
+.link-loading {
+    pointer-events: none;
+    font-style: italic;
 }
