@@ -10,7 +10,7 @@ use App\Repository\CategoryEditsRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the Category Edits tool.
@@ -45,11 +45,10 @@ class CategoryEditsController extends XtoolsController
 
     /**
      * Display the search form.
-     * @Route("/categoryedits", name="CategoryEdits")
-     * @Route("/categoryedits/{project}", name="CategoryEditsProject")
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(path: '/categoryedits', name: 'CategoryEdits')]
+    #[Route(path: '/categoryedits/{project}', name: 'CategoryEditsProject')]
     public function indexAction(): Response
     {
         // Redirect if at minimum project, username and categories are provided.
@@ -135,22 +134,20 @@ class CategoryEditsController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route(
-     *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}/{offset}",
-     *     name="CategoryEditsResult",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
-     *     },
-     *     defaults={"start"=false, "end"=false, "offset"=false}
-     * )
-     * @param CategoryEditsRepository $categoryEditsRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/categoryedits/{project}/{username}/{categories}/{start}/{end}/{offset}",
+        name: "CategoryEditsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+        ],
+        defaults: ["start" => false, "end" => false, "offset" => false]
+    )]
     public function resultAction(CategoryEditsRepository $categoryEditsRepo): Response
     {
         $this->setupCategoryEdits($categoryEditsRepo);
@@ -160,22 +157,20 @@ class CategoryEditsController extends XtoolsController
 
     /**
      * Get edits by a user to pages in given categories.
-     * @Route(
-     *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
-     *   name="CategoryContributionsResult",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
-     *   },
-     *   defaults={"start"=false, "end"=false, "offset"=false}
-     * )
-     * @param CategoryEditsRepository $categoryEditsRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
+        name: "CategoryContributionsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+        ],
+        defaults: ["start" => false, "end" => false, "offset" => false]
+    )]
     public function categoryContributionsAction(CategoryEditsRepository $categoryEditsRepo): Response
     {
         $this->setupCategoryEdits($categoryEditsRepo);
@@ -187,18 +182,6 @@ class CategoryEditsController extends XtoolsController
 
     /**
      * Count the number of edits a user has made in a category.
-     * @Route(
-     *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
-     *   name="UserApiCategoryEditCount",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *       "start" = "|\d{4}-\d{2}-\d{2}",
-     *       "end" = "|\d{4}-\d{2}-\d{2}"
-     *   },
-     *   defaults={"start" = false, "end" = false},
-     *   methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Count the number of edits a user has made to pages in
             any of the given [categories](https://w.wiki/6oKx).")
@@ -231,10 +214,20 @@ class CategoryEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param CategoryEditsRepository $categoryEditsRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
+        name: "UserApiCategoryEditCount",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+        ],
+        defaults: ["start" => false, "end" => false],
+        methods: ["GET"]
+    )]
     public function categoryEditCountApiAction(CategoryEditsRepository $categoryEditsRepo): JsonResponse
     {
         $this->recordApiUsage('user/category_editcount');

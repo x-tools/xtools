@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
@@ -34,11 +34,10 @@ class QuoteController extends XtoolsController
     /**
      * Method for rendering the Bash Main Form. This method redirects if valid parameters are found,
      * making it a valid form endpoint as well.
-     * @Route("/bash", name="Bash")
-     * @Route("/quote", name="Quote")
-     * @Route("/bash/base.php", name="BashBase")
-     * @return Response
      */
+    #[Route("/bash", name: "Bash")]
+    #[Route("/quote", name: "Quote")]
+    #[Route("/bash/base.php", name: "BashBase")]
     public function indexAction(): Response
     {
         // Check to see if the quote is a param.  If so,
@@ -63,10 +62,9 @@ class QuoteController extends XtoolsController
 
     /**
      * Method for rendering a random quote. This should redirect to the /quote/{id} path below.
-     * @Route("/quote/random", name="QuoteRandom")
-     * @Route("/bash/random", name="BashRandom")
-     * @return RedirectResponse
      */
+    #[Route("/quote/random", name: "QuoteRandom")]
+    #[Route("/bash/random", name: "BashRandom")]
     public function randomQuoteAction(): RedirectResponse
     {
         // Choose a random quote by ID. If we can't find the quotes, return back to
@@ -83,10 +81,9 @@ class QuoteController extends XtoolsController
 
     /**
      * Method to show all quotes.
-     * @Route("/quote/all", name="QuoteAll")
-     * @Route("/bash/all", name="BashAll")
-     * @return Response
      */
+    #[Route("/quote/all", name: "QuoteAll")]
+    #[Route("/bash/all", name: "BashAll")]
     public function quoteAllAction(): Response
     {
         // Load up an array of all the quotes.
@@ -111,11 +108,9 @@ class QuoteController extends XtoolsController
 
     /**
      * Method to render a single quote.
-     * @param int $id ID of the quote
-     * @Route("/quote/{id}", name="QuoteID")
-     * @Route("/bash/{id}", name="BashID")
-     * @return Response
      */
+    #[Route("/quote/{id}", name: "QuoteID", requirements: ["id" => "\d+"])]
+    #[Route("/bash/{id}", name: "BashID", requirements: ["id" => "\d+"])]
     public function quoteAction(int $id): Response
     {
         // Get the singular quote.
@@ -153,7 +148,6 @@ class QuoteController extends XtoolsController
 
     /**
      * Get random quote.
-     * @Route("/api/quote/random", name="QuoteApiRandom", methods={"GET"})
      * @OA\Tag(name="Quote API")
      * @OA\Get(description="Get a random quote. The quotes are sourced from [developer quips](https://w.wiki/6rpo)
            and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
@@ -164,9 +158,9 @@ class QuoteController extends XtoolsController
      *         @OA\Property(property="<quote-id>", type="string")
      *     )
      * )
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route("/api/quote/random", name: "QuoteApiRandom", methods: ["GET"])]
     public function randomQuoteApiAction(): JsonResponse
     {
         $this->validateIsEnabled();
@@ -183,7 +177,6 @@ class QuoteController extends XtoolsController
 
     /**
      * Get all quotes.
-     * @Route("/api/quote/all", name="QuoteApiAll", methods={"GET"})
      * @OA\Tag(name="Quote API")
      * @OA\Get(description="Get a list of all quotes, sourced from [developer quips](https://w.wiki/6rpo)
            and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
@@ -194,10 +187,10 @@ class QuoteController extends XtoolsController
      *         @OA\Property(property="<quote-id>", type="string")
      *     )
      * )
-     * @return Response
      * @codeCoverageIgnore
      */
-    public function allQuotesApiAction(): Response
+    #[Route("/api/quote/all", name: "QuoteApiAll", methods: ["GET"])]
+    public function allQuotesApiAction(): JsonResponse
     {
         $this->validateIsEnabled();
 
@@ -215,7 +208,6 @@ class QuoteController extends XtoolsController
 
     /**
      * Get the quote with the given ID.
-     * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"}, methods={"GET"})
      * @OA\Tag(name="Quote API")
      * @OA\Get(description="Get a quote with the given ID.")
      * @OA\Parameter(name="id", in="path", required="true", @OA\Schema(type="integer", minimum=0))
@@ -226,10 +218,9 @@ class QuoteController extends XtoolsController
      *         @OA\Property(property="<quote-id>", type="string")
      *     )
      * )
-     * @param int $id
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route("/api/quote/{id}", name: "QuoteApiQuote", requirements: ["id" => "\d+"], methods: ["GET"])]
     public function singleQuotesApiAction(int $id): JsonResponse
     {
         $this->validateIsEnabled();

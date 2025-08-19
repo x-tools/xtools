@@ -10,9 +10,8 @@ use App\Repository\EditRepository;
 use DateTime;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the AutomatedEdits tool.
@@ -46,13 +45,12 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Display the search form.
-     * @Route("/autoedits", name="AutoEdits")
-     * @Route("/automatededits", name="AutoEditsLong")
-     * @Route("/autoedits/index.php", name="AutoEditsIndexPhp")
-     * @Route("/automatededits/index.php", name="AutoEditsLongIndexPhp")
-     * @Route("/autoedits/{project}", name="AutoEditsProject")
-     * @return Response
      */
+    #[Route("/autoedits", name: "AutoEdits")]
+    #[Route("/automatededits", name: "AutoEditsLong")]
+    #[Route("/autoedits/index.php", name: "AutoEditsIndexPhp")]
+    #[Route("/automatededits/index.php", name: "AutoEditsLongIndexPhp")]
+    #[Route("/autoedits/{project}", name: "AutoEditsProject")]
     public function indexAction(): Response
     {
         // Redirect if at minimum project and username are provided.
@@ -89,8 +87,6 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Set defaults, and instantiate the AutoEdits model. This is called at the top of every view action.
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
      * @codeCoverageIgnore
      */
     private function setupAutoEdits(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): void
@@ -151,22 +147,20 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route(
-     *     "/autoedits/{project}/{username}/{namespace}/{start}/{end}/{offset}", name="AutoEditsResult",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-     *     },
-     *     defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
-     * )
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/autoedits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "AutoEditsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+        ],
+        defaults: ["namespace" => 0, "start" => false, "end" => false, "offset" => false]
+    )]
     public function resultAction(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): Response
     {
         // Will redirect back to index if the user has too high of an edit count.
@@ -181,23 +175,20 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get non-automated edits for the given user.
-     * @Route(
-     *   "/nonautoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
-     *   name="NonAutoEditsContributionsResult",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "namespace"="|all|\d+",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-     *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
-     * )
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/nonautoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "NonAutoEditsContributionsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+        ],
+        defaults: ["namespace" => 0, "start" => false, "end" => false, "offset" => false]
+    )]
     public function nonAutomatedEditsAction(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): Response
     {
         $this->setupAutoEdits($autoEditsRepo, $editRepo);
@@ -206,23 +197,20 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get automated edits for the given user using the given tool.
-     * @Route(
-     *   "/autoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
-     *   name="AutoEditsContributionsResult",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "namespace"="|all|\d+",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-     *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false}
-     * )
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/autoedits-contributions/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "AutoEditsContributionsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+        ],
+        defaults: ["namespace" => 0, "start" => false, "end" => false, "offset" => false]
+    )]
     public function automatedEditsAction(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): Response
     {
         $this->setupAutoEdits($autoEditsRepo, $editRepo);
@@ -234,7 +222,6 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get a list of the known automated tools for a project along with their regex/tags/etc.
-     * @Route("/api/project/automated_tools/{project}", name="ProjectApiAutoEditsTools", methods={"GET"})
      * @OA\Tag(name="Project API")
      * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/API/Project#Automated_tools")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -256,10 +243,9 @@ class AutomatedEditsController extends XtoolsController
      *     )
      * )
      * @OA\Response(response=404, ref="#/components/responses/404")
-     * @param AutoEditsRepository $autoEditsRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route("/api/project/automated_tools/{project}", name: "ProjectApiAutoEditsTools", methods: ["GET"])]
     public function automatedToolsApiAction(AutoEditsRepository $autoEditsRepo): JsonResponse
     {
         $this->recordApiUsage('user/automated_tools');
@@ -270,18 +256,6 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get the number of automated edits a user has made.
-     * @Route(
-     *   "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
-     *   name="UserApiAutoEditsCount",
-     *   requirements={
-     *       "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "namespace"="|all|\d+",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}"
-     *   },
-     *   defaults={"namespace"="all", "start"=false, "end"=false, "tools"=false},
-     *   methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get the number of edits a user has made using
             [known semi-automated tools](https://w.wiki/6oKQ), and optionally how many times each tool was used.")
@@ -312,11 +286,20 @@ class AutomatedEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/automated_editcount/{project}/{username}/{namespace}/{start}/{end}/{tools}",
+        name: "UserApiAutoEditsCount",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+        ],
+        defaults: ["namespace" => "all", "start" => false, "end" => false, "tools" => false],
+        methods: ["GET"]
+    )]
     public function automatedEditCountApiAction(
         AutoEditsRepository $autoEditsRepo,
         EditRepository $editRepo
@@ -341,19 +324,6 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get non-automated contributions for a user.
-     * @Route(
-     *   "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
-     *   name="UserApiNonAutoEdits",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "namespace"="|all|\d+",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?"
-     *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50},
-     *   methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get a list of contributions a user has made without the use of any
         [known (semi-)automated tools](https://w.wiki/6oKQ). If more results are available than the `limit`, a
@@ -386,11 +356,21 @@ class AutomatedEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/nonautomated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "UserApiNonAutoEdits",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+        ],
+        defaults: ["namespace" => 0, "start" => false, "end" => false, "offset" => false, "limit" => 50],
+        methods: ["GET"]
+    )]
     public function nonAutomatedEditsApiAction(
         AutoEditsRepository $autoEditsRepo,
         EditRepository $editRepo
@@ -410,19 +390,6 @@ class AutomatedEditsController extends XtoolsController
 
     /**
      * Get (semi-)automated contributions made by a user.
-     * @Route(
-     *   "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
-     *   name="UserApiAutoEdits",
-     *   requirements={
-     *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *       "namespace"="|all|\d+",
-     *       "start"="|\d{4}-\d{2}-\d{2}",
-     *       "end"="|\d{4}-\d{2}-\d{2}",
-     *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
-     *   },
-     *   defaults={"namespace"=0, "start"=false, "end"=false, "offset"=false, "limit"=50},
-     *   methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get a list of contributions a user has made using of any of the
         [known (semi-)automated tools](https://w.wiki/6oKQ). If more results are available than the `limit`, a
@@ -458,12 +425,22 @@ class AutomatedEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param AutoEditsRepository $autoEditsRepo
-     * @param EditRepository $editRepo
-     * @return Response
      * @codeCoverageIgnore
      */
-    public function automatedEditsApiAction(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): Response
+    #[Route(
+        "/api/user/automated_edits/{project}/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "UserApiAutoEdits",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+        ],
+        defaults: ["namespace" => 0, "start" => false, "end" => false, "offset" => false, "limit" => 50],
+        methods: ["GET"]
+    )]
+    public function automatedEditsApiAction(AutoEditsRepository $autoEditsRepo, EditRepository $editRepo): JsonResponse
     {
         $this->recordApiUsage('user/automated_edits');
 

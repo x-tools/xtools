@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Repository\PageAssessmentsRepository;
+use App\Repository\Repository;
 
 /**
  * A PageAssessments is responsible for handling logic around
@@ -36,13 +37,13 @@ class PageAssessments extends Model
 
     /**
      * Create a new PageAssessments.
-     * @param PageAssessmentsRepository $repository
+     * @param Repository|PageAssessmentsRepository $repository
      * @param Project $project
      */
-    public function __construct(PageAssessmentsRepository $repository, Project $project)
-    {
-        $this->repository = $repository;
-        $this->project = $project;
+    public function __construct(
+        protected Repository|PageAssessmentsRepository $repository,
+        protected Project $project
+    ) {
     }
 
     /**
@@ -118,7 +119,7 @@ class PageAssessments extends Model
      * @param Page $page
      * @return string[]|false With keys 'value' and 'badge', or false if assessments are unsupported.
      */
-    public function getAssessment(Page $page)
+    public function getAssessment(Page $page): array|false
     {
         if (!$this->isEnabled() || !$this->isSupportedNamespace($page->getNamespace())) {
             return false;

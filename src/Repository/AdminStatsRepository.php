@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Repository;
 
 use App\Model\Project;
-use PDO;
 
 /**
  * AdminStatsRepository is responsible for retrieving data from the database
@@ -95,8 +94,8 @@ class AdminStatsRepository extends Repository
                 // admin_stats.yaml gives us the log type and action as a string in the format of "type/action".
                 [$logType, $logAction] = explode('/', $entry);
 
-                $logTypes[] = $keyTypes[] = $connection->quote($logType, PDO::PARAM_STR);
-                $logActions[] = $keyActions[] = $connection->quote($logAction, PDO::PARAM_STR);
+                $logTypes[] = $keyTypes[] = $connection->getDatabasePlatform()->quoteStringLiteral($logType);
+                $logActions[] = $keyActions[] = $connection->getDatabasePlatform()->quoteStringLiteral($logAction);
             }
 
             $keyTypes = implode(',', array_unique($keyTypes));
@@ -196,7 +195,7 @@ class AdminStatsRepository extends Repository
         foreach (($global ? $res['globalgroups'] : $res['usergroups']) as $userGroup) {
             // If they are able to add and remove user groups, we'll treat them as having the 'userrights' permission.
             if (isset($userGroup['add']) || isset($userGroup['remove'])) {
-                array_push($userGroup['rights'], 'userrights');
+                $userGroup['rights'][] = 'userrights';
                 $userGroup['rights'][] = 'userrights';
             }
             if (count(array_intersect($userGroup['rights'], $permissions)) > 0) {

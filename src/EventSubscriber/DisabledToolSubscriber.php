@@ -17,16 +17,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DisabledToolSubscriber implements EventSubscriberInterface
 {
-
-    protected ParameterBagInterface $parameterBag;
-
     /**
      * Save the container for later use.
      * @param ParameterBagInterface $parameterBag
      */
-    public function __construct(ParameterBagInterface $parameterBag)
+    public function __construct(protected ParameterBagInterface $parameterBag)
     {
-        $this->parameterBag = $parameterBag;
     }
 
     /**

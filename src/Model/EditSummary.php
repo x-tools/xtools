@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Repository\EditSummaryRepository;
+use App\Repository\Repository;
 use DateTime;
 
 /**
@@ -12,9 +13,6 @@ use DateTime;
  */
 class EditSummary extends Model
 {
-    /** @var int Number of edits from present to consider as 'recent'. */
-    protected int $numEditsRecent;
-
     /**
      * Counts of summaries, raw edits, and per-month breakdown.
      * Keys are underscored because this also is served in the API.
@@ -37,30 +35,24 @@ class EditSummary extends Model
     /**
      * EditSummary constructor.
      *
-     * @param EditSummaryRepository $repository
+     * @param Repository|EditSummaryRepository $repository
      * @param Project $project The project we're working with.
-     * @param User $user The user to process.
+     * @param ?User $user The user to process.
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
      * @param int $numEditsRecent Number of edits from present to consider as 'recent'.
      */
     public function __construct(
-        EditSummaryRepository $repository,
-        Project $project,
-        User $user,
-        $namespace,
-        $start = false,
-        $end = false,
-        int $numEditsRecent = 150
+        protected Repository|EditSummaryRepository $repository,
+        protected Project $project,
+        protected ?User $user,
+        protected int|string $namespace,
+        protected int|false $start = false,
+        protected int|false $end = false,
+        /** @var int Number of edits from present to consider as 'recent'. */
+        protected int $numEditsRecent = 150
     ) {
-        $this->repository = $repository;
-        $this->project = $project;
-        $this->user = $user;
-        $this->namespace = $namespace;
-        $this->start = $start;
-        $this->end = $end;
-        $this->numEditsRecent = $numEditsRecent;
     }
 
     /**

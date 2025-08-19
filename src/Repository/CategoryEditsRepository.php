@@ -8,9 +8,9 @@ use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Project;
 use App\Model\User;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Result;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
@@ -25,11 +25,6 @@ use Wikimedia\IPUtils;
  */
 class CategoryEditsRepository extends Repository
 {
-    protected AutomatedEditsHelper $autoEditsHelper;
-    protected EditRepository $editRepo;
-    protected PageRepository $pageRepo;
-    protected UserRepository $userRepo;
-
     /**
      * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
@@ -44,22 +39,18 @@ class CategoryEditsRepository extends Repository
      * @param UserRepository $userRepo
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        AutomatedEditsHelper $autoEditsHelper,
-        EditRepository $editRepo,
-        PageRepository $pageRepo,
-        UserRepository $userRepo
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected AutomatedEditsHelper $autoEditsHelper,
+        protected EditRepository $editRepo,
+        protected PageRepository $pageRepo,
+        protected UserRepository $userRepo
     ) {
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->editRepo = $editRepo;
-        $this->pageRepo = $pageRepo;
-        $this->userRepo = $userRepo;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
@@ -76,8 +67,8 @@ class CategoryEditsRepository extends Repository
         Project $project,
         User $user,
         array $categories,
-        $start = false,
-        $end = false
+        int|false $start = false,
+        int|false $end = false
     ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categoryeditcount');
         if ($this->cache->hasItem($cacheKey)) {
@@ -122,8 +113,8 @@ class CategoryEditsRepository extends Repository
         Project $project,
         User $user,
         array $categories,
-        $start = false,
-        $end = false
+        int|false $start = false,
+        int|false $end = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categorycounts');
         if ($this->cache->hasItem($cacheKey)) {
@@ -180,9 +171,9 @@ class CategoryEditsRepository extends Repository
         Project $project,
         User $user,
         array $categories,
-        $start = false,
-        $end = false,
-        $offset = false
+        int|false $start = false,
+        int|false $end = false,
+        int|false $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_categoryedits');
         if ($this->cache->hasItem($cacheKey)) {
@@ -232,14 +223,14 @@ class CategoryEditsRepository extends Repository
      * @param Project $project
      * @param User $user
      * @param string[] $categories
-     * @return ResultStatement
+     * @return Result
      */
     private function executeStmt(
         string $sql,
         Project $project,
         User $user,
         array $categories
-    ): ResultStatement {
+    ): Result {
         if ($user->isIpRange()) {
             [$hexStart, $hexEnd] = IPUtils::parseRange($user->getUsername());
             $params = [
@@ -250,7 +241,7 @@ class CategoryEditsRepository extends Repository
             $types = [
                 ParameterType::STRING,
                 ParameterType::STRING,
-                Connection::PARAM_STR_ARRAY,
+                ArrayParameterType::STRING,
             ];
         } else {
             $params = [
@@ -259,7 +250,7 @@ class CategoryEditsRepository extends Repository
             ];
             $types = [
                 ParameterType::STRING,
-                Connection::PARAM_STR_ARRAY,
+                ArrayParameterType::STRING,
             ];
         }
 

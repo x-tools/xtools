@@ -11,7 +11,7 @@ use App\Repository\TopEditsRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The Top Edits tool.
@@ -57,12 +57,11 @@ class TopEditsController extends XtoolsController
 
     /**
      * Display the form.
-     * @Route("/topedits", name="topedits")
-     * @Route("/topedits", name="TopEdits")
-     * @Route("/topedits/index.php", name="TopEditsIndex")
-     * @Route("/topedits/{project}", name="TopEditsProject")
-     * @return Response
      */
+    #[Route('/topedits', name: 'topedits')]
+    #[Route('/topedits', name: 'TopEdits')]
+    #[Route('/topedits/index.php', name: 'TopEditsIndex')]
+    #[Route('/topedits/{project}', name: 'TopEditsProject')]
     public function indexAction(): Response
     {
         // Redirect if at minimum project and username are provided.
@@ -112,21 +111,19 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for all pages in a particular namespace.
-     * @Route("/topedits/{project}/{username}/{namespace}/{start}/{end}",
-     *     name="TopEditsResultNamespace",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"namespace" = "all", "start"=false, "end"=false}
-     * )
-     * @param TopEditsRepository $topEditsRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/topedits/{project}/{username}/{namespace}/{start}/{end}',
+        name: 'TopEditsResultNamespace',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['namespace' => 'all', 'start' => false, 'end' => false]
+    )]
     public function namespaceTopEditsAction(
         TopEditsRepository $topEditsRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -150,23 +147,21 @@ class TopEditsController extends XtoolsController
 
     /**
      * List top edits by this user for a particular page.
-     * @Route("/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}",
-     *     name="TopEditsResultPage",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false}
-     * )
-     * @param TopEditsRepository $topEditsRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return Response
      * @codeCoverageIgnore
      * @todo Add pagination.
      */
+    #[Route(
+        '/topedits/{project}/{username}/{namespace}/{page}/{start}/{end}',
+        name: 'TopEditsResultPage',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['namespace' => 'all', 'start' => false, 'end' => false]
+    )]
     public function singlePageTopEditsAction(
         TopEditsRepository $topEditsRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -186,17 +181,6 @@ class TopEditsController extends XtoolsController
 
     /**
      * Get the most-edited pages by a user.
-     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}",
-     *     name="UserApiTopEditsNamespace",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|\d+|all",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="List the most-edited pages by a user in one or all namespaces.")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -231,11 +215,20 @@ class TopEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param TopEditsRepository $topEditsRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/user/top_edits/{project}/{username}/{namespace}/{start}/{end}',
+        name: 'UserApiTopEditsNamespace',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['namespace' => 'all', 'start' => false, 'end' => false],
+        methods: ['GET']
+    )]
     public function namespaceTopEditsUserApiAction(
         TopEditsRepository $topEditsRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -252,18 +245,6 @@ class TopEditsController extends XtoolsController
 
     /**
      * Get the all edits made by a user to a specific page.
-     * @Route("/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}",
-     *     name="UserApiTopEditsPage",
-     *     requirements = {
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|\d+|all",
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"namespace"="all", "start"=false, "end"=false},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get all edits made by a user to a specific page.")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -299,12 +280,22 @@ class TopEditsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param TopEditsRepository $topEditsRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      * @todo Add pagination.
      */
+    #[Route(
+        '/api/user/top_edits/{project}/{username}/{namespace}/{page}/{start}/{end}',
+        name: 'UserApiTopEditsPage',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['namespace' => 'all', 'start' => false, 'end' => false],
+        methods: ['GET']
+    )]
     public function singlePageTopEditsUserApiAction(
         TopEditsRepository $topEditsRepo,
         AutomatedEditsHelper $autoEditsHelper

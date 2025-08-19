@@ -41,7 +41,7 @@ class ModelTest extends TestAdapter
         self::assertEquals($end, $model->getEndDate());
         self::assertTrue($model->hasDateRange());
         self::assertNull($model->getLimit());
-        self::assertNull($model->getOffset());
+        self::assertFalse($model->getOffset());
         self::assertNull($model->getOffsetISO());
     }
 }

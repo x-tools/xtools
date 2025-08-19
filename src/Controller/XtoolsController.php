@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
@@ -39,24 +40,6 @@ use Wikimedia\IPUtils;
  */
 abstract class XtoolsController extends AbstractController
 {
-    /** DEPENDENCIES */
-
-    protected CacheItemPoolInterface $cache;
-    protected Client $guzzle;
-    protected Environment $twig;
-    protected FlashBagInterface $flashBag;
-    protected I18nHelper $i18n;
-    protected ManagerRegistry $managerRegistry;
-    protected ProjectRepository $projectRepo;
-    protected UserRepository $userRepo;
-    protected PageRepository $pageRepo;
-
-    /** @var bool Whether this is a WMF installation. */
-    protected bool $isWMF;
-
-    /** @var string The configured default project. */
-    protected string $defaultProject;
-
     /** OTHER CLASS PROPERTIES */
 
     /** @var Request The request object. */
@@ -81,16 +64,16 @@ abstract class XtoolsController extends AbstractController
     protected ?Page $page = null;
 
     /** @var int|false Start date parsed from the Request. */
-    protected $start = false;
+    protected int|false $start = false;
 
     /** @var int|false End date parsed from the Request. */
-    protected $end = false;
+    protected int|false $end = false;
 
     /** @var int|string|null Namespace parsed from the Request, ID as int or 'all' for all namespaces. */
-    protected $namespace;
+    protected int|string|null $namespace;
 
     /** @var int|false Unix timestamp. Pagination offset that substitutes for $end. */
-    protected $offset = false;
+    protected int|false $offset = false;
 
     /** @var int|null Number of results to return. */
     protected ?int $limit = 50;
@@ -192,7 +175,6 @@ abstract class XtoolsController extends AbstractController
      * @param RequestStack $requestStack
      * @param ManagerRegistry $managerRegistry
      * @param CacheItemPoolInterface $cache
-     * @param FlashBagInterface $flashBag
      * @param Client $guzzle
      * @param I18nHelper $i18n
      * @param ProjectRepository $projectRepo
@@ -205,31 +187,21 @@ abstract class XtoolsController extends AbstractController
     public function __construct(
         ContainerInterface $container,
         RequestStack $requestStack,
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        FlashBagInterface $flashBag,
-        Client $guzzle,
-        I18nHelper $i18n,
-        ProjectRepository $projectRepo,
-        UserRepository $userRepo,
-        PageRepository $pageRepo,
-        Environment $twig,
-        bool $isWMF,
-        string $defaultProject
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected I18nHelper $i18n,
+        protected ProjectRepository $projectRepo,
+        protected UserRepository $userRepo,
+        protected PageRepository $pageRepo,
+        protected Environment $twig,
+        /** @var bool Whether this is a WMF installation. */
+        protected bool $isWMF,
+        /** @var string The configured default project. */
+        protected string $defaultProject,
     ) {
         $this->container = $container;
         $this->request = $requestStack->getCurrentRequest();
-        $this->managerRegistry = $managerRegistry;
-        $this->cache = $cache;
-        $this->flashBag = $flashBag;
-        $this->guzzle = $guzzle;
-        $this->i18n = $i18n;
-        $this->projectRepo = $projectRepo;
-        $this->userRepo = $userRepo;
-        $this->pageRepo = $pageRepo;
-        $this->twig = $twig;
-        $this->isWMF = $isWMF;
-        $this->defaultProject = $defaultProject;
         $this->params = $this->parseQueryParams();
 
         // Parse out the name of the controller and action.
@@ -577,7 +549,7 @@ abstract class XtoolsController extends AbstractController
             // Clear flash bag for API responses, since they get intercepted in ExceptionListener
             // and would otherwise be shown in subsequent requests.
             if ($this->isApi) {
-                $this->flashBag->clear();
+                $this->getFlashBag()?->clear();
             }
 
             throw new XtoolsHttpException(
@@ -927,11 +899,11 @@ abstract class XtoolsController extends AbstractController
         ], $data);
 
         // Merge in flash messages, putting them at the top.
-        $flashes = $this->flashBag->peekAll();
+        $flashes = $this->getFlashBag()?->peekAll() ?? [];
         $ret = array_merge($flashes, $ret);
 
         // Flashes now can be cleared after merging into the response.
-        $this->flashBag->clear();
+        $this->getFlashBag()?->clear();
 
         // Normalize path param values.
         $ret = self::normalizeApiProperties($ret);
@@ -1040,6 +1012,18 @@ abstract class XtoolsController extends AbstractController
         } catch (Exception $e) {
             // Do nothing. API response should still be returned rather than erroring out.
         }
+    }
+
+    /**
+     * Get the FlashBag instance from the current session, if available.
+     * @return ?FlashBagInterface
+     */
+    public function getFlashBag(): ?FlashBagInterface
+    {
+        if ($this->request->getSession() instanceof FlashBagAwareSessionInterface) {
+            return $this->request->getSession()->getFlashBag();
+        }
+        return null;
     }
 
     /**

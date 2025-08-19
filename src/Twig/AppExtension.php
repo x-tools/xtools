@@ -24,48 +24,19 @@ use Wikimedia\IPUtils;
  */
 class AppExtension extends AbstractExtension
 {
-    protected I18nHelper $i18n;
-    protected ParameterBagInterface $parameterBag;
-    protected ProjectRepository $projectRepo;
-    protected RequestStack $requestStack;
-    protected UrlGeneratorInterface $urlGenerator;
-
-    protected bool $isWMF;
-    protected int $replagThreshold;
-    protected bool $singleWiki;
-
     /** @var float Duration of the current HTTP request in seconds. */
     protected float $requestTime;
 
-    /**
-     * Constructor, with the I18nHelper through dependency injection.
-     * @param RequestStack $requestStack
-     * @param I18nHelper $i18n
-     * @param UrlGeneratorInterface $generator
-     * @param ProjectRepository $projectRepo
-     * @param ParameterBagInterface $parameterBag
-     * @param bool $isWMF
-     * @param bool $singleWiki
-     * @param int $replagThreshold
-     */
     public function __construct(
-        RequestStack $requestStack,
-        I18nHelper $i18n,
-        UrlGeneratorInterface $generator,
-        ProjectRepository $projectRepo,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        bool $singleWiki,
-        int $replagThreshold
+        protected RequestStack $requestStack,
+        protected I18nHelper $i18n,
+        protected UrlGeneratorInterface $urlGenerator,
+        protected ProjectRepository $projectRepo,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected bool $singleWiki,
+        protected int $replagThreshold
     ) {
-        $this->requestStack = $requestStack;
-        $this->i18n = $i18n;
-        $this->urlGenerator = $generator;
-        $this->projectRepo = $projectRepo;
-        $this->parameterBag = $parameterBag;
-        $this->isWMF = $isWMF;
-        $this->singleWiki = $singleWiki;
-        $this->replagThreshold = $replagThreshold;
     }
 
     /*********************************** FUNCTIONS ***********************************/
@@ -455,7 +426,7 @@ class AppExtension extends AbstractExtension
      * Get the currently logged in user's details.
      * @return string[]|object|null
      */
-    public function loggedInUser()
+    public function loggedInUser(): array|object|null
     {
         return $this->requestStack->getSession()->get('logged_in_user');
     }
@@ -502,7 +473,7 @@ class AppExtension extends AbstractExtension
      * @param int $decimals Number of decimals to format to.
      * @return string
      */
-    public function numberFormat($number, int $decimals = 0): string
+    public function numberFormat(int|float $number, int $decimals = 0): string
     {
         return $this->i18n->numberFormat($number, $decimals);
     }
@@ -541,7 +512,7 @@ class AppExtension extends AbstractExtension
      * @see http://userguide.icu-project.org/formatparse/datetime
      * @return string
      */
-    public function dateFormat($datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
+    public function dateFormat(string|int|DateTime $datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
     {
         return $this->i18n->dateFormat($datetime, $pattern);
     }
@@ -575,7 +546,7 @@ class AppExtension extends AbstractExtension
      * @param integer $precision Number of decimal places to show.
      * @return string Formatted percentage.
      */
-    public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
+    public function percentFormat(int|float $numerator, ?int $denominator = null, int $precision = 1): string
     {
         return $this->i18n->percentFormat($numerator, $denominator, $precision);
     }
@@ -586,7 +557,7 @@ class AppExtension extends AbstractExtension
      * @param User|string $user User object or username as a string.
      * @return bool
      */
-    public function isUserAnon(Project $project, $user): bool
+    public function isUserAnon(Project $project, User|string $user): bool
     {
         if ($user instanceof User) {
             $username = $user->getUsername();
@@ -602,7 +573,7 @@ class AppExtension extends AbstractExtension
      * @param string[] $namespaces List of available namespaces as retrieved from Project::getNamespaces().
      * @return string Namespace name
      */
-    public function nsName($namespace, array $namespaces): string
+    public function nsName(int|string $namespace, array $namespaces): string
     {
         if ('all' === $namespace) {
             return $this->i18n->msg('all');
@@ -663,7 +634,7 @@ class AppExtension extends AbstractExtension
      * @return string|array Examples: '30 seconds', '2 minutes', '15 hours', '500 days',
      *   or [30, 'num-seconds'] (etc.) if $translate is false.
      */
-    public function formatDuration(int $seconds, bool $translate = true)
+    public function formatDuration(int $seconds, bool $translate = true): string|array
     {
         [$val, $key] = $this->getDurationMessageKey($seconds);
 

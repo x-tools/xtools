@@ -9,7 +9,7 @@ use App\Model\Page;
 use App\Model\Project;
 use App\Model\User;
 use DateTime;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Result;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
@@ -111,8 +111,8 @@ class PageRepository extends Repository
     public function getRevisions(
         Page $page,
         ?User $user = null,
-        $start = false,
-        $end = false,
+        false|int $start = false,
+        false|int $end = false,
         ?int $limit = null,
         ?int $numRevisions = null
     ): array {
@@ -138,16 +138,16 @@ class PageRepository extends Repository
      *   a separate query is ran to get the number of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return ResultStatement
+     * @return Result
      */
     public function getRevisionsStmt(
         Page $page,
         ?User $user = null,
         ?int $limit = null,
         ?int $numRevisions = null,
-        $start = false,
-        $end = false
-    ): ResultStatement {
+        false|int $start = false,
+        false|int $end = false
+    ): Result {
         $revTable = $this->getTableName(
             $page->getProject()->getDatabaseName(),
             'revision',
@@ -215,8 +215,12 @@ class PageRepository extends Repository
      * @param false|int $end
      * @return int
      */
-    public function getNumRevisions(Page $page, ?User $user = null, $start = false, $end = false): int
-    {
+    public function getNumRevisions(
+        Page $page,
+        ?User $user = null,
+        false|int $start = false,
+        false|int $end = false
+    ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_numrevisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -272,22 +276,19 @@ class PageRepository extends Repository
         // Page title without underscores (str_replace just to be sure)
         $pageTitle = str_replace('_', ' ', $page->getTitle());
 
-        $conn = $this->getToolsConnection();
-        return $conn->executeQuery($sql, [
+        return $this->getToolsConnection()->executeQuery($sql, [
             'dbName' => $dbName,
             'title' => $pageTitle,
         ])->fetchAllAssociative();
     }
 
     /**
-     * Get or count all wikidata items for the given page,
-     *     not just languages of sister projects
+     * Get or count all wikidata items for the given page, not just languages of sister projects.
      * @param Page $page
      * @param bool $count Set to true to get only a COUNT
-     * @return string[]|int Records as returend by the DB,
-     *                      or raw COUNT of the records.
+     * @return string[]|int Records as returned by the DB, or raw COUNT of the records.
      */
-    public function getWikidataItems(Page $page, bool $count = false)
+    public function getWikidataItems(Page $page, bool $count = false): array|int
     {
         if (!$page->getWikidataId()) {
             return $count ? 0 : [];
@@ -319,18 +320,18 @@ class PageRepository extends Repository
         $linkTargetTable = $page->getProject()->getTableName('linktarget');
         $redirectTable = $page->getProject()->getTableName('redirect');
 
-        $sql = "SELECT COUNT(*) AS value, 'links_ext' AS type
+        $sql = "SELECT 'links_ext_count' AS type, COUNT(*) AS value
                 FROM $externalLinksTable WHERE el_from = :id
                 UNION
-                SELECT COUNT(*) AS value, 'links_out' AS type
+                SELECT 'links_out_count' AS type, COUNT(*) AS value
                 FROM $pageLinksTable WHERE pl_from = :id
                 UNION
-                SELECT COUNT(*) AS value, 'links_in' AS type
+                SELECT 'links_in_count' AS type, COUNT(*) AS value
                 FROM $pageLinksTable
                 JOIN $linkTargetTable ON lt_id = pl_target_id
                 WHERE lt_namespace = :namespace AND lt_title = :title
                 UNION
-                SELECT COUNT(*) AS value, 'redirects' AS type
+                SELECT 'redirects_count' AS type, COUNT(*) AS value
                 FROM $redirectTable WHERE rd_namespace = :namespace AND rd_title = :title";
 
         $params = [
@@ -339,15 +340,7 @@ class PageRepository extends Repository
             'namespace' => $page->getNamespace(),
         ];
 
-        $res = $this->executeProjectsQuery($page->getProject(), $sql, $params);
-        $data = [];
-
-        // Transform to associative array by 'type'
-        foreach ($res as $row) {
-            $data[$row['type'] . '_count'] = (int)$row['value'];
-        }
-
-        return $data;
+        return $this->executeProjectsQuery($page->getProject(), $sql, $params)->fetchAllKeyValue();
     }
 
     /**
@@ -369,7 +362,7 @@ class PageRepository extends Repository
      * @return string[][][]
      * @throws BadGatewayException
      */
-    public function getPageviews(Page $page, $start, $end): array
+    public function getPageviews(Page $page, string|DateTime $start, string|DateTime $end): array
     {
         // Pull from cache for each call during the same request.
         // FIXME: This is fine for now as we only fetch pageviews for one page at a time,
@@ -413,7 +406,7 @@ class PageRepository extends Repository
     /**
      * Get the full HTML content of the the page.
      * @param Page $page
-     * @param int|null $revId What revision to query for.
+     * @param ?int $revId What revision to query for.
      * @return string
      * @throws BadGatewayException
      */

@@ -893,7 +893,7 @@ class PageInfo extends PageInfoApi
                 'first' => $edit->getTimestamp(),
                 'firstId' => $edit->getId(),
                 'last' => null,
-                'atbe' => null,
+                'atbe' => 0,
                 'added' => 0,
             ];
         }

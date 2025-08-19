@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Repository\AuthorshipRepository;
+use App\Repository\Repository;
 use DateTime;
 use GuzzleHttp\Exception\RequestException;
 
@@ -39,20 +40,17 @@ class Authorship extends Model
 
     /**
      * Authorship constructor.
-     * @param AuthorshipRepository $repository
-     * @param Page $page The page to process.
-     * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
-     * @param int|null $limit Max number of results.
+     * @param Repository|AuthorshipRepository $repository
+     * @param ?Page $page The page to process.
+     * @param ?string $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
+     * @param ?int $limit Max number of results.
      */
     public function __construct(
-        AuthorshipRepository $repository,
-        Page $page,
+        protected Repository|AuthorshipRepository $repository,
+        protected ?Page $page,
         ?string $target = null,
-        ?int $limit = null
+        protected ?int $limit = null
     ) {
-        $this->repository = $repository;
-        $this->page = $page;
-        $this->limit = $limit;
         $this->target = $this->getTargetRevId($target);
     }
 
@@ -163,7 +161,7 @@ class Authorship extends Model
     {
         try {
             $ret = $this->repository->getData($this->page, $this->target, $returnRevId);
-        } catch (RequestException $e) {
+        } catch (RequestException) {
             $this->data = [
                 'error' => 'unknown',
             ];
@@ -297,7 +295,7 @@ class Authorship extends Model
             $editor = $token['editor'];
 
             // IPs are prefixed with '0|', otherwise it's the user ID.
-            if ('0|' === substr($editor, 0, 2)) {
+            if (str_starts_with($editor, '0|')) {
                 $editor = substr($editor, 2);
             } else {
                 $userIds[] = $editor;

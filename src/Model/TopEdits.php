@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Helper\AutomatedEditsHelper;
+use App\Repository\Repository;
 use App\Repository\TopEditsRepository;
 
 /**
@@ -12,8 +13,6 @@ use App\Repository\TopEditsRepository;
  */
 class TopEdits extends Model
 {
-    protected AutomatedEditsHelper $autoEditsHelper;
-
     /** @var string[]|Edit[] Top edits, either to a page or across namespaces. */
     protected array $topEdits = [];
 
@@ -32,19 +31,16 @@ class TopEdits extends Model
     /** @var int Number of reverted top edits. */
     protected int $totalReverted = 0;
 
-    /** @var int Which page of results to show. */
-    protected int $pagination = 0;
-
     private const DEFAULT_LIMIT_SINGLE_NAMESPACE = 1000;
     private const DEFAULT_LIMIT_ALL_NAMESPACES = 20;
 
     /**
      * TopEdits constructor.
-     * @param TopEditsRepository $repository
+     * @param Repository|TopEditsRepository $repository
      * @param AutomatedEditsHelper $autoEditsHelper
      * @param Project $project
-     * @param User $user
-     * @param Page|null $page
+     * @param ?User $user
+     * @param ?Page $page
      * @param string|int $namespace Namespace ID or 'all'.
      * @param int|false $start Start date as Unix timestamp.
      * @param int|false $end End date as Unix timestamp.
@@ -53,26 +49,19 @@ class TopEdits extends Model
      * @param int $pagination Which page of results to show.
      */
     public function __construct(
-        TopEditsRepository $repository,
-        AutomatedEditsHelper $autoEditsHelper,
-        Project $project,
-        User $user,
-        ?Page $page = null,
-        $namespace = 0,
-        $start = false,
-        $end = false,
+        protected Repository|TopEditsRepository $repository,
+        protected AutomatedEditsHelper $autoEditsHelper,
+        protected Project $project,
+        protected ?User $user,
+        protected ?Page $page = null,
+        string|int $namespace = 0,
+        protected int|false $start = false,
+        protected int|false $end = false,
         ?int $limit = null,
-        int $pagination = 0
+        /** @var int Which page of results to show. */
+        protected int $pagination = 0,
     ) {
-        $this->repository = $repository;
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->project = $project;
-        $this->user = $user;
-        $this->page = $page;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-        $this->start = $start;
-        $this->end = $end;
-        $this->pagination = $pagination;
 
         if (null !== $limit) {
             $this->limit = $limit;
@@ -171,36 +160,13 @@ class TopEdits extends Model
      */
     public function getProjectTotals(int $ns): array
     {
-        if ($this->getNumPagesNamespace() > $this->limit) {
-            $projectTotals = $this->repository->getProjectTotals(
-                $this->project,
-                $this->user,
-                $ns,
-                $this->start,
-                $this->end
-            );
-        } else {
-            $counts_tmp = [];
-            // List of pages for this namespace
-            $rows = $this->topEdits[$ns];
-            foreach ($rows as $row) {
-                $num = $row["count"];
-                // May be null or nonexistent for assessment-less pages
-                $titles = $row["pap_project_title"] ?? "{}";
-                // Had to use json to pass multiple values in SQL select
-                foreach (json_decode($titles) as $projectName) {
-                    $counts_tmp[$projectName] ??= 0;
-                    $counts_tmp[$projectName] += $num;
-                }
-            }
-            arsort($counts_tmp);
-            $counts_tmp = array_slice($counts_tmp, 0, 10);
-            $projectTotals = [];
-            foreach ($counts_tmp as $project => $count) {
-                $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
-            }
-        }
-        return $projectTotals;
+         return $this->repository->getProjectTotals(
+             $this->project,
+             $this->user,
+             $ns,
+             $this->start,
+             $this->end
+         );
     }
 
     /**

@@ -6,6 +6,7 @@ namespace App\Model;
 
 use App\Repository\EditRepository;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use App\Repository\UserRepository;
 use DateTime;
 use TypeError;
@@ -19,8 +20,6 @@ class Edit extends Model
     public const DELETED_COMMENT = 2;
     public const DELETED_USER = 4;
     public const DELETED_RESTRICTED = 8;
-
-    protected UserRepository $userRepo;
 
     /** @var int ID of the revision */
     protected int $id;
@@ -54,17 +53,17 @@ class Edit extends Model
 
     /**
      * Edit constructor.
-     * @param EditRepository $repository
+     * @param Repository|EditRepository $repository
      * @param UserRepository $userRepo
-     * @param Page $page
+     * @param ?Page $page
      * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
      */
-    public function __construct(EditRepository $repository, UserRepository $userRepo, Page $page, array $attrs = [])
-    {
-        $this->repository = $repository;
-        $this->userRepo = $userRepo;
-        $this->page = $page;
-
+    public function __construct(
+        protected Repository|EditRepository $repository,
+        protected UserRepository $userRepo,
+        protected ?Page $page,
+        array $attrs = []
+    ) {
         // Copy over supported attributes
         $this->id = isset($attrs['id']) ? (int)$attrs['id'] : (int)$attrs['rev_id'];
 

@@ -12,7 +12,7 @@ use App\Repository\UserRightsRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The AdminStatsController serves the search form and results page of the AdminStats tool.
@@ -56,24 +56,25 @@ class AdminStatsController extends XtoolsController
     /**
      * Method for rendering the AdminStats Main Form.
      * This method redirects if valid parameters are found, making it a valid form endpoint as well.
-     * @Route(
-     *     "/adminstats", name="AdminStats",
-     *     requirements={"group"="admin|patroller|steward"},
-     *     defaults={"group"="admin"}
-     * )
-     * @Route(
-     *     "/patrollerstats", name="PatrollerStats",
-     *     requirements={"group"="admin|patroller|steward"},
-     *     defaults={"group"="patroller"}
-     * )
-     * @Route(
-     *     "/stewardstats", name="StewardStats",
-     *     requirements={"group"="admin|patroller|steward"},
-     *     defaults={"group"="steward"}
-     * )
-     * @param AdminStatsRepository $adminStatsRepo
-     * @return Response
      */
+    #[Route(
+        "/adminstats",
+        name: "AdminStats",
+        requirements: ["group" => "admin|patroller|steward"],
+        defaults: ["group" => "admin"]
+    )]
+    #[Route(
+        "/patrollerstats",
+        name: "PatrollerStats",
+        requirements: ["group" => "admin|patroller|steward"],
+        defaults: ["group" => "patroller"]
+    )]
+    #[Route(
+        "/stewardstats",
+        name: "StewardStats",
+        requirements: ["group" => "admin|patroller|steward"],
+        defaults: ["group" => "steward"]
+    )]
     public function indexAction(AdminStatsRepository $adminStatsRepo): Response
     {
         $this->getAndSetRequestedActions();
@@ -182,8 +183,6 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Every action in this controller (other than 'index') calls this first.
-     * @param AdminStatsRepository $adminStatsRepo
-     * @return AdminStats
      * @codeCoverageIgnore
      */
     public function setUpAdminStats(AdminStatsRepository $adminStatsRepo): AdminStats
@@ -205,17 +204,22 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Method for rendering the AdminStats results.
-     * @Route(
-     *     "/{group}stats/{project}/{start}/{end}", name="AdminStatsResult",
-     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
-     *     defaults={"start"=false, "end"=false, "group"="admin"}
-     * )
-     * @param AdminStatsRepository $adminStatsRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param I18nHelper $i18n
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/{group}stats/{project}/{start}/{end}",
+        name: "AdminStatsResult",
+        requirements: [
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "group" => "admin|patroller|steward",
+        ],
+        defaults: [
+            "start" => false,
+            "end" => false,
+            "group" => "admin",
+        ]
+    )]
     public function resultAction(
         AdminStatsRepository $adminStatsRepo,
         UserRightsRepository $userRightsRepo,
@@ -241,13 +245,6 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Get users of the project that are capable of making admin, patroller, or steward actions.
-     * @Route(
-     *     "/api/project/{group}_groups/{project}",
-     *     name="ProjectApiAdminsGroups",
-     *     requirements={"group"="admin|patroller|steward"},
-     *     defaults={"group"="admin"},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Project API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Group")
@@ -268,10 +265,15 @@ class AdminStatsController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param AdminStatsRepository $adminStatsRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/project/{group}_groups/{project}",
+        name: "ProjectApiAdminsGroups",
+        requirements: ["group" => "admin|patroller|steward"],
+        defaults: ["group" => "admin"],
+        methods: ["GET"]
+    )]
     public function adminsGroupsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
         $this->recordApiUsage('project/admin_groups');
@@ -289,13 +291,6 @@ class AdminStatsController extends XtoolsController
 
     /**
      * Get counts of logged actions by admins, patrollers, or stewards.
-     * @Route(
-     *     "/api/project/{group}_stats/{project}/{start}/{end}",
-     *     name="ProjectApiAdminStats",
-     *     requirements={"start"="|\d{4}-\d{2}-\d{2}", "end"="|\d{4}-\d{2}-\d{2}", "group"="admin|patroller|steward"},
-     *     defaults={"start"=false, "end"=false, "group"="admin"},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Project API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Group")
@@ -328,10 +323,23 @@ class AdminStatsController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param AdminStatsRepository $adminStatsRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/project/{group}_stats/{project}/{start}/{end}",
+        name: "ProjectApiAdminStats",
+        requirements: [
+            "start" => "|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "group" => "admin|patroller|steward",
+        ],
+        defaults: [
+            "start" => false,
+            "end" => false,
+            "group" => "admin",
+        ],
+        methods: ["GET"]
+    )]
     public function adminStatsApiAction(AdminStatsRepository $adminStatsRepo): JsonResponse
     {
         $this->recordApiUsage('project/adminstats');

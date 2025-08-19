@@ -8,7 +8,7 @@ use App\Model\Authorship;
 use App\Repository\AuthorshipRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the search form and results for the Authorship tool
@@ -36,10 +36,9 @@ class AuthorshipController extends XtoolsController
 
     /**
      * The search form.
-     * @Route("/authorship", name="Authorship")
-     * @Route("/authorship/{project}", name="AuthorshipProject")
-     * @return Response
      */
+    #[Route('/authorship', name: 'Authorship')]
+    #[Route('/authorship/{project}', name: 'AuthorshipProject')]
     public function indexAction(): Response
     {
         $this->params['target'] = $this->request->query->get('target', '');
@@ -73,29 +72,26 @@ class AuthorshipController extends XtoolsController
     }
 
     /**
-     * @Route(
-     *     "/articleinfo-authorship/{project}/{page}",
-     *     name="AuthorshipResultLegacy",
-     *     requirements={
-     *         "page"="(.+?)",
-     *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"target"="latest"}
-     * )
-     * @Route(
-     *     "/authorship/{project}/{page}/{target}",
-     *     name="AuthorshipResult",
-     *     requirements={
-     *         "page"="(.+?)",
-     *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"target"="latest"}
-     * )
-     * @param string $target
-     * @param AuthorshipRepository $authorshipRepo
-     * @param RequestStack $requestStack
-     * @return Response
+     * The result page.
      */
+    #[Route(
+        '/authorship/{project}/{page}/{target}',
+        name: 'AuthorshipResult',
+        requirements: [
+            'page' => '(.+?)',
+            'target' => '|latest|\d+|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['target' => 'latest']
+    )]
+    #[Route(
+        '/articleinfo-authorship/{project}/{page}',
+        name: 'AuthorshipResultLegacy',
+        requirements: [
+            'page' => '(.+?)',
+            'target' => '|latest|\d+|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: ['target' => 'latest']
+    )]
     public function resultAction(
         string $target,
         AuthorshipRepository $authorshipRepo,

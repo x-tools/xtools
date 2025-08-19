@@ -8,7 +8,6 @@ use App\Model\Project;
 use App\Model\User;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
-use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -20,24 +19,22 @@ use Wikimedia\IPUtils;
  */
 class GlobalContribsRepository extends Repository
 {
-    protected ProjectRepository $projectRepo;
 
     /** @var Project CentralAuth project (meta.wikimedia for WMF installation). */
     protected Project $caProject;
 
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ProjectRepository $projectRepo,
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected ProjectRepository $projectRepo,
         string $centralAuthProject
     ) {
         $this->caProject = new Project($centralAuthProject);
-        $this->projectRepo = $projectRepo;
         $this->caProject->setRepository($this->projectRepo);
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
@@ -47,7 +44,7 @@ class GlobalContribsRepository extends Repository
      * @see GlobalContribsRepository::globalEditCountsFromCentralAuth()
      * @see GlobalContribsRepository::globalEditCountsFromDatabases()
      * @param User $user The user.
-     * @return mixed[] Elements are arrays with 'project' (Project), and 'total' (int). Null if anon (too slow).
+     * @return ?array Elements are arrays with 'project' (Project), and 'total' (int). Null if anon (too slow).
      */
     public function globalEditCounts(User $user): ?array
     {
@@ -221,11 +218,11 @@ class GlobalContribsRepository extends Repository
     public function getRevisions(
         array $dbNames,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false,
+        int|string $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false,
         int $limit = 31, // One extra to know whether there should be another page.
-        $offset = false
+        int|false $offset = false
     ): array {
         // Check cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'gc_revisions');
@@ -235,15 +232,15 @@ class GlobalContribsRepository extends Repository
 
         // Just need any Connection to use the ->quote() method.
         $quoteConn = $this->getProjectsConnection('s1');
-        $username = $quoteConn->quote($user->getUsername(), PDO::PARAM_STR);
+        $username = $quoteConn->getDatabasePlatform()->quoteStringLiteral($user->getUsername());
 
         // IP range handling.
         $startIp = '';
         $endIp = '';
         if ($user->isIpRange()) {
             [$startIp, $endIp] = IPUtils::parseRange($user->getUsername());
-            $startIp = $quoteConn->quote($startIp, PDO::PARAM_STR);
-            $endIp = $quoteConn->quote($endIp, PDO::PARAM_STR);
+            $startIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral($startIp);
+            $endIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral($endIp);
         }
 
         // Fetch actor IDs (for IP ranges, it strips trailing zeros and uses a LIKE query).

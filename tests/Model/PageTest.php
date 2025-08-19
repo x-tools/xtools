@@ -229,7 +229,7 @@ class PageTest extends TestAdapter
      */
     public function testErrors(): void
     {
-        $this->markTestSkipped( 'Broken until T413013 is fixed' );
+        $this->markTestSkipped('Broken until T413013 is fixed');
         $checkWikiErrors = [
             [
                 'error' => '61',
@@ -320,11 +320,11 @@ class PageTest extends TestAdapter
     {
         static::createClient();
         return new PageRepository(
-            self::$container->get('doctrine'),
-            self::$container->get('cache.app'),
-            self::$container->get('eight_points_guzzle.client.xtools'),
+            static::getContainer()->get('doctrine'),
+            static::getContainer()->get('cache.app'),
+            static::getContainer()->get('eight_points_guzzle.client.xtools'),
             $this->createMock(LoggerInterface::class),
-            self::$container->get('parameter_bag'),
+            static::getContainer()->get('parameter_bag'),
             true,
             30
         );

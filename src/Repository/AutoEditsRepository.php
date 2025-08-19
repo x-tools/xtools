@@ -23,8 +23,6 @@ use Wikimedia\IPUtils;
  */
 class AutoEditsRepository extends UserRepository
 {
-    protected AutomatedEditsHelper $autoEditsHelper;
-
     /** @var array List of automated tools, used for fetching the tool list and filtering it. */
     private array $aeTools;
 
@@ -44,21 +42,20 @@ class AutoEditsRepository extends UserRepository
      * @param int $queryTimeout
      * @param ProjectRepository $projectRepo
      * @param AutomatedEditsHelper $autoEditsHelper
-     * @param RequestStack $requestStack
+     * @param ?RequestStack $requestStack
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ProjectRepository $projectRepo,
-        AutomatedEditsHelper $autoEditsHelper,
-        RequestStack $requestStack
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected ProjectRepository $projectRepo,
+        protected AutomatedEditsHelper $autoEditsHelper,
+        protected ?RequestStack $requestStack
     ) {
-        $this->autoEditsHelper = $autoEditsHelper;
         parent::__construct(
             $managerRegistry,
             $cache,
@@ -96,7 +93,7 @@ class AutoEditsRepository extends UserRepository
      * @param int|string $namespace Namespace ID or 'all'.
      * @return array
      */
-    public function getTools(Project $project, $namespace = 'all'): array
+    public function getTools(Project $project, int|string $namespace = 'all'): array
     {
         if (!isset($this->aeTools)) {
             $this->aeTools = $this->autoEditsHelper->getTools($project, $this->useSandbox);
@@ -134,7 +131,7 @@ class AutoEditsRepository extends UserRepository
      * Overrides Repository::setCache(), and will not call the parent (which sets the cache) if using the sandbox.
      * @inheritDoc
      */
-    public function setCache(string $cacheKey, $value, $duration = 'PT20M')
+    public function setCache(string $cacheKey, $value, $duration = 'PT20M'): mixed
     {
         if ($this->useSandbox) {
             return $value;
@@ -155,9 +152,9 @@ class AutoEditsRepository extends UserRepository
     public function countAutomatedEdits(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false
+        string|int $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false
     ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoeditcount');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
@@ -235,10 +232,10 @@ class AutoEditsRepository extends UserRepository
     public function getNonAutomatedEdits(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false,
-        $offset = false,
+        string|int $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false,
+        int|false $offset = false,
         int $limit = 50
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_nonautoedits');
@@ -320,11 +317,11 @@ class AutoEditsRepository extends UserRepository
     public function getAutomatedEdits(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false,
+        string|int $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false,
         ?string $tool = null,
-        $offset = false,
+        int|false $offset = false,
         int $limit = 50
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autoedits');
@@ -420,8 +417,13 @@ class AutoEditsRepository extends UserRepository
      *                      ],
      *                  ]
      */
-    public function getToolCounts(Project $project, User $user, $namespace = 'all', $start = false, $end = false): array
-    {
+    public function getToolCounts(
+        Project $project,
+        User $user,
+        string|int $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false
+    ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_autotoolcounts');
         if (!$this->useSandbox && $this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -473,9 +475,9 @@ class AutoEditsRepository extends UserRepository
     private function getAutomatedCountsSql(
         Project $project,
         User $user,
-        $namespace,
-        $start = false,
-        $end = false
+        string|int $namespace,
+        int|false $start = false,
+        int|false $end = false
     ): string {
         $revDateConditions = $this->getDateConditions($start, $end);
 
@@ -501,7 +503,7 @@ class AutoEditsRepository extends UserRepository
         foreach ($tools as $toolName => $values) {
             [$condTool, $commentJoin, $tagJoin] = $this->getInnerAutomatedCountsSql($project, $toolName, $values);
 
-            $toolName = $conn->quote($toolName, PDO::PARAM_STR);
+            $toolName = $conn->getDatabasePlatform()->quoteStringLiteral($toolName);
 
             // No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
             // configuration, but no local tag exists on the said project.
@@ -543,7 +545,7 @@ class AutoEditsRepository extends UserRepository
         if (isset($values['regex'])) {
             $commentTable = $project->getTableName('comment', 'revision');
             $commentJoin = "LEFT OUTER JOIN $commentTable ON rev_comment_id = comment_id";
-            $regex = $conn->quote($values['regex'], PDO::PARAM_STR);
+            $regex = $conn->getDatabasePlatform()->quoteStringLiteral($values['regex']);
             $condTool = "comment_text REGEXP $regex";
         }
         if (isset($values['tags'])) {
@@ -581,7 +583,7 @@ class AutoEditsRepository extends UserRepository
     private function getToolRegexAndTags(
         Project $project,
         ?string $tool = null,
-        $namespace = null
+        int|string|null $namespace = null
     ): array {
         $tools = $this->getTools($project);
         $regexes = [];

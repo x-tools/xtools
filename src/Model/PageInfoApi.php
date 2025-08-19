@@ -8,6 +8,7 @@ use App\Exception\BadGatewayException;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\PageInfoRepository;
+use App\Repository\Repository;
 use DateTime;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -22,9 +23,6 @@ class PageInfoApi extends Model
 {
     /** @var int Number of days of recent data to show for pageviews. */
     public const PAGEVIEWS_OFFSET = 30;
-
-    protected AutomatedEditsHelper $autoEditsHelper;
-    protected I18nHelper $i18n;
 
     /** @var int Number of revisions that belong to the page. */
     protected int $numRevisions;
@@ -52,27 +50,21 @@ class PageInfoApi extends Model
 
     /**
      * PageInfoApi constructor.
-     * @param PageInfoRepository $repository
+     * @param Repository|PageInfoRepository $repository
      * @param I18nHelper $i18n
      * @param AutomatedEditsHelper $autoEditsHelper
-     * @param Page $page The page to process.
+     * @param ?Page $page The page to process.
      * @param false|int $start Start date as Unix timestmap.
      * @param false|int $end End date as Unix timestamp.
      */
     public function __construct(
-        PageInfoRepository $repository,
-        I18nHelper $i18n,
-        AutomatedEditsHelper $autoEditsHelper,
-        Page $page,
-        $start = false,
-        $end = false
+        protected Repository|PageInfoRepository $repository,
+        protected I18nHelper $i18n,
+        protected AutomatedEditsHelper $autoEditsHelper,
+        protected ?Page $page,
+        protected false|int $start = false,
+        protected false|int $end = false
     ) {
-        $this->repository = $repository;
-        $this->i18n = $i18n;
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->page = $page;
-        $this->start = $start;
-        $this->end = $end;
     }
 
     /**
@@ -169,7 +161,7 @@ class PageInfoApi extends Model
 
         try {
             $html = $this->page->getHTMLContent($datetime);
-        } catch (BadGatewayException $e) {
+        } catch (BadGatewayException) {
             // Prose stats are non-critical, so handle the BadGatewayException gracefully in the views.
             return null;
         }
@@ -292,10 +284,10 @@ class PageInfoApi extends Model
 
         try {
             $info = $this->repository->getBasicEditingInfo($page);
-        } catch (ServiceUnavailableHttpException $e) {
+        } catch (ServiceUnavailableHttpException) {
             // No more open database connections.
             $data['error'] = 'Unable to fetch revision data. Please try again later.';
-        } catch (HttpException $e) {
+        } catch (HttpException) {
             /**
              * The query most likely exceeded the maximum query time,
              * so we'll abort and give only info retrieved by the API.

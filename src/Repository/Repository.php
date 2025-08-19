@@ -8,9 +8,9 @@ use App\Exception\BadGatewayException;
 use App\Model\Project;
 use DateInterval;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
@@ -29,63 +29,39 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 abstract class Repository
 {
-    protected CacheItemPoolInterface $cache;
-    protected Client $guzzle;
-    protected LoggerInterface $logger;
-    protected ManagerRegistry $managerRegistry;
-    protected ParameterBagInterface $parameterBag;
-
     /** @var Connection The database connection to the meta database. */
     private Connection $metaConnection;
 
     /** @var Connection The database connection to other tools' databases.  */
     private Connection $toolsConnection;
 
-    /** @var bool Whether this is configured as a WMF installation. */
-    protected bool $isWMF;
-
-    /** @var int */
-    protected int $queryTimeout;
-
-    /** @var RequestStack|null */
-    protected ?RequestStack $requestStack;
-
     /** @var string Prefix URL for where the dblists live. Will be followed by i.e. 's1.dblist' */
     public const DBLISTS_URL = 'https://noc.wikimedia.org/conf/dblists/';
 
     /**
      * Create a new Repository.
-     * @param ManagerRegistry $managerRegistry
-     * @param Client $guzzle
-     * @param LoggerInterface $logger
-     * @param ParameterBagInterface $parameterBag
-     * @param bool $isWMF
-     * @param int $queryTimeout
-     * @param RequestStack|null $requestStack
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ?RequestStack $requestStack = null
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected ?RequestStack $requestStack = null
     ) {
-        $this->managerRegistry = $managerRegistry;
-        $this->cache = $cache;
-        $this->guzzle = $guzzle;
-        $this->logger = $logger;
-        $this->parameterBag = $parameterBag;
-        $this->isWMF = $isWMF;
-        $this->queryTimeout = $queryTimeout;
-        $this->requestStack = $requestStack;
     }
 
     /***************
      * CONNECTIONS *
      ***************/
+
+    private function getConnection(string $name): Connection
+    {
+        /** @type Connection */
+        return $this->managerRegistry->getConnection($name);
+    }
 
     /**
      * Get the database connection for the 'meta' database.
@@ -106,7 +82,7 @@ abstract class Repository
      * @return Connection
      * @codeCoverageIgnore
      */
-    protected function getProjectsConnection($project): Connection
+    protected function getProjectsConnection(Project|string $project): Connection
     {
         if (is_string($project)) {
             if (1 === preg_match('/^s\d+$/', $project)) {
@@ -120,7 +96,7 @@ abstract class Repository
             $slice = $this->getDbList()[$project->getDatabaseName()];
         }
 
-        return $this->managerRegistry->getConnection('toolforge_'.$slice);
+        return $this->getConnection('toolforge_'.$slice);
     }
 
     /**
@@ -131,7 +107,7 @@ abstract class Repository
     protected function getToolsConnection(): Connection
     {
         if (!isset($this->toolsConnection)) {
-            $this->toolsConnection = $this->managerRegistry->getConnection('toolsdb');
+            $this->toolsConnection = $this->getConnection('toolsdb');
         }
         return $this->toolsConnection;
     }
@@ -154,7 +130,7 @@ abstract class Repository
         $exists = true;
         $i = 0;
 
-        while ($exists) {
+        while (true) {
             $i += 1;
             $response = $this->guzzle->request('GET', self::DBLISTS_URL."s$i.dblist", ['http_errors' => false]);
             $exists = in_array(
@@ -335,7 +311,7 @@ abstract class Repository
      * @param string $duration Valid DateInterval string.
      * @return mixed The given $value.
      */
-    public function setCache(string $cacheKey, $value, string $duration = 'PT20M')
+    public function setCache(string $cacheKey, mixed $value, string $duration = 'PT20M'): mixed
     {
         $cacheItem = $this->cache
             ->getItem($cacheKey)
@@ -359,9 +335,9 @@ abstract class Repository
      * @return string
      */
     public function getDateConditions(
-        $start,
-        $end,
-        $offset = false,
+        false|int $start,
+        false|int $end,
+        false|int $offset = false,
         string $tableAlias = '',
         string $field = 'rev_timestamp'
     ) : string {
@@ -392,16 +368,16 @@ abstract class Repository
      * @param array $params Parameters to bound to the prepared query.
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the APP_QUERY_TIMEOUT env variable.
-     * @return ResultStatement
+     * @return Result
      * @throws DriverException
      * @codeCoverageIgnore
      */
     public function executeProjectsQuery(
-        $project,
+        Project|string $project,
         string $sql,
         array $params = [],
         ?int $timeout = null
-    ): ResultStatement {
+    ): Result {
         try {
             $timeout = $timeout ?? $this->queryTimeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;
@@ -417,17 +393,18 @@ abstract class Repository
      * @param QueryBuilder $qb
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the APP_QUERY_TIMEOUT env variable.
-     * @return ResultStatement
+     * @return Result
      * @throws HttpException
      * @throws DriverException
      * @codeCoverageIgnore
      */
-    public function executeQueryBuilder(QueryBuilder $qb, ?int $timeout = null): ResultStatement
+    public function executeQueryBuilder(QueryBuilder $qb, ?int $timeout = null): Result
     {
         try {
             $timeout = $timeout ?? $this->queryTimeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$qb->getSQL();
-            return $qb->getConnection()->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
+            // FIXME
+            return $qb->executeQuery($sql, $qb->getParameters(), $qb->getParameterTypes());
         } catch (DriverException $e) {
             $this->handleDriverError($e, $timeout);
         }
@@ -448,9 +425,9 @@ abstract class Repository
             $timeout = $this->queryTimeout;
         }
 
-        if (1226 === $e->getErrorCode()) {
+        if (1226 === $e->getCode()) {
             throw new ServiceUnavailableHttpException(30, 'error-service-overload', null, 503);
-        } elseif (in_array($e->getErrorCode(), [2006, 2013])) {
+        } elseif (in_array($e->getCode(), [2006, 2013])) {
             // FIXME: Attempt to reestablish connection on 2006 error (MySQL server has gone away).
             throw new HttpException(
                 Response::HTTP_GATEWAY_TIMEOUT,
@@ -459,7 +436,7 @@ abstract class Repository
                 [],
                 Response::HTTP_GATEWAY_TIMEOUT
             );
-        } elseif (1969 == $e->getErrorCode()) {
+        } elseif (1969 == $e->getCode()) {
             throw new HttpException(
                 Response::HTTP_GATEWAY_TIMEOUT,
                 'error-query-timeout',

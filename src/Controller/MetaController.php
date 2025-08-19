@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves everything for the Meta tool.
@@ -29,11 +29,10 @@ class MetaController extends XtoolsController
 
     /**
      * Display the form.
-     * @Route("/meta", name="meta")
-     * @Route("/meta", name="Meta")
-     * @Route("/meta/index.php", name="MetaIndexPhp")
-     * @return Response
      */
+    #[Route("/meta", name: "meta")]
+    #[Route("/meta", name: "Meta")]
+    #[Route("/meta/index.php", name: "MetaIndexPhp")]
     public function indexAction(): Response
     {
         if (isset($this->params['start']) && isset($this->params['end'])) {
@@ -49,19 +48,16 @@ class MetaController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route(
-     *     "/meta/{start}/{end}/{legacy}",
-     *     name="MetaResult",
-     *     requirements={
-     *         "start"="\d{4}-\d{2}-\d{2}",
-     *         "end"="\d{4}-\d{2}-\d{2}",
-     *     },
-     * )
-     * @param ManagerRegistry $managerRegistry
-     * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/meta/{start}/{end}/{legacy}",
+        name: "MetaResult",
+        requirements: [
+            "start" => "\d{4}-\d{2}-\d{2}",
+            "end" => "\d{4}-\d{2}-\d{2}",
+        ]
+    )]
     public function resultAction(ManagerRegistry $managerRegistry, bool $legacy = false): Response
     {
         $db = $legacy ? 'toolsdb' : 'default';
@@ -194,7 +190,6 @@ class MetaController extends XtoolsController
     /**
      * Record usage of a particular XTools tool. This is called automatically
      *   in base.html.twig via JavaScript so that it is done asynchronously.
-     * @Route("/meta/usage/{tool}/{project}/{token}")
      * @param Request $request
      * @param ParameterBagInterface $parameterBag
      * @param ManagerRegistry $managerRegistry
@@ -205,6 +200,7 @@ class MetaController extends XtoolsController
      * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route("/meta/usage/{tool}/{project}/{token}", name: "RecordMetaUsage")]
     public function recordUsageAction(
         Request $request,
         ParameterBagInterface $parameterBag,

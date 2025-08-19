@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Helper\I18nHelper;
+use App\Repository\Repository;
 use App\Repository\UserRightsRepository;
 use DateInterval;
 use DateTimeImmutable;
@@ -15,8 +16,6 @@ use Exception;
  */
 class UserRights extends Model
 {
-    protected I18nHelper $i18n;
-
     /** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
     protected array $rightsChanges;
 
@@ -33,15 +32,17 @@ class UserRights extends Model
     protected bool $impossibleLogs = false;
 
     /**
-     * @param UserRightsRepository $repository
-     * @param User $user
+     * @param Repository|UserRightsRepository $repository
+     * @param Project $project
+     * @param User|null $user
+     * @param I18nHelper $i18n
      */
-    public function __construct(UserRightsRepository $repository, Project $project, User $user, I18nHelper $i18n)
-    {
-        $this->repository = $repository;
-        $this->project = $project;
-        $this->user = $user;
-        $this->i18n = $i18n;
+    public function __construct(
+        protected Repository|UserRightsRepository $repository,
+        protected Project $project,
+        protected ?User $user,
+        protected I18nHelper $i18n
+    ) {
     }
 
     /**
@@ -81,7 +82,7 @@ class UserRights extends Model
      * Checks the user rights log to see whether the user is an admin or used to be one.
      * @return string|false One of false (never an admin), 'current' or 'former'.
      */
-    public function getAdminStatus()
+    public function getAdminStatus(): false|string
     {
         $rightsStates = $this->getRightsStates();
 
@@ -245,7 +246,7 @@ class UserRights extends Model
             // Nothing was deleted.
             } else {
                 $unserialized = @unserialize($row['log_params']);
-    
+
                 if (false !== $unserialized) {
                     $old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
                     $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
@@ -253,21 +254,21 @@ class UserRights extends Model
                     $removed = array_diff($old, $new);
                     $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
                     $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
-    
+
                     // Check for changes only to expiry.
                     // If such exists, treat it as added. Various issets are safeguards.
                     if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
                         foreach ($old as $index => $right) {
                             $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
                             $newExpiry = $newMetadata[$index]['expiry'] ?? null;
-    
+
                             // Check if an expiry was added, removed, or modified.
                             if ((null !== $oldExpiry && null === $newExpiry) ||
                                 (null === $oldExpiry && null !== $newExpiry) ||
                                 (null !== $oldExpiry && null !== $newExpiry)
                             ) {
                                 $added[$index] = $right;
-    
+
                                 // Remove the last auto-removal(s), which must exist.
                                 foreach (array_reverse($rightsChanges, true) as $timestamp => $change) {
                                     if (in_array($right, $change['removed']) && !in_array($right, $change['added']) &&
@@ -279,12 +280,12 @@ class UserRights extends Model
                             }
                         }
                     }
-    
+
                     // If a right was removed, remove any previously pending auto-removals.
                     if (count($removed) > 0) {
                         $this->unsetAutoRemoval($rightsChanges, $removed);
                     }
-    
+
                     $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
                 } else {
                     // This is the old school format that most likely contains
@@ -295,14 +296,14 @@ class UserRights extends Model
                         $new = array_filter(array_map('trim', explode(',', (string)$new)));
                         $added = array_diff($new, $old);
                         $removed = array_diff($old, $new);
-                    } catch (Exception $e) {
+                    } catch (Exception) {
                         // Really, really old school format that may be missing metadata
                         // altogether. Here we'll just leave $added and $removed empty.
                         $added = [];
                         $removed = [];
                     }
                 }
-    
+
                 // Remove '(none)'.
                 if (in_array('(none)', $added)) {
                     array_splice($added, array_search('(none)', $added), 1);
@@ -324,7 +325,7 @@ class UserRights extends Model
             // Then append those that are in $added.
             // (Doesn't take care of duplicates, but that should be impossible.)
             $tempRights = array_merge($tempRights, $added);
-            
+
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
@@ -415,7 +416,7 @@ class UserRights extends Model
      * Get the timestamp of when the user became autoconfirmed.
      * @return string|false YmdHis format, or false if date is in the future or if AC status could not be determined.
      */
-    private function getAutoconfirmedTimestamp()
+    private function getAutoconfirmedTimestamp(): false|string
     {
         static $acTimestamp = null;
         if (null !== $acTimestamp) {
