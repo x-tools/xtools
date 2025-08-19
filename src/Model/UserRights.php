@@ -318,7 +318,11 @@ class UserRights extends Model
                 // Then we're removing something which isn't there.
                 $this->impossibleLogs = true;
             }
+            // Keep up to date our temporary rights list:
+            // Filter out those that are in $removed,
             $tempRights = array_diff($tempRights, $removed);
+            // Then append those that are in $added.
+            // (Doesn't take care of duplicates, but that should be impossible.)
             $tempRights = array_merge($tempRights, $added);
             
             $rightsChanges[$row['log_timestamp']] = [
