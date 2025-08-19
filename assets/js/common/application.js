@@ -712,6 +712,7 @@ function clearLinkTimer()
     // change the link's label back
     let old = $("#submit_timer").parent()[0];
     $(old).html(old.initialtext);
+    $(old).removeClass("link-loading");
 }
 
 /**
@@ -732,12 +733,14 @@ function setupLinkLoadingNotices(undo)
             el.className == "" && // only plain links, not buttons
             el.href.startsWith(document.location.origin) && // to XTools
             new URL(el.href).pathname.replaceAll(/[^\/]/g, "").length > 1 && // that include parameters (just going to a search form is not costy)
+            el.target != "_blank" && // that doesn't open in a new tab
             el.href.split("#")[0] != document.location.href // and that isn't a section link to here.
         ).on("click", (ev) => {
             // And then add a listener
             let el = $(ev.target);
             el.prop("initialtext", el.html());
             el.html($.i18n('loading') + ' <span id=\'submit_timer\'></span>');
+            el.addClass("link-loading");
             if (loadingTimerId) {
                 clearLinkTimer();
             }
