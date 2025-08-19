@@ -9,6 +9,7 @@ use App\Tests\SessionHelper;
 use App\Tests\TestAdapter;
 use DateTime;
 use Krinkle\Intuition\Intuition;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @covers \App\Helper\I18nHelper
@@ -18,12 +19,13 @@ class I18nHelperTest extends TestAdapter
     use SessionHelper;
 
     protected I18nHelper $i18n;
+    protected Session $session;
 
     public function setUp(): void
     {
-        $session = $this->createSession(static::createClient());
+        $this->session = $this->createSession(static::createClient());
         $this->i18n = new I18nHelper(
-            $this->getRequestStack($session),
+            $this->getRequestStack($this->session),
             static::getContainer()->getParameter('kernel.project_dir')
         );
     }
@@ -63,5 +65,14 @@ class I18nHelperTest extends TestAdapter
         static::assertEquals($datetime, $this->i18n->dateFormat('2023-01-23T12:34'));
         static::assertEquals($datetime, $this->i18n->dateFormat(new DateTime($datetime)));
         static::assertEquals($datetime, $this->i18n->dateFormat(1674477240));
+    }
+
+    public function testGetIntuitionInvalidLang(): void
+    {
+        $invalidI18n = new I18nHelper(
+            $this->getRequestStack($this->session, ['uselang' => 'invalid-lang']),
+            static::getContainer()->getParameter('kernel.project_dir')
+        );
+        static::assertEquals('en', $invalidI18n->getLang());
     }
 }

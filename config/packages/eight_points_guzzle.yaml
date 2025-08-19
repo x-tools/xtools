@@ -6,4 +6,5 @@ eight_points_guzzle:
             options:
                 headers:
                     Accept: "application/json"
+                    User-Agent: 'XTools/%env(APP_VERSION)% (https://xtools.wmcloud.org %env(MAILER_TO_EMAIL)%) GuzzleHttp'
                 timeout: 30

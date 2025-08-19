@@ -1,6 +1,8 @@
 {
 	"@metadata": {
-		"authors": []
+		"authors": [
+			"Alien333"
+		]
 	},
 	"all": "Alle",
 	"all-languages": "Alle Schprohche",
@@ -21,10 +23,10 @@
 	"performer": "Metmaacher",
 	"project": "Projäk",
 	"report-issue": "Donn e Problehm mällde",
-	"size-gigabytes": "$1&nbsp;GB",
-	"size-kilobytes": "$1&nbsp;KB",
-	"size-megabytes": "$1&nbsp;MB",
-	"size-terabytes": "$1&nbsp;TB",
+	"size-gigabytes": "$1 GB",
+	"size-kilobytes": "$1 KB",
+	"size-megabytes": "$1 MB",
+	"size-terabytes": "$1 TB",
 	"translation-credits": "Övversäzonge kumme vun $1 un $2",
 	"user": "Metmaacher"
 }

@@ -134,6 +134,7 @@ class PagesTest extends TestAdapter
                 'badge' => 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Symbol_question.svg',
                 'color' => '',
                 'category' => 'Category:Unassessed articles',
+                'projects' => ['Random'],
             ],
         ], $results[0][0]);
         static::assertEquals([
@@ -151,6 +152,7 @@ class PagesTest extends TestAdapter
                 'badge' => 'https://upload.wikimedia.org/wikipedia/commons/2/25/Symbol_a_class.svg',
                 'color' => '#66FFFF',
                 'category' => 'Category:A-Class articles',
+                'projects' => ['Technology', 'Websites', 'Internet'],
             ],
         ], $results[1][0]);
         static::assertTrue($pages->isMultiNamespace());
@@ -173,6 +175,7 @@ class PagesTest extends TestAdapter
                     'recreated' => null,
                     'pa_class' => 'A',
                     'was_redirect' => null,
+                    'pap_project_title' => '["Technology","Websites","Internet"]',
                 ], [
                     'namespace' => 0,
                     'type' => 'arc',
@@ -185,6 +188,7 @@ class PagesTest extends TestAdapter
                     'recreated' => 1,
                     'pa_class' => null,
                     'was_redirect' => '1',
+                    'pap_project_title' => '["Random"]',
                 ], [
                     'namespace' => 0,
                     'type' => 'rev',
@@ -197,6 +201,7 @@ class PagesTest extends TestAdapter
                     'recreated' => null,
                     'pa_class' => 'FA',
                     'was_redirect' => null,
+                    'pap_project_title' => '["Computing","Technology","Linguistics"]',
                 ],
             ]);
         $this->pagesRepo->expects($this->once())
