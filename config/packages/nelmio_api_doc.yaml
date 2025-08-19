@@ -264,8 +264,16 @@ nelmio_api_doc:
                             type: boolean
                             description:
                                 Whether the edit has definitively been reverted.
-                                A `false` value or commission of the `reverted` property does not
+                                A `false` value or ommission of the `reverted` property does not
                                 necessarily mean it wasn't reverted.
+                            example: true
+                        pending:
+                            type: boolean
+                            description:
+                                Whether the edit is pending review.
+                                (From the FlaggedRevs extension.)
+                                A `false` value or omission of the property does not
+                                necessarily mean it isn't pending.
                             example: true
                 EditWithProject:
                     allOf:
