@@ -69,6 +69,7 @@
 	"auto-edits-request": "Text of for a link to request that a new (semi-)automated tool be added to XTools.",
 	"auto-edits-tool-filter-desc": "Tooltip for dropdown in AutoEdits that lets you filter results by a given tool.",
 	"auto-edits-unknown-tool": "Error message shown when the requested tool does not exist.",
+	"auto-tool-counts": "Header for the table of the number of edits using each tool.",
 	"auto-tool-edits": "Title for page listing semi-automated edits using a specific tool. $1 is a link with the name of the tool as the link text.",
 	"automatic": "Word to indicate the surrounding change happened automatically, such as a user rights change.\n{{Identical|Automatic}}",
 	"average-change-per-page": "Label for the average change (in bytes) the user has made on a page.",

@@ -50,6 +50,7 @@
 	"auto-edits-request": "Request that a new (semi-)automated tool be added",
 	"auto-edits-tool-filter-desc": "Show only edits using the given tool.",
 	"auto-edits-unknown-tool": "No known tool with the name: $1",
+	"auto-tool-counts": "Tool counts",
 	"auto-tool-edits": "$1 edits",
 	"automatic": "Automatic",
 	"average-change-per-page": "Average change per page",
