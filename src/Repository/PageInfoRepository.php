@@ -227,6 +227,33 @@ class PageInfoRepository extends AutoEditsRepository
     }
 
     /**
+     * Get the number of subpages
+     * @param Page $page
+     * @return int
+     */
+    public function getSubpageCount(Page $page): int
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_subpagecount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $project = $page->getProject();
+        $pageTable = $project->getTableName('page');
+        $title = $page->getTitleWithoutNamespace();
+        $ns = $page->getNamespace();
+
+        $sql = "SELECT COUNT(page_id) as `count`
+            FROM $pageTable
+            WHERE page_title LIKE '$title/%'
+            AND page_namespace = $ns";
+
+        $result = $this->executeProjectsQuery($project, $sql)->fetchAllAssociative();
+
+        return $this->setCache($cacheKey, $result[0]['count']);
+    }
+
+    /**
      * Get the top editors to the page by edit count.
      * @param Page $page
      * @param false|int $start

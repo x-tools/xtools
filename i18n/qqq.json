@@ -428,6 +428,7 @@
 	"steward-stats-notice2": "Message shown at the top of the Steward Stats tool. Similar to the 'admin-stats-notice2' message.",
 	"stewards": "Name for the steward user group. Used to select which user group to show in the Admin Stats tool.\n{{Identical|Steward}}",
 	"submit": "Submit button text\n{{Identical|Submit}}",
+	"subpages": "Label for the number of subpages of a page",
 	"sul-info": "Label for link to a user's SUL (single user login) page.",
 	"summary": "Title for statistics summary\n{{Identical|Summary}}",
 	"sunday": "{{Identical|Sunday}}",

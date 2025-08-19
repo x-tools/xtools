@@ -416,6 +416,15 @@ class PageInfo extends PageInfoApi
     }
 
     /**
+     * Get the subpage count.
+     * @return int
+     */
+    public function getSubpageCount(): int
+    {
+        return $this->repository->getSubpageCount($this->page);
+    }
+
+    /**
      * Get the list of editors to the page, including various statistics.
      * @return array
      */
