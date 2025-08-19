@@ -195,6 +195,7 @@ class EditCounterRepository extends Repository
             'protect-unprotect',
             'rights-rights',
             'move-move',
+            'move-move_redir',
             'delete-delete',
             'delete-revision',
             'delete-restore',
@@ -582,20 +583,21 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT AVG(sizes.size) AS average_size,
-                COUNT(CASE WHEN sizes.size < 20 THEN 1 END) AS small_edits,
-                COUNT(CASE WHEN sizes.size > 1000 THEN 1 END) AS large_edits
-                FROM (
-                    SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
-                    FROM $revisionTable AS revs
-                    JOIN $pageTable ON revs.rev_page = page_id
-                    $ipcJoin
-                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE $whereClause
-                    ORDER BY revs.rev_timestamp DESC
-                    LIMIT 5000
-                ) sizes";
-        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
+        $sql = "SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
+                FROM $revisionTable AS revs
+                JOIN $pageTable ON revs.rev_page = page_id
+                $ipcJoin
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE $whereClause
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 5000";
+        $data = $this->executeProjectsQuery($project, $sql, $params)->fetchFirstColumn();
+        $results = $data;
+        $results['average_size'] = count($data) > 0 ? array_sum($data)/count($data) : 0;
+        $isSmall = fn($n) => abs(intval($n)) < 20;
+        $isLarge = fn($n) => abs(intval($n)) > 1000;
+        $results['small_edits'] = count(array_filter($data, $isSmall));
+        $results['large_edits'] = count(array_filter($data, $isLarge));
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);

@@ -13,6 +13,7 @@
 			"Nehme1499",
 			"Nemo bis",
 			"Samuele2002",
+			"Wheelygay",
 			"Wim b"
 		]
 	},
@@ -373,6 +374,7 @@
 	"redirfilter-noredirects": "Escludi i reindirizzamenti",
 	"redirfilter-onlyredirects": "Includi solo i reindirizzamenti",
 	"references": "Note",
+	"registered-edits": "Modifiche registrate",
 	"registration-date": "Data di registrazione",
 	"report-issue": "Segnala un problema",
 	"reprotect": "Riproteggi",
@@ -487,7 +489,11 @@
 	"unique-references": "Riferimenti unici",
 	"unknown": "Sconosciuto",
 	"unprotect": "Sproteggi",
+	"unregistered-edits": "Modifiche non registrate",
+	"unregistered-edits-tooltip": "Modifiche effetuate da conti o IP temporanei",
+	"unregistered-edits-percentage": "Modifiche non registrate %",
 	"unreverted-edits": "Contributi non ripristinati",
+	"use-log-scale": "Utilizzare la scala logaritmica",
 	"user": "Utente",
 	"user-groups": "Gruppi utente",
 	"user-id": "ID utente",

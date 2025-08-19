@@ -80,7 +80,15 @@ class SimpleEditCounterRepository extends Repository
                     $arNamespaceWhereSql
                     $arDateConditions
                 UNION
-                SELECT 'rev' AS source, COUNT(*) AS value
+                SELECT 'rev' AS source,
+                    CONCAT(COUNT(*), \";\",
+                    COUNT(
+                        CASE rev_parent_id
+                        WHEN 0
+                        THEN 1
+                        ELSE NULL
+                        END
+                    )) AS value
                     FROM $revisionTable
                     $revNamespaceJoinSql
                     WHERE rev_actor = :actorId
