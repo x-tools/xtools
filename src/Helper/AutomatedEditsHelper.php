@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class AutomatedEditsHelper
 {
-    protected CacheItemPoolInterface $cache;
     protected SessionInterface $session;
 
     /** @var array The list of tools that are considered reverting. */
@@ -29,24 +28,29 @@ class AutomatedEditsHelper
      * AutomatedEditsHelper constructor.
      * @param RequestStack $requestStack
      * @param CacheItemPoolInterface $cache
+     * @param \GuzzleHttp\Client $guzzle
      */
-    public function __construct(RequestStack $requestStack, CacheItemPoolInterface $cache)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        protected CacheItemPoolInterface $cache,
+        protected \GuzzleHttp\Client $guzzle
+    ) {
         $this->session = $requestStack->getSession();
-        $this->cache = $cache;
     }
 
     /**
-     * Get the tool that matched the given edit summary.
-     * This only works for tools defined with regular expressions, not tags.
+     * Get the first tool that matched the given edit summary and tags.
      * @param string $summary Edit summary
      * @param Project $project
+     * @param string[] $tags
      * @return string[]|null Tool entry including key for 'name', or false if nothing was found
      */
-    public function getTool(string $summary, Project $project): ?array
+    public function getTool(string $summary, Project $project, array $tags = []): ?array
     {
         foreach ($this->getTools($project) as $tool => $values) {
-            if (isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) {
+            if ((isset($values['regex']) && preg_match('/'.$values['regex'].'/', $summary)) ||
+                (isset($values['tags']) && count(array_intersect($values['tags'], $tags)) > 0)
+            ) {
                 return array_merge([
                     'name' => $tool,
                 ], $values);
@@ -58,7 +62,6 @@ class AutomatedEditsHelper
 
     /**
      * Was the edit (semi-)automated, based on the edit summary?
-     * This only works for tools defined with regular expressions, not tags.
      * @param string $summary Edit summary
      * @param Project $project
      * @return bool
@@ -99,7 +102,7 @@ class AutomatedEditsHelper
                 $uri
             ));
         } else {
-            $resp = json_decode(file_get_contents($uri));
+            $resp = json_decode($this->guzzle->get($uri)->getBody()->getContents());
         }
 
         $ret = json_decode($resp->query->pages[0]->revisions[0]->slots->main->content, true);

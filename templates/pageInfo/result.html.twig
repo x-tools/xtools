@@ -310,6 +310,28 @@
                                 ({{ ai.topTenCount|percent_format(ai.numRevisionsProcessed) }})
                             </td>
                         </tr>
+                        <tr>
+                            {% apply spaceless %}
+                                <td class="stat-list--new-group">
+                                    <span class="help-text" title="{{ msg('mobile-edits-tooltip') }}">{{ msg('mobile-edits') }}</span>
+                                </td>
+                            {% endapply %}
+                            <td class="stat-list--new-group">
+                                {{ wiki.pageLinkRaw( page.title, project, ai.mobileCount|num_format, 'action=history&tagfilter=mobile+edit' ) }}
+                                &middot;
+                                ({{ ai.mobileCount|percent_format(ai.numRevisionsProcessed) }})
+                            </td>
+                        </tr>
+                        {% if project.hasVisualEditor %}
+                            <tr>
+                                <td>{{ msg('visual-edits') }}</td>
+                                <td>
+                                    {{ wiki.pageLinkRaw( page.title, project, ai.visualCount|num_format, 'action=history&tagfilter=visualeditor' ) }}
+                                    &middot;
+                                    ({{ ai.visualCount|percent_format(ai.numRevisionsProcessed) }})
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -355,6 +377,16 @@
                                     {{ wiki.pageInfoLink(page, ai.numTemplates|num_format, 'mw-pageinfo-templates') }}
                                 </td>
                             </tr>
+                            {% if ai.subpageCount > 0 %}
+                                <tr>
+                                    <td class="stat-list--new-group">{{ msg('subpages') }}</td>
+                                    <td class="stat-list--new-group">
+                                        {{
+                                            wiki.pageLinkRaw("Special:PrefixIndex/" ~ page.title, project, ai.subpageCount|num_format)
+                                        }}
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endif %}
                     </tbody>
                 </table>

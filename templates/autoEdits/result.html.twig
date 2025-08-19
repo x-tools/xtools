@@ -41,7 +41,7 @@
                     {% if ae.end is not empty %}
                         <tr>
                             <td>{{ msg('end') }}</td>
-                            <td class="xt-test--end-date">{{ ae.endDate }}</td>
+                            <td>{{ ae.endDate }}</td>
                         </tr>
                     {% endif %}
                     <tr>
@@ -237,7 +237,7 @@
         {% set downloadLink %}
             {{ layout.downloadLink('UserApiNonAutoEdits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ae.namespace, 'start': ae.startDate, 'end': ae.endDate, 'tools': '1'}, [], 'UserApiAutoEditsCount') }}
         {% endset %}
-        {{ layout.content_block('auto-edits', content, downloadLink) }}
+        {{ layout.content_block('auto-tool-counts', content, downloadLink) }}
 
         {% if ae.editCount == 0 %}
             {% set content %}
