@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"BraunOBruno",
 			"Eduardo Addad de Oliveira",
 			"Eduardoaddad",
 			"Felipe L. Ewald",
@@ -484,7 +485,9 @@
 	"unique-references": "Referências únicas",
 	"unknown": "Desconhecido",
 	"unprotect": "Desproteções",
+	"unregistered-edits": "Edições não registradas",
 	"unreverted-edits": "Edições desfeitas",
+	"use-log-scale": "Use escala logarítmica",
 	"user": "Usuário",
 	"user-groups": "Grupos de usuários",
 	"user-id": "ID de usuário",

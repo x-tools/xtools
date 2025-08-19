@@ -78,6 +78,12 @@
                                 <td>{{ wiki.pageLinkRaw('Special:DeletedContributions/' ~ user.username, project, sec.deletedEditCount|num_format) }}</td>
                             </tr>
                         {% endif %}
+                        <tr>
+                            <td>{{ msg('pages-created') }}</td>
+                            <td>
+                                <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: sec.namespace, start: sec.startDate, end: sec.endDate, redirects: 'all', deleted: 'live'}) }}">{{ sec.creationCount|num_format }}</a>
+                            </td>
+                        </tr>
                     {% endif %}
                 </table>
             </div>

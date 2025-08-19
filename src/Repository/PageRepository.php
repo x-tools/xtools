@@ -103,16 +103,25 @@ class PageRepository extends Repository
      * @param User|null $user Specify to get only revisions by the given user.
      * @param false|int $start
      * @param false|int $end
-     * @return string[] Each member with keys: id, timestamp, length.
+     * @param int|null $limit
+     * @param int|null $numRevisions
+     * @return string[] Each member with keys: id, timestamp, length,
+     *   minor, length_change, user_id, username, comment, sha, deleted, tags.
      */
-    public function getRevisions(Page $page, ?User $user = null, $start = false, $end = false): array
-    {
+    public function getRevisions(
+        Page $page,
+        ?User $user = null,
+        $start = false,
+        $end = false,
+        ?int $limit = null,
+        ?int $numRevisions = null
+    ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'page_revisions');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
 
-        $stmt = $this->getRevisionsStmt($page, $user, null, null, $start, $end);
+        $stmt = $this->getRevisionsStmt($page, $user, $limit, $numRevisions, $start, $end);
         $result = $stmt->fetchAllAssociative();
 
         // Cache and return.
@@ -146,6 +155,8 @@ class PageRepository extends Repository
         );
         $commentTable = $page->getProject()->getTableName('comment');
         $actorTable = $page->getProject()->getTableName('actor');
+        $ctTable = $page->getProject()->getTableName('change_tag');
+        $ctdTable = $page->getProject()->getTableName('change_tag_def');
         $userClause = $user ? "revs.rev_actor = :actorId AND " : "";
 
         $limitClause = '';
@@ -166,7 +177,14 @@ class PageRepository extends Repository
                         actor_name AS username,
                         comment_text AS `comment`,
                         revs.rev_sha1 AS `sha`,
-                        revs.rev_deleted AS `deleted`
+                        revs.rev_deleted AS `deleted`,
+                        (
+                            SELECT JSON_ARRAYAGG(ctd_name)
+                            FROM $ctTable
+                            JOIN $ctdTable
+                            ON ct_tag_id = ctd_id
+                            WHERE ct_rev_id = revs.rev_id
+                        ) as `tags`
                     FROM $revTable AS revs
                     LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
@@ -254,41 +272,6 @@ class PageRepository extends Repository
         return $conn->executeQuery($sql, [
             'dbName' => $dbName,
             'title' => $pageTitle,
-        ])->fetchAllAssociative();
-    }
-
-    /**
-     * Get basic wikidata on the page: label and description.
-     * @param Page $page
-     * @return string[][] In the format:
-     *    [[
-     *         'term' => string such as 'label',
-     *         'term_text' => string (value for 'label'),
-     *     ], ... ]
-     */
-    public function getWikidataInfo(Page $page): array
-    {
-        if (empty($page->getWikidataId())) {
-            return [];
-        }
-
-        $wikidataId = ltrim($page->getWikidataId(), 'Q');
-        $lang = $page->getProject()->getLang();
-        $wdp = 'wikidatawiki_p';
-
-        $sql = "SELECT wby_name AS term, wbx_text AS term_text
-                FROM $wdp.wbt_item_terms
-                JOIN $wdp.wbt_term_in_lang ON wbit_term_in_lang_id = wbtl_id
-                JOIN $wdp.wbt_type ON wbtl_type_id = wby_id
-                JOIN $wdp.wbt_text_in_lang ON wbtl_text_in_lang_id = wbxl_id
-                JOIN $wdp.wbt_text ON wbxl_text_id = wbx_id
-                WHERE wbit_item_id = :wikidataId
-                AND wby_name IN ('label', 'description')
-                AND wbxl_language = :lang";
-
-        return $this->executeProjectsQuery('wikidatawiki', $sql, [
-            'lang' => $lang,
-            'wikidataId' => $wikidataId,
         ])->fetchAllAssociative();
     }
 
