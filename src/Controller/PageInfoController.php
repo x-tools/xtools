@@ -242,8 +242,8 @@ class PageInfoController extends XtoolsController
      *         @OA\Property(property="revisions", type="integer"),
      *         @OA\Property(property="editors", type="integer"),
      *         @OA\Property(property="minor_edits", type="integer"),
-     *         @OA\Property(property="author", type="string", example="Jimbo Wales"),
-     *         @OA\Property(property="author_editcount", type="integer"),
+     *         @OA\Property(property="creator", type="string", example="Jimbo Wales"),
+     *         @OA\Property(property="creator_editcount", type="integer"),
      *         @OA\Property(property="created_at", type="date"),
      *         @OA\Property(property="created_rev_id", type="integer"),
      *         @OA\Property(property="modified_at", type="date"),
@@ -289,17 +289,6 @@ class PageInfoController extends XtoolsController
         if ('html' === $this->request->query->get('format')) {
             return $this->getApiHtmlResponse($this->project, $this->page, $data);
         }
-
-        $this->addFlash('warning', 'In XTools 3.21, the last_edit_id property will be removed. ' .
-            'Use the modified_rev_id property instead.');
-        $data['last_edit_id'] = $data['modified_rev_id'];
-        $this->addFlash('warning', 'In XTools 3.21, the author and author_editcount properties ' .
-            'will be removed. Instead, use creator and creator_editcount, respectively.');
-        $data['author'] = $data['creator'];
-        $data['author_editcount'] = $data['creator_editcount'];
-        $this->addFlash('warning', 'In XTools 3.21, the ip_edits property will be removed. ' .
-            'Use the anon_edits property instead.');
-        $data['ip_edits'] = $data['anon_edits'];
 
         return $this->getFormattedApiResponse($data);
     }

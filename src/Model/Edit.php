@@ -52,6 +52,9 @@ class Edit extends Model
     /** @var int Deletion status of the revision. */
     protected int $deleted;
 
+    /** @var string[] List of tags of the revision. */
+    protected array $tags;
+
     /**
      * Edit constructor.
      * @param EditRepository $repository
@@ -92,6 +95,9 @@ class Edit extends Model
         $this->length = isset($attrs['length']) ? (int)$attrs['length'] : null;
         $this->lengthChange = isset($attrs['length_change']) ? (int)$attrs['length_change'] : null;
         $this->comment = $attrs['comment'] ?? '';
+
+        // Had to be JSON to put multiple values in 1 column.
+        $this->tags = json_decode($attrs['tags'] ?? '[]');
 
         if (isset($attrs['rev_sha1']) || isset($attrs['sha'])) {
             $this->sha = $attrs['rev_sha1'] ?? $attrs['sha'];
@@ -458,7 +464,7 @@ class Edit extends Model
      */
     public function getTool(): ?array
     {
-        return $this->repository->getAutoEditsHelper()->getTool($this->comment, $this->getProject());
+        return $this->repository->getAutoEditsHelper()->getTool($this->comment, $this->getProject(), $this->tags);
     }
 
     /**
@@ -478,6 +484,16 @@ class Edit extends Model
     public function isAnon(Project $project): ?bool
     {
         return $this->getUser() ? $this->getUser()->isAnon($project) : null;
+    }
+
+    /**
+     * List of tag names for the edit.
+     * Only filled in by PageInfo.
+     * @return string[]
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
     }
 
     /**

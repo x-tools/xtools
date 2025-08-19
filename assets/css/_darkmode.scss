@@ -88,7 +88,8 @@ $tooltip-shadow: #333;
   .table-bordered,
   .table-bordered > tbody > tr > td,
   .table-bordered > thead > tr > th,
-  .table-bordered > tfoot > tr > th {
+  .table-bordered > tfoot > tr > th,
+  .table-bordered > thead > tr > td {
     border-color: $border-color-light;
   }
 

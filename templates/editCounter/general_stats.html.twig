@@ -128,7 +128,7 @@
         {% if not(user.isIpRange) %}
             <tr>
                 <td><strong>{{ msg('total-edits') }}</strong></td>
-                <td class="xt-test--total-edits"><strong>{{ ec.countAllRevisions|num_format }}</strong></td>
+                <td><strong>{{ ec.countAllRevisions|num_format }}</strong></td>
             </tr>
         {% endif %}
     </tbody></table>

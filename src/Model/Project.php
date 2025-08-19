@@ -287,6 +287,16 @@ class Project extends Model
     }
 
     /**
+     * Whether this wiki has the VisualEditor extension enabled.
+     * @return bool
+     */
+    public function hasVisualEditor(): bool
+    {
+        $extensions = $this->getInstalledExtensions();
+        return in_array('VisualEditor', $extensions);
+    }
+
+    /**
      * Whether the project has temporary accounts enabled.
      * @return bool
      */
