@@ -14,6 +14,40 @@
             {% if project.userHasOptedIn(user) and te.topEdits|length > 2 %}
                 {{ layout.nsToc(project, te.topEdits|keys) }}
             {% endif %}
+
+            {% set content %}
+                <div class="col-lg-6 stat-list clearfix">
+                    <table class="table"><tbody>
+                        <tr>
+                            <td>{{ msg('namespace') }}</td>
+                            <td>
+                                {{ nsName(te.namespace, project.namespaces) }}
+                            </td>
+                        </tr>
+                        {% if te.start is not empty %}
+                            <tr>
+                                <td>{{ msg('start') }}</td>
+                                <td>{{ te.startDate }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if te.end is not empty %}
+                            <tr>
+                                <td>{{ msg('end') }}</td>
+                                <td>{{ te.endDate }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td class="stat-list--new-group">{{ msg('total-edits') }}</td>
+                            <td class="stat-list--new-group">{{ te.numTopEdits|num_format }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ msg('unique-pages-edited') }}</td>
+                            <td>{{ te.getNumPagesNamespace|num_format }}</td>
+                        </tr>
+                    </tbody></table>
+                </div>
+            {% endset %}
+            {{ layout.content_block('summary', content) }}
 {% endif %}
 
 {% if not(project.userHasOptedIn(user)) %}
@@ -22,9 +56,8 @@
     {% for ns, pages in te.topEdits %}
         {% set showPageAssessment = project.hasPageAssessments(ns) %}
         {% set content %}
-        <p>{{ te.numPagesAnyNamespace(ns)|num_format }} {{ msg('pages')|lower }}.</p>
-        <div class="side-to-side">
-            <div><table class="table table-bordered table-hover table-striped topedits-namespace-table xt-show-hide--target">
+        <div class="side-to-side xt-show-hide--target">
+            <div><table class="table table-bordered table-hover table-striped topedits-namespace-table">
                 <thead><tr>
                     <th>
                         <span class="sort-link sort-link--edits" data-column="edits">
@@ -79,7 +112,7 @@
                     {% if pages|length >= 10 and te.topEdits|length > 1 %}
                         <tr>
                             <td colspan={{ showPageAssessment ? 4 : 3 }}>
-                                <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns}) }}">
+                                <a href="{{ path('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns, start:te.startDate, end:te.endDate}) }}">
                                     {{ msg('more') }}&hellip;
                                 </a>
                             </td>
@@ -127,7 +160,7 @@
             {% set numPages = (te.getNumPagesNamespace / te.limit)|round(0, 'ceil') %}
             {% set hasPrev = te.pagination - 1 >= 0 %}
             {% set hasNext = te.pagination + 1 < numPages %}
-            {% set pathVars = {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace} %}
+            {% set pathVars = {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace, 'start': te.startDate, 'end': te.endDate} %}
 
             {% if hasNext or hasPrev %}
                 <nav aria-label="...">
@@ -166,13 +199,10 @@
                 <small class='xt-show'>[{{ msg('show')|lower }}]</small>
                 <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
             </h4>
-        {% endif %}
-
-        {% if is_sub_request %}
             {{ content }}
         {% else %}
             {% set downloadLink %}
-                {{ layout.downloadLink('TopEditsResultNamespace', {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace}, ['wikitext'], 'UserApiTopEditsNamespace') }}
+                {{ layout.downloadLink('TopEditsResultNamespace', {'project': project.domain, 'username': user.usernameIdent, 'namespace': te.namespace, 'start': te.startDate, 'end': te.endDate}, ['wikitext'], 'UserApiTopEditsNamespace') }}
             {% endset %}
             {{ layout.content_block(nsName(ns, project.namespaces), content, downloadLink, ns, true, te.topEdits|length > 1) }}
         {% endif %}
