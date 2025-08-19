@@ -90,6 +90,10 @@
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countMinorRevisions }}}}{% if ec.countLiveRevisions %} ({{ ((ec.countMinorRevisions / ec.countLiveRevisions) * 100)|percent_format }})
 {% endif %}
 |-
+| {{ msg('auto-edits-tagged') }}
+| {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countAutoEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countAutoEdits / ec.countLast5000) * 100)|percent_format }})
+{% endif %}
+|-
 | {{ msg('small-edits') }}*
 | {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ ec.countSmallEdits }}}}{% if ec.countLast5000 %} ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
 {% endif %}

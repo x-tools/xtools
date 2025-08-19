@@ -188,6 +188,18 @@ class AutomatedEditsHelper
     }
 
     /**
+     * Get all the tags associated to automated edits on a given project.
+     * @param bool $useSandbox Whether to use the /sandbox version for testing (also bypasses caching).
+     * @return array Array with numeric keys and values being tag names (as in change_tag_def).
+     */
+    public function getTags(Project $project, bool $useSandbox = false): array
+    {
+        $tools = $this->getTools($project, $useSandbox);
+        $tags = array_merge(... array_map(fn($o) => $o["tags"], array_values($tools)));
+        return $tags;
+    }
+
+    /**
      * Merges the given rule sets, giving priority to the local set. Regex is concatenated, not overridden.
      * @param string[] $globalRules The global rule set.
      * @param string[] $localRules The rule set for the local wiki.
