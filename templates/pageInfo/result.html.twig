@@ -311,11 +311,11 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="stat-list--new-group">
-                                <span class="mobile-edits-tooltip" title="{{ msg('mobile-edits-tooltip') }}">
-                                    {{ msg('mobile-edits') }}
-                                </span>
-                            </td>
+                            {% apply spaceless %}
+                                <td class="stat-list--new-group">
+                                    <span class="help-text" title="{{ msg('mobile-edits-tooltip') }}">{{ msg('mobile-edits') }}</span>
+                                </td>
+                            {% endapply %}
                             <td class="stat-list--new-group">
                                 {{ wiki.pageLinkRaw( page.title, project, ai.mobileCount|num_format, 'action=history&tagfilter=mobile+edit' ) }}
                                 &middot;
