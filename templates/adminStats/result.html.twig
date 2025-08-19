@@ -87,11 +87,6 @@
                         <th>
                             <span class="sort-link sort-link--{{ key }}" data-column="{{ key }}">
                                 {{ msg(key)|ucfirst }}
-                                {% if key == 're-block' %}
-                                    <sup>1</sup>
-                                {% elseif key == 're-protect' %}
-                                    <sup>2</sup>
-                                {% endif %}
                                 <span class="glyphicon glyphicon-sort"></span>
                             </span>
                         </th>
@@ -132,12 +127,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {# Footnotes for re-blocks and re-protections. #}
-            <div class="footnotes">
-                <sup>1</sup> {{ msg('re-block-desc') }}
-                <br/><sup>2</sup> {{ msg('re-protect-desc') }}
-            </div>
-
         {% endset %}
 
         {% set params = {'project': project.domain, 'start': as.startDate, 'end': as.endDate, 'group': as.type, 'actions': as.actions|join('|')} %}
