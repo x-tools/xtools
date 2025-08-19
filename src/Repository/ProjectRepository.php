@@ -275,6 +275,7 @@ class ProjectRepository extends Repository
         $metadata = [
             'general' => [],
             'namespaces' => [],
+            'canonical_namespaces' => [],
             'tempAccountPatterns' => $res['query']['autocreatetempuser']['matchPatterns'] ?? null,
         ];
 
@@ -305,7 +306,7 @@ class ProjectRepository extends Repository
     /**
      * Set the namespaces on the given $metadata.
      * @param array $res As produced by meta=siteinfo API.
-     * @param array &$metadata The metadata array to modify.
+     * @param array $metadata The metadata array to modify.
      */
     private function setNamespaces(array $res, array &$metadata): void
     {
@@ -323,10 +324,13 @@ class ProjectRepository extends Repository
             } elseif (isset($namespace['*'])) {
                 $name = $namespace['*'];
             } else {
-                continue;
+                $name = null;
             }
 
-            $metadata['namespaces'][$namespace['id']] = $name;
+            if (null !== $name ) {
+                $metadata['namespaces'][$namespace['id']] = $name;
+            }
+            $metadata['canonical_namespaces'][$namespace['id']] = $namespace['canonical'] ?? '';
         }
     }
 
@@ -378,6 +382,11 @@ class ProjectRepository extends Repository
      */
     public function getInstalledExtensions(Project $project): array
     {
+        $cacheKey = $this->getCacheKey(func_get_args(), "project_extensions");
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
         $res = json_decode($this->guzzle->request('GET', $project->getApiUrl(), ['query' => [
             'action' => 'query',
             'meta' => 'siteinfo',
@@ -386,9 +395,39 @@ class ProjectRepository extends Repository
         ]])->getBody()->getContents(), true);
 
         $extensions = $res['query']['extensions'] ?? [];
-        return array_map(function ($extension) {
+
+        // Cache for one hour and return.
+        return $this->setCache($cacheKey, array_map(function ($extension) {
             return $extension['name'];
-        }, $extensions);
+        }, $extensions), 'PT1H');
+    }
+
+    /**
+     * Get the list of the names for each ProofreadPage quality
+     * on this wiki. Keys are 0, 1, 2, 3, and 4.
+     * @param Project $project
+     * @return string[]
+     */
+    public function getPrpQualityNames(Project $project): array
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), "project_prp_levels");
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $res = json_decode($this->guzzle->request('GET', $project->getApiUrl(), ['query' => [
+            'action' => 'query',
+            'meta' => 'proofreadinfo',
+            'prpiprop' => 'qualitylevels',
+            'format' => 'json',
+        ]])->getBody()->getContents(), true);
+
+        $qualityLevels = $res['query']['proofreadqualitylevels'] ?? [];
+
+        // Cache for one week (will change extremely rarely) and return.
+        return $this->setCache($cacheKey, array_map(function ($level) {
+            return $level['category'];
+        }, $qualityLevels), 'P1W');
     }
 
     /**

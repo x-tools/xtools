@@ -35,6 +35,10 @@
                     {% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
                         {% set columns = columns|merge(['assessment']) %}
                     {% endif %}
+                    {% if pages.isProofreadPage(ns) %}
+                        {% set columns = columns|merge(['proofreadpage-quality']) %}
+                        {% set qualityNames = project.prpQualityNames %}
+                    {% endif %}
                     {% for thKey in columns %}
                         <th>
                             <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
@@ -99,6 +103,17 @@
                                             <img alt="{{ page.assessment.class }}" src="{{ page.assessment.badge }}" class="assessment-badge" />
                                         {% endif %}
                                         {{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            {% if page.prp_quality is defined %}
+                                <td>
+                                    {% if page.deleted %}
+                                        {{ msg('na') }}
+                                    {% else %}
+                                        <span class="prp-qualitytext prp-quality{{ page.prp_quality }}">
+                                            {{ qualityNames[page.prp_quality] }}
+                                        </span>
                                     {% endif %}
                                 </td>
                             {% endif %}

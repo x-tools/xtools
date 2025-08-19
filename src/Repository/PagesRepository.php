@@ -49,17 +49,26 @@ class PagesRepository extends UserRepository
         $conditions = array_merge(
             $conditions,
             $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
-            $this->getUserConditions('' !== $start.$end)
+            $this->getUserConditions('' !== $start.$end),
+            $this->getPrpConditions($namespace, $project)
         );
 
         $wasRedirect = $this->getWasRedirectClause($redirects, $deleted);
         $summation = Pages::DEL_NONE !== $deleted ? 'redirect OR was_redirect' : 'redirect';
+
+        $prpSelect = '';
+        if ($project->isPrpPage($namespace)) {
+            foreach ([0, 1, 2, 3, 4] as $level) {
+                $prpSelect .= ", SUM(IF(`prp_quality` = $level, 1, 0)) AS `prp_quality$level`";
+            }
+        }
 
         $sql = "SELECT `namespace`,
                     COUNT(page_title) AS `count`,
                     SUM(IF(type = 'arc', 1, 0)) AS `deleted`,
                     SUM($summation) AS `redirects`,
                     SUM(rev_length) AS `total_length`
+                    $prpSelect
                 FROM (" .
             $this->getPagesCreatedInnerSql($project, $conditions, $deleted, $start, $end, false, true)."
                 ) a ".
@@ -112,7 +121,8 @@ class PagesRepository extends UserRepository
         $conditions = array_merge(
             $conditions,
             $this->getNamespaceRedirectAndDeletedPagesConditions($namespace, $redirects),
-            $this->getUserConditions('' !== $start.$end)
+            $this->getUserConditions('' !== $start.$end),
+            $this->getPrpConditions($namespace, $project)
         );
 
         $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
@@ -132,7 +142,7 @@ class PagesRepository extends UserRepository
                     ON pa_project_id = pap_project_id
                     WHERE pa_page_id = page_id
                 ) AS pap_project_title";
-            $conditions['paSelectsArchive'] = ', NULL AS pa_class, NULL as pap_project_title';
+            $conditions['paSelectsArchive'] = ', NULL AS pa_class, NULL AS pap_project_title';
             $conditions['revPageGroupBy'] = 'GROUP BY rev_page';
         }
 
@@ -194,6 +204,29 @@ class PagesRepository extends UserRepository
     }
 
     /**
+     * Get SQL fragments for ProofreadPage quality.
+     * @param int|string $namespace
+     * @param Project $project
+     * @return string[] With keys 'prpSelect', 'prpArSelect' and 'prpJoin'
+     */
+    private function getPrpConditions($namespace, $project): array
+    {
+        $conditions = [
+            'prpSelect' => '',
+            'prpArSelect' => '',
+            'prpJoin' => ''
+        ];
+        if ($project->isPrpPage($namespace)) {
+            $pagePropsTable = $project->getTableName('page_props', '');
+            $conditions['prpSelect'] = ", pp_value AS `prp_quality`";
+            $conditions['prpArSelect'] = ", NULL AS `prp_quality`";
+            $conditions['prpJoin'] = "LEFT OUTER JOIN $pagePropsTable
+                ON (pp_page, pp_propname) = (page_id, 'proofread_page_quality_level')";
+        }
+        return $conditions;
+    }
+
+    /**
      * Inner SQL for getting or counting pages created by the user.
      * @param Project $project
      * @param string[] $conditions Conditions for the SQL, must include 'paSelects',
@@ -221,7 +254,7 @@ class PagesRepository extends UserRepository
         $logTable = $project->getTableName('logging', 'logindex');
 
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-        $revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
+        $revSelects = "page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
             . "page_is_redirect AS `redirect`, rev_len AS `rev_length`";
         if (!$count) {
             $revSelects .= ", page_len AS `length`, rev_timestamp AS `timestamp`, "
@@ -235,10 +268,11 @@ class PagesRepository extends UserRepository
         $tagDefTable = $project->getTableName('change_tag_def');
 
         $revisionsSelect = "
-            SELECT $revSelects ".$conditions['paSelects'].",
+            SELECT $revSelects ".$conditions['paSelects'].$conditions['prpSelect'].",
                 NULL AS was_redirect
             FROM $pageTable
             JOIN $revisionTable ON page_id = rev_page
+            ".$conditions['prpJoin']."
             WHERE ".$conditions['whereRev']."
                 AND rev_parent_id = '0'".
                 $conditions['namespaceRev'].
@@ -249,6 +283,7 @@ class PagesRepository extends UserRepository
         // Only SELECT things that are needed, based on whether or not we're doing a COUNT.
         $arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS `page_title`, "
             . "'0' AS `redirect`, ar_len AS `rev_length`";
+
         if (!$count) {
             $arSelects .= ", NULL AS `length`, MIN(ar_timestamp) AS `timestamp`, ".
                 "ar_rev_id AS `rev_id`, EXISTS(
@@ -259,7 +294,7 @@ class PagesRepository extends UserRepository
         }
 
         $archiveSelect = "
-            SELECT $arSelects ".$conditions['paSelectsArchive'].",
+            SELECT $arSelects ".$conditions['paSelectsArchive'].$conditions['prpArSelect'].",
                 (
                     SELECT 1
                     FROM $tagTable

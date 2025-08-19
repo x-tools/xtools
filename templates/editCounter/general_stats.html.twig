@@ -533,13 +533,14 @@
         {### ProofreadPage quality changes ###}
         {% if project.hasProofreadPage %}
             {% set qualityChanges = ec.countQualityChanges %}
+            {% set qualityNames = project.prpQualityNames %}
             {% if qualityChanges.total > 1 %}
                 <div class="pull-left">
                     {{ msg('proofreadpage-qualitychanges') }}*
                     {{
                         chart.pie_chart('prp_qualitychanges',
                             [0, 1, 2, 3, 4]|map((i) => {
-                                label: msg('proofreadpage-quality' ~ i),
+                                label: qualityNames[i],
                                 value: qualityChanges[i],
                                 percentage: ((qualityChanges[i] / qualityChanges.total) * 100),
                                 color: color([11, 0, 4, 2, 1][i])

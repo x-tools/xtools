@@ -69,6 +69,31 @@ class Project extends Model
     }
 
     /**
+     * Whether or not this namespace is the Page namespace (of ProofreadPage).
+     * Or true if it is 'all'.
+     * @param int|string $namespace Namespace ID, or 'all'.
+     * @return bool
+     */
+    public function isPrpPage($namespace): bool
+    {
+        return $this->hasProofreadPage() && 
+            (
+                !is_numeric($namespace) ||
+                'Page' === $this->getCanonicalNamespace($namespace)
+            );
+    }
+
+    /**
+     * Get the list of the names of each ProofreadPage
+     * quality level. Keys are 0, 1, 2, 3, and 4.
+     * @return string[]
+     */
+    public function getPrpQualityNames(): array
+    {
+        return $this->repository->getPrpQualityNames($this);
+    }
+
+    /**
      * Unique identifier this Project, to be used in cache keys.
      * @see Repository::getCacheKey()
      * @return string
@@ -236,6 +261,22 @@ class Project extends Model
     {
         $metadata = $this->getMetadata();
         return $metadata['namespaces'];
+    }
+
+    /**
+     * Get the canonical namespace name for a namespace ID.
+     * Or '' if the namespace does not exist.
+     * @param int $namespace
+     * @return string
+     */
+    public function getCanonicalNamespace($namespace): string
+    {
+        $canonicalNamespaces = $this->getMetadata()['canonical_namespaces'];
+        if (array_key_exists($namespace, $canonicalNamespaces)) {
+            return $canonicalNamespaces[$namespace];
+        } else {
+            return '';
+        }
     }
 
     /**

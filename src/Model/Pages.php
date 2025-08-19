@@ -405,6 +405,21 @@ class Pages extends Model
     }
 
     /**
+     * Check if a namespace is the PRP Page namespace.
+     * Sadly, we don't have a clean way of knowing that
+     * and the namespace ID varies between wikis,
+     * so we have to just look at the data and check
+     * if the first row has a quality set.
+     * @param int $namespace Namespace ID.
+     * @return bool
+     */
+    public function isProofreadPage(int $namespace): bool
+    {
+        return $this->pages[$namespace][0] && 
+            array_key_exists('prp_quality', $this->pages[$namespace][0]);
+    }
+
+    /**
      * Run the query to get pages created by the user with options.
      * This is ran independently for each namespace if $this->namespace is 'all'.
      * @param int $namespace Namespace ID.
@@ -490,6 +505,10 @@ class Pages extends Model
                     'category' => $attrs['category'],
                     'projects' => json_decode($row['pap_project_title'] ?? '[]'),
                 ];
+            }
+            
+            if (array_key_exists('prp_quality', $row)) {
+                $pageData['prp_quality'] = (int)$row['prp_quality'];
             }
 
             $results[$row['namespace']][] = $pageData;
