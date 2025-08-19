@@ -158,16 +158,6 @@
                             </td>
                         </tr>
                     {% endif %}
-                    {% if ai.subpageCount > 0 %}
-                        <tr>
-                            <td>{{ msg('subpages') }}</td>
-                            <td>
-                                {{
-                                    wiki.pageLinkRaw("Special:PrefixIndex/" ~ page.title, project, ai.subpageCount|num_format)
-                                }}
-                            </td>
-                        </tr>
-                    {% endif %}
                 </tbody></table>
             </div>
 
@@ -387,6 +377,16 @@
                                     {{ wiki.pageInfoLink(page, ai.numTemplates|num_format, 'mw-pageinfo-templates') }}
                                 </td>
                             </tr>
+                            {% if ai.subpageCount > 0 %}
+                                <tr>
+                                    <td class="stat-list--new-group">{{ msg('subpages') }}</td>
+                                    <td class="stat-list--new-group">
+                                        {{
+                                            wiki.pageLinkRaw("Special:PrefixIndex/" ~ page.title, project, ai.subpageCount|num_format)
+                                        }}
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endif %}
                     </tbody>
                 </table>
