@@ -214,7 +214,7 @@ class PagesRepository extends UserRepository
         $conditions = [
             'prpSelect' => '',
             'prpArSelect' => '',
-            'prpJoin' => ''
+            'prpJoin' => '',
         ];
         if ($project->isPrpPage($namespace)) {
             $pagePropsTable = $project->getTableName('page_props', '');

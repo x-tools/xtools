@@ -76,7 +76,7 @@ class Project extends Model
      */
     public function isPrpPage($namespace): bool
     {
-        return $this->hasProofreadPage() && 
+        return $this->hasProofreadPage() &&
             (
                 !is_numeric($namespace) ||
                 'Page' === $this->getCanonicalNamespace($namespace)

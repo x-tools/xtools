@@ -415,7 +415,7 @@ class Pages extends Model
      */
     public function isProofreadPage(int $namespace): bool
     {
-        return $this->pages[$namespace][0] && 
+        return $this->pages[$namespace][0] &&
             array_key_exists('prp_quality', $this->pages[$namespace][0]);
     }
 

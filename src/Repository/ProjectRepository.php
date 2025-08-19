@@ -327,7 +327,7 @@ class ProjectRepository extends Repository
                 $name = null;
             }
 
-            if (null !== $name ) {
+            if (null !== $name) {
                 $metadata['namespaces'][$namespace['id']] = $name;
             }
             $metadata['canonical_namespaces'][$namespace['id']] = $namespace['canonical'] ?? '';
