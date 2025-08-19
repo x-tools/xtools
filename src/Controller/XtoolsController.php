@@ -198,6 +198,7 @@ abstract class XtoolsController extends AbstractController
      * @param ProjectRepository $projectRepo
      * @param UserRepository $userRepo
      * @param PageRepository $pageRepo
+     * @param Environment $twig
      * @param bool $isWMF
      * @param string $defaultProject
      */

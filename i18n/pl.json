@@ -1,6 +1,7 @@
 {
 	"@metadata": {
 		"authors": [
+			"Alien333",
 			"Ankam",
 			"Chrumps",
 			"DeRudySoulStorm",
@@ -318,9 +319,9 @@
 	"show": "pokaż",
 	"show-sections-desc": "Wybór statystyk do wyświetlenia. Im więcej wybierzesz, tym więcej czasu zajmie ich załadowanie.",
 	"size": "Rozmiar",
-	"size-gigabytes": "$1&nbsp;GB",
-	"size-kilobytes": "$1&nbsp;KB",
-	"size-megabytes": "$1&nbsp;MB",
+	"size-gigabytes": "$1 GB",
+	"size-kilobytes": "$1 KB",
+	"size-megabytes": "$1 MB",
 	"size-over-time": "Rozmiar artykułu w czasie",
 	"small-edits": "Małych edycji (<20 bajtów)",
 	"start": "Data początkowa",
