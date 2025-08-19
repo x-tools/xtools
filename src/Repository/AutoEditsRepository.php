@@ -167,7 +167,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, null, $namespace);
 
         [$pageJoin, $condNamespace] = $this->getPageAndNamespaceSql($project, $namespace);
 
@@ -249,7 +249,7 @@ class AutoEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.');
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, null, $namespace);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, null, $namespace);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -338,7 +338,7 @@ class AutoEditsRepository extends UserRepository
         }
 
         // Get the combined regex and tags for the tools
-        [$regex, $tagIds] = $this->getToolRegexAndTags($project, false, $tool);
+        [$regex, $tagIds] = $this->getToolRegexAndTags($project, $tool);
 
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
@@ -564,7 +564,6 @@ class AutoEditsRepository extends UserRepository
     /**
      * Get the combined regex and tags for all semi-automated tools, or the given tool, ready to be used in a query.
      * @param Project $project
-     * @param bool $nonAutoEdits Set to true to exclude tools with the 'contribs' flag.
      * @param string|null $tool
      * @param int|string|null $namespace Tools only used in given namespace ID, or 'all' for all namespaces.
      * @return array In the format: ['combined|regex', '1,2,3'] where the second element is a
@@ -572,7 +571,6 @@ class AutoEditsRepository extends UserRepository
      */
     private function getToolRegexAndTags(
         Project $project,
-        bool $nonAutoEdits = false,
         ?string $tool = null,
         $namespace = null
     ): array {
