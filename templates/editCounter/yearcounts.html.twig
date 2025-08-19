@@ -10,10 +10,6 @@
 
 {% if ec.yearTotals|length > 0 %}
 
-{% if not is_sub_request %}
-    {{ include('editCounter/externallegend.html.twig') }}
-{% endif %}
-
     <table class="sr-only">
         <thead>
             <tr>
@@ -39,8 +35,7 @@
 
     {# Set height of chart based on how many years (horizontal rows) are being reported. #}
     {# the pointer events is to not capture legend clicks #}
-    {# float-left to avoid issues with the external legend and the checkbox #}
-    <div style="float:left;position:relative; pointer-events:none; height:{{ 30 * (ec.yearCounts.yearLabels|length + 1) }}px">
+    <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.yearCounts.yearLabels|length + 1) }}px">
         <canvas id="yearcounts-canvas" style="pointer-events:all;"></canvas>
     </div>
 
@@ -89,6 +84,11 @@
             {{ msg('use-log-scale') }}
         </label>
     </div>
+
+{% if not is_sub_request %}
+    {{ include('editCounter/externallegend.html.twig') }}
+{% endif %}
+
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
