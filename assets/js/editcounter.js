@@ -251,7 +251,8 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                         // with log, it prevents a log(0) infinite loop
                         // fixed two minor chartjs versions later (2.7.2)
                         min: (type == "logarithmic" ? 1 : 0),
-                        reverse: i18nRTL,
+                        // Sadly, logarithmic breaks if reverse
+                        reverse: (type == "logarithmic" ? false : i18nRTL),
                         callback: function (value) {
                             if (Math.floor(value) === value) {
                                 return value.toLocaleString(i18nLang);

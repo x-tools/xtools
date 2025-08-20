@@ -10,9 +10,6 @@
 {% if not project.userHasOptedIn(user) %}
     {{ wiki.userOptedOut(project, user) }}
 {% elseif ec.monthCounts.monthLabels|length > 0 %}
-{% if not is_sub_request %}
-    {{ include('editCounter/externallegend.html.twig') }}
-{% endif %}
 
     <table class="sr-only">
         <thead>
@@ -77,6 +74,11 @@
             {{ msg('use-log-scale') }}
         </label>
     </div>
+
+{% if not is_sub_request %}
+    {{ include('editCounter/externallegend.html.twig') }}
+{% endif %}
+
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}
