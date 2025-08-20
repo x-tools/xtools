@@ -82,6 +82,42 @@ class TopEditsRepository extends UserRepository
     }
 
     /**
+     * Get the selects for PageAssessments class and projects.
+     * @param Project $project
+     * @param int|string $namespace
+     * @param string $pageTablePrefix What should be prepended to columns of the page table. Default ''.
+     * @return string
+     */
+    private function getPaSelects(
+        Project $project,
+        $namespace,
+        string $pageTablePrefix = ''
+    ): string {
+        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
+        $paTable = $project->getTableName('page_assessments');
+        $paSelect = $hasPageAssessments
+            ?  ", (
+                    SELECT pa_class
+                    FROM $paTable
+                    WHERE pa_page_id = ".$pageTablePrefix."page_id
+                    AND pa_class != ''
+                    LIMIT 1
+                ) AS pa_class"
+            : '';
+        $paProjectsTable = $project->getTableName('page_assessments_projects');
+        $paProjectsSelect = $hasPageAssessments
+            ? ", (
+                    SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $paTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = ".$pageTablePrefix."page_id
+                ) AS pap_project_title"
+            : '';
+        return $paSelect . $paProjectsSelect;
+    }
+
+    /**
      * Get the top edits by a user in a single namespace.
      * @param Project $project
      * @param User $user
@@ -111,28 +147,6 @@ class TopEditsRepository extends UserRepository
         $pageTable = $project->getTableName('page');
         $revisionTable = $project->getTableName('revision');
 
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
-        $paTable = $project->getTableName('page_assessments');
-        $paSelect = $hasPageAssessments
-            ?  ", (
-                    SELECT pa_class
-                    FROM $paTable
-                    WHERE pa_page_id = page_id
-                    AND pa_class != ''
-                    LIMIT 1
-                ) AS pa_class"
-            : '';
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
-        $paProjectsSelect = $hasPageAssessments
-            ? ", (
-                    SELECT JSON_ARRAYAGG(pap_project_title)
-                    FROM $paTable
-                    JOIN $paProjectsTable
-                    ON pa_project_id = pap_project_id
-                    WHERE pa_page_id = page_id
-                ) AS pap_project_title"
-            : '';
-
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
         $params = [];
@@ -143,13 +157,13 @@ class TopEditsRepository extends UserRepository
             [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
         }
 
+        $paSelects = $this->getPaSelects($project, $namespace);
+
         $offset = $pagination * $limit;
         $sql = "SELECT page_namespace AS `namespace`, page_title,
                     page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
-                    $paSelect
-                    $paProjectsSelect
+                    $paSelects
                 FROM $pageTable
-
                 JOIN $revisionTable ON page_id = rev_page
                 $ipcJoin
                 WHERE $whereClause
@@ -298,28 +312,7 @@ class TopEditsRepository extends UserRepository
         $revDateConditions = $this->getDateConditions($start, $end);
         $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
         $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
-        $pageAssessmentsTable = $this->getTableName($project->getDatabaseName(), 'page_assessments');
-        $paSelect = $hasPageAssessments
-            ?  ", (
-                    SELECT pa_class
-                    FROM $pageAssessmentsTable
-                    WHERE pa_page_id = e.page_id
-                    AND pa_class != ''
-                    LIMIT 1
-                ) AS pa_class"
-            : '';
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
-        $paProjectsSelect = $hasPageAssessments
-            ? ", (
-                    SELECT JSON_ARRAYAGG(pap_project_title)
-                    FROM $pageAssessmentsTable
-                    JOIN $paProjectsTable
-                    ON pa_project_id = pap_project_id
-                    WHERE pa_page_id = e.page_id
-                ) AS pap_project_title"
-            : '';
-
+        $paSelects = $this->getPaSelects($project, 'all', 'e.');
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -332,7 +325,7 @@ class TopEditsRepository extends UserRepository
         }
 
         $sql = "SELECT c.page_namespace AS `namespace`, e.page_title,
-                    c.page_is_redirect AS `redirect`, c.count $paSelect $paProjectsSelect
+                    c.page_is_redirect AS `redirect`, c.count $paSelects
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
