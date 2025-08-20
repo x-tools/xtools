@@ -110,7 +110,7 @@
                                     </td>
                                 {% endif %}
                                 {% if page.prp_quality is defined %}
-                                    <td>
+                                    <td class="sort-entry--quality" data-value="{{ page.prp_quality }}">
                                         {% if page.deleted %}
                                             {{ msg('na') }}
                                         {% else %}

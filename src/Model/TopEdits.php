@@ -390,6 +390,10 @@ class TopEdits extends Model
                 unset($page['pa_class']);
             }
 
+            if (array_key_exists('prp_quality', $page)) {
+                $page['prp_quality'] = (int)$page['prp_quality'];
+            }
+
             if (isset($topEditedPages[$nsId])) {
                 $topEditedPages[$nsId][] = $page;
             } else {
