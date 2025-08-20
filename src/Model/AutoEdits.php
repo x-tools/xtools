@@ -153,28 +153,25 @@ class AutoEdits extends Model
      */
     public function getNonAutomatedEdits(bool $forJson = false): array
     {
-        if (isset($this->nonAutomatedEdits)) {
-            return $this->nonAutomatedEdits;
+        if (!isset($this->nonAutomatedEdits) {
+            $revs = $this->repository->getNonAutomatedEdits(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->start,
+                $this->end,
+                $this->offset,
+                $this->limit
+            );
+            $this->nonAutomatedEdits = Edit::getEditsFromRevs(
+                $this->pageRepo,
+                $this->editRepo,
+                $this->userRepo,
+                $this->project,
+                $this->user,
+                $revs
+            );
         }
-
-        $revs = $this->repository->getNonAutomatedEdits(
-            $this->project,
-            $this->user,
-            $this->namespace,
-            $this->start,
-            $this->end,
-            $this->offset,
-            $this->limit
-        );
-
-        $this->nonAutomatedEdits = Edit::getEditsFromRevs(
-            $this->pageRepo,
-            $this->editRepo,
-            $this->userRepo,
-            $this->project,
-            $this->user,
-            $revs
-        );
 
         if ($forJson) {
             return array_map(function (Edit $edit) {
@@ -192,29 +189,26 @@ class AutoEdits extends Model
      */
     public function getAutomatedEdits(bool $forJson = false): array
     {
-        if (isset($this->automatedEdits)) {
-            return $this->automatedEdits;
+        if (!isset($this->automatedEdits)) {
+            $revs = $this->repository->getAutomatedEdits(
+                $this->project,
+                $this->user,
+                $this->namespace,
+                $this->start,
+                $this->end,
+                $this->tool,
+                $this->offset,
+                $this->limit
+            );
+            $this->automatedEdits = Edit::getEditsFromRevs(
+                $this->pageRepo,
+                $this->editRepo,
+                $this->userRepo,
+                $this->project,
+                $this->user,
+                $revs
+            );
         }
-
-        $revs = $this->repository->getAutomatedEdits(
-            $this->project,
-            $this->user,
-            $this->namespace,
-            $this->start,
-            $this->end,
-            $this->tool,
-            $this->offset,
-            $this->limit
-        );
-
-        $this->automatedEdits = Edit::getEditsFromRevs(
-            $this->pageRepo,
-            $this->editRepo,
-            $this->userRepo,
-            $this->project,
-            $this->user,
-            $revs
-        );
 
         if ($forJson) {
             return array_map(function (Edit $edit) {
