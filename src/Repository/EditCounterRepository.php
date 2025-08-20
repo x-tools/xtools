@@ -20,7 +20,6 @@ use Wikimedia\IPUtils;
  */
 class EditCounterRepository extends Repository
 {
-    protected AutoEditsRepository $autoEditsRepo;
     protected ProjectRepository $projectRepo;
 
     public function __construct(
@@ -32,10 +31,8 @@ class EditCounterRepository extends Repository
         bool $isWMF,
         int $queryTimeout,
         ProjectRepository $projectRepo,
-        AutoEditsRepository $autoEditsRepo
     ) {
         $this->projectRepo = $projectRepo;
-        $this->autoEditsRepo = $autoEditsRepo;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
@@ -562,7 +559,7 @@ class EditCounterRepository extends Repository
      * @return string[] With keys 'sizes, 'average_size',
      * 'small_edits', 'large_edits', and 'tag_lists'
      */
-    public function getEditSizeData(Project $project, User $user): array
+    public function getEditData(Project $project, User $user): array
     {
         // Set up cache.
         $cacheKey = $this->getCacheKey(func_get_args(), 'ec_editsizes');
@@ -618,17 +615,5 @@ class EditCounterRepository extends Repository
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
-    }
-
-    /**
-     * Get the number of edits this user made using semi-automated tools.
-     * @param Project $project
-     * @param User $user
-     * @return int Result of query, see below.
-     * @deprecated Inject AutoEditsRepository and call the countAutomatedEdits directly.
-     */
-    public function countAutomatedEdits(Project $project, User $user): int
-    {
-        return $this->autoEditsRepo->countAutomatedEdits($project, $user);
     }
 }

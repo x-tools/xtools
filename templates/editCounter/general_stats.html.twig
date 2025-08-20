@@ -173,20 +173,20 @@
         <tr>
             <td>{{ msg('small-edits') }}*</td>
             <td>
-                {{ ec.countSmallEdits|num_format }}
+                {{ ec.editData.small_edits|num_format }}
                 {% if ec.countLast5000 %}
                     &middot;
-                    ({{ ((ec.countSmallEdits / ec.countLast5000) * 100)|percent_format }})
+                    ({{ ((ec.editData.small_edits / ec.countLast5000) * 100)|percent_format }})
                 {% endif %}
             </td>
         </tr>
         <tr>
             <td>{{ msg('large-edits') }}*</td>
             <td>
-                {{ ec.countLargeEdits|num_format }}
+                {{ ec.editData.large_edits|num_format }}
                 {% if ec.countLast5000 %}
                     &middot;
-                    ({{ ((ec.countLargeEdits / ec.countLast5000) * 100)|percent_format }})
+                    ({{ ((ec.editData.small_edits / ec.countLast5000) * 100)|percent_format }})
                 {% endif %}
             </td>
         </tr>
@@ -524,7 +524,7 @@
         <script type="text/javascript">
             $(function() {
                 xtools.editcounter.setupSizeHistogram(
-                    {{ ec.editSizeData.sizes|json_encode()|raw }},
+                    {{ ec.editData.sizes|json_encode()|raw }},
                     ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
                     ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
                 );

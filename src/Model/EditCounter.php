@@ -46,10 +46,10 @@ class EditCounter extends Model
     protected array $timeCardData;
 
     /**
-     * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
-     * @var string[] As returned by the DB, unconverted to int or float
+     * Various data on the last 5000 edits.
+     * @var string[]
      */
-    protected array $editSizeData;
+    protected array $editData;
 
     /**
      * Duration of the longest block in seconds; -1 if indefinite,
@@ -149,19 +149,21 @@ class EditCounter extends Model
      * @param bool $blocksOnly Whether to include only blocks, and not reblocks and unblocks.
      * @return array
      */
-    protected function getBlocks(string $type, bool $blocksOnly = true): array
+    public function getBlocks(string $type, bool $blocksOnly = true): array
     {
         if (isset($this->blocks[$type]) && is_array($this->blocks[$type])) {
-            return $this->blocks[$type];
+            $blocks = $this->blocks[$type];
+        } else {
+            $method = "getBlocks".ucfirst($type);
+            $blocks = $this->repository->$method($this->project, $this->user);
+            $this->blocks[$type] = $blocks;
         }
-        $method = "getBlocks".ucfirst($type);
-        $blocks = $this->repository->$method($this->project, $this->user);
-        $this->blocks[$type] = $blocks;
 
         // Filter out unblocks unless requested.
+        // Expressly don't store this.
         if ($blocksOnly) {
             $blocks = array_filter($blocks, function ($block) {
-                return ('block' === $block['log_action'] || 'reblock' == $block['log_action']);
+                return ('block' === $block['log_action'] || 'reblock' === $block['log_action']);
             });
         }
 
@@ -335,9 +337,11 @@ class EditCounter extends Model
      */
     public function getLongestBlockSeconds()
     {
+        // @codeCoverageIgnoreStart
         if (isset($this->longestBlockSeconds)) {
             return $this->longestBlockSeconds;
         }
+        // @codeCoverageIgnoreEnd
 
         $blocks = $this->getBlocks('received', false);
         $this->longestBlockSeconds = false;
@@ -786,20 +790,21 @@ class EditCounter extends Model
         // Fill in zeros for timeslots that have no values.
         $sortedTotals = [];
         $index = 0;
-        $sortedIndex = 0;
         foreach (range(1, 7) as $day) {
             foreach (range(0, 23) as $hour) {
-                if (isset($totals[$index]) && (int)$totals[$index]['hour'] === $hour) {
-                    $sortedTotals[$sortedIndex] = $totals[$index];
+                if (isset($totals[$index])
+                    && (int)$totals[$index]['day_of_week'] === $day
+                    && (int)$totals[$index]['hour'] === $hour
+                ) {
+                    $sortedTotals[] = $totals[$index];
                     $index++;
                 } else {
-                    $sortedTotals[$sortedIndex] = [
+                    $sortedTotals[] = [
                         'day_of_week' => $day,
                         'hour' => $hour,
                         'value' => 0,
                     ];
                 }
-                $sortedIndex++;
             }
         }
 
@@ -819,10 +824,12 @@ class EditCounter extends Model
             return $this->monthCounts;
         }
 
+        // @codeCoverageIgnoreStart
         // Set to current month if we're not unit-testing
         if (!($currentTime instanceof DateTime)) {
             $currentTime = new DateTime('last day of this month');
         }
+        // @codeCoverageIgnoreEnd
 
         $totals = $this->repository->getMonthCounts($this->project, $this->user);
         $out = [
@@ -889,8 +896,6 @@ class EditCounter extends Model
      *           string[] - Modified $out filled with month stats,
      *           DateTime - timestamp of first edit
      *         ]
-     * Tests covered in self::monthCounts().
-     * @codeCoverageIgnore
      */
     private function fillInMonthCounts(array $out, array $totals, DateTime $firstEdit): array
     {
@@ -914,8 +919,6 @@ class EditCounter extends Model
      * @param array $out
      * @param DatePeriod $dateRange From first edit to present.
      * @return array Modified $out filled with month stats.
-     * Tests covered in self::monthCounts().
-     * @codeCoverageIgnore
      */
     private function fillInMonthTotalsAndLabels(array $out, DatePeriod $dateRange): array
     {
@@ -946,9 +949,11 @@ class EditCounter extends Model
      */
     public function yearCounts(?DateTime $currentTime = null): array
     {
+        // @codeCoverageIgnoreStart
         if (isset($this->yearCounts)) {
             return $this->yearCounts;
         }
+        // @codeCoverageIgnoreEnd
 
         $monthCounts = $this->monthCounts($currentTime);
         $yearCounts = [
@@ -1015,16 +1020,16 @@ class EditCounter extends Model
     }
 
     /**
-     * Get average edit size, and number of large and small edits.
-     * @return array
+     * Get average edit size, number of large and small edits, and change tags.
+     * @return array With keys "sizes", "average_size", "small_edits", "large_edits", "tag_lists".
      */
-    public function getEditSizeData(): array
+    public function getEditData(): array
     {
-        if (!isset($this->editSizeData)) {
-            $this->editSizeData = $this->repository
-                ->getEditSizeData($this->project, $this->user);
+        if (!isset($this->editData)) {
+            $this->editData = $this->repository
+                ->getEditData($this->project, $this->user);
         }
-        return $this->editSizeData;
+        return $this->editData;
     }
 
     /**
@@ -1038,32 +1043,12 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the number of edits under 20 bytes of the user's past 5000 edits.
-     * @return int
-     */
-    public function countSmallEdits(): int
-    {
-        $editSizeData = $this->getEditSizeData();
-        return isset($editSizeData['small_edits']) ? (int) $editSizeData['small_edits'] : 0;
-    }
-
-    /**
-     * Get the total number of edits over 1000 bytes of the user's past 5000 edits.
-     * @return int
-     */
-    public function countLargeEdits(): int
-    {
-        $editSizeData = $this->getEditSizeData();
-        return isset($editSizeData['large_edits']) ? (int) $editSizeData['large_edits'] : 0;
-    }
-
-    /**
      * Get the ProofreadPage tagged quality changes in the last 5000 edits.
      * @return int[] With keys 0, 1, 2, 3, 4, and 'total'.
      */
     public function countQualityChanges(): array
     {
-        $tagLists = $this->getEditSizeData()['tag_lists'];
+        $tagLists = $this->getEditData()['tag_lists'];
         $res = [
             0 => 0,
             1 => 0,
@@ -1096,9 +1081,9 @@ class EditCounter extends Model
      */
     public function averageEditSize(): float
     {
-        $editSizeData = $this->getEditSizeData();
-        if (isset($editSizeData['average_size'])) {
-            return round((float)$editSizeData['average_size'], 3);
+        $editData = $this->getEditData();
+        if (isset($editData['average_size'])) {
+            return round((float)$editData['average_size'], 3);
         } else {
             return 0;
         }
