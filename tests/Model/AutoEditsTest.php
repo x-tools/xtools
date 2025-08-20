@@ -95,7 +95,6 @@ class AutoEditsTest extends TestAdapter
             ->willReturn([$rev]);
 
         $autoEdits = $this->getAutoEdits();
-        $rawEdits = $autoEdits->getNonAutomatedEdits(false); // Just checking that works
         $rawEdits = $autoEdits->getNonAutomatedEdits(true);
         static::assertSame([
             'page_title' => 'Test page',
@@ -124,6 +123,9 @@ class AutoEditsTest extends TestAdapter
 
         // One more time to ensure things are re-queried.
         static::assertEquals($edit, $autoEdits->getNonAutomatedEdits()[0]);
+
+        // Ensure that works
+        $autoEdits->getNonAutomatedEdits(false);
     }
 
     /**
@@ -174,7 +176,6 @@ class AutoEditsTest extends TestAdapter
             ->willReturn([$rev]);
 
         $autoEdits = $this->getAutoEdits();
-        $editObjs = $autoEdits->getAutomatedEdits(false); // Just checking that works
         $editObjs = $autoEdits->getAutomatedEdits(true);
         static::assertSame([
             'page_title' => 'Test page',
@@ -203,6 +204,9 @@ class AutoEditsTest extends TestAdapter
 
         // One more time to ensure things are re-queried.
         static::assertEquals($edit, $autoEdits->getAutomatedEdits()[0]);
+
+        // Ensure that works
+        $autoEdits->getAutomatedEdits(false);
     }
 
     /**
