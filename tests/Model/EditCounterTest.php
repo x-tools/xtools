@@ -264,6 +264,7 @@ class EditCounterTest extends TestAdapter
                 ],
             ]);
         static::assertEquals(0, $this->editCounter->getDays());
+        static::assertEquals(0, $this->editCounter->averageRevisionsPerDay());
     }
 
     /**
@@ -287,6 +288,21 @@ class EditCounterTest extends TestAdapter
         static::assertEquals(6, $this->editCounter->countCreatedPagesLive());
         static::assertEquals(2, $this->editCounter->countPagesCreatedDeleted());
         static::assertEquals(8, $this->editCounter->countPagesCreated());
+    }
+
+    /**
+     * Test fallbacks for when no pages were edited
+     */
+    public function testNoPages(): void
+    {
+        $this->editCounterRepo->expects(static::once())
+            ->method('getPairData')
+            ->willReturn([
+                'edited-live' => 0,
+                'edited-deleted' => 0,
+            ]);
+        static::assertEquals(0, $this->editCounter->countAllPagesEdited());
+        static::assertEquals(0, $this->editCounter->averageRevisionsPerPage());
     }
 
     /**

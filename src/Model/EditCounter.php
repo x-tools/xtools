@@ -588,18 +588,6 @@ class EditCounter extends Model
     }
 
     /**
-     * Get the total number of edits made by the user with semi-automating tools.
-     */
-    public function countAutomatedEdits(): int
-    {
-        if ($this->autoEditCount) {
-            return $this->autoEditCount;
-        }
-        $this->autoEditCount = $this->repository->countAutomatedEdits($this->project, $this->user);
-        return $this->autoEditCount;
-    }
-
-    /**
      * Get the count of (non-deleted) edits made in the given timeframe to now.
      * @param string $time One of 'day', 'week', 'month', or 'year'.
      * @return int The total number of live edits.
@@ -772,9 +760,11 @@ class EditCounter extends Model
      */
     public function timeCard(): array
     {
+        // @codeCoverageIgnoreStart
         if (isset($this->timeCardData)) {
             return $this->timeCardData;
         }
+        // @codeCoverageIgnoreEnd
         $totals = $this->repository->getTimeCard($this->project, $this->user);
 
         // Scale the radii: get the max, then scale each radius.
@@ -783,8 +773,8 @@ class EditCounter extends Model
         foreach ($totals as $total) {
             $max = max($max, $total['value']);
         }
-        foreach ($totals as &$total) {
-            $total['scale'] = round(($total['value'] / $max) * 20);
+        foreach ($totals as $index => $total) {
+            $totals[$index]['scale'] = round(($total['value'] / $max) * 20);
         }
 
         // Fill in zeros for timeslots that have no values.
