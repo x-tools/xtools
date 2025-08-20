@@ -149,4 +149,31 @@ class AdminStatsTest extends TestAdapter
             ],
         ];
     }
+
+    /**
+     * Test construction of "totals" row
+     */
+    public function testTotalsRow(): void
+    {
+        $as = new AdminStats($this->asRepo, $this->project, 0, 0, 'admin', []);
+        $this->asRepo->expects($this->once())
+            ->method('getStats')
+            ->willReturn($this->adminStatsFactory());
+        $as->setRepository($this->asRepo);
+        $as->prepareStats();
+        static::assertEquals(
+            [
+                'delete' => 5+1,
+                'restore' => 3+0,
+                'block' => 0+0,
+                'unblock' => 1+0,
+                'protect' => 3+0,
+                'unprotect' => 2+0,
+                'rights' => 4+0,
+                'import' => 2+0,
+                'total' => 20+0,
+            ],
+            $as->getTotalsRow()
+        );
+    }
 }

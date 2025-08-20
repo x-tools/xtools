@@ -91,7 +91,21 @@
                             </span>
                         </th>
                     {% endfor %}
-                </tr></thead>
+                </tr>
+                <tr>
+                    {% set totals = as.totalsRow %}
+                    <td></td>
+                    <td><i>{{ msg('total') }}</i></td>
+                    <td></td>
+                    <td></td>
+                    {% if as.actions|length > 1 %}
+                        <td class="sort-entry--total" data-value="{{ totals.total }}">{{ totals.total|num_format }}</td>
+                    {% endif %}
+                    {% for action in as.actions %}
+                        <td class="sort-entry--{{ action }}" data-value="{{ totals[action] }}">{{ totals[action]|num_format }}</td>
+                    {% endfor %}
+                </tr>
+                </thead>
                 <tbody>
                     {% for user in as.stats %}
                         {% set username = user.username %}

@@ -22,7 +22,6 @@ use Wikimedia\IPUtils;
 class UserRepository extends Repository
 {
     protected ProjectRepository $projectRepo;
-    protected RequestStack $requestStack;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -47,8 +46,16 @@ class UserRepository extends Repository
         RequestStack $requestStack
     ) {
         $this->projectRepo = $projectRepo;
-        $this->requestStack = $requestStack;
-        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
+        parent::__construct(
+            $managerRegistry,
+            $cache,
+            $guzzle,
+            $logger,
+            $parameterBag,
+            $isWMF,
+            $queryTimeout,
+            $requestStack
+        );
     }
 
     /**

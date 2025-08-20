@@ -152,7 +152,55 @@ class TopEdits extends Model
      */
     public function getNumTopEdits(): int
     {
-        return count($this->topEdits);
+        if (isset($this->page)) {
+            return count($this->topEdits);
+        }
+        return $this->repository->countEdits(
+            $this->project,
+            $this->user,
+            $this->namespace,
+            $this->start,
+            $this->end
+        );
+    }
+
+    /**
+     * Get the WikiProject totals.
+     * @param int $ns Namespace ID.
+     * @return array
+     */
+    public function getProjectTotals(int $ns): array
+    {
+        if ($this->getNumPagesNamespace() > $this->limit) {
+            $projectTotals = $this->repository->getProjectTotals(
+                $this->project,
+                $this->user,
+                $ns,
+                $this->start,
+                $this->end
+            );
+        } else {
+            $counts_tmp = [];
+            // List of pages for this namespace
+            $rows = $this->topEdits[$ns];
+            foreach ($rows as $row) {
+                $num = $row["count"];
+                // May be null or nonexistent for assessment-less pages
+                $titles = $row["pap_project_title"] ?? "{}";
+                // Had to use json to pass multiple values in SQL select
+                foreach (json_decode($titles) as $projectName) {
+                    $counts_tmp[$projectName] ??= 0;
+                    $counts_tmp[$projectName] += $num;
+                }
+            }
+            arsort($counts_tmp);
+            $counts_tmp = array_slice($counts_tmp, 0, 10);
+            $projectTotals = [];
+            foreach ($counts_tmp as $project => $count) {
+                $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
+            }
+        }
+        return $projectTotals;
     }
 
     /**
@@ -184,6 +232,10 @@ class TopEdits extends Model
      */
     public function prepareData(): void
     {
+        if (!$this->project->userHasOptedIn($this->user)) {
+            $this->topEdits = [];
+            return;
+        }
         if (isset($this->page)) {
             $this->topEdits = $this->getTopEditsPage();
         } else {
@@ -222,15 +274,11 @@ class TopEdits extends Model
 
     /**
      * Get the total number of pages edited in the namespace.
-     * @return int|null
+     * @return int
      */
-    public function getNumPagesNamespace(): ?int
+    public function getNumPagesNamespace(): int
     {
-        if ('all' === $this->namespace) {
-            return null;
-        }
-
-        return (int)$this->repository->countEditsNamespace(
+        return (int)$this->repository->countPagesNamespace(
             $this->project,
             $this->user,
             $this->namespace,

@@ -1,5 +1,40 @@
 # Release Notes #
 
+## 3.21.1 ##
+- EditCounter (T236087): Add edit size histogram to the general stats.
+- EditCounter (T392731): Improve performance of chart dataset creation.
+- PageInfo (T180629): Make the "Top Editors" pie charts and legends mobile-friendly.
+- PageInfo (T398932): Remove checks for Wikidata errors.
+- Pages (T218466): Add "(recreated)" marker to wikitext output.
+- TopEdits (T396423): Escape reserved keyword following MariaDB 10.7 upgrade.
+- TopEdits (T396494): Don't run any queries if the data isn't going to be shown.
+- (T272851): Allow ampersands in the page title input fields.
+- (T316176): Fix bug with double loading timers
+- (T327579): Improve display of SVGs in dark mode.
+- Localization updates.
+
+## 3.21.0 ##
+- EditCounter (T391824): Fix issue with counting infinite reblocks.
+- EditCounter (T391824): Update to support multiblocks, only showing the
+  number of active blocks since there can be multiple expiries.
+- Blame,Authorship: update links to WikiWho
+- EditCounter (T385962): Add totals for each hour to the timecard, and
+  make the day count update with timezone changes.
+- EditCounter (T311704): add external legend to month/year charts and
+  ensure the size of the bars are scaled correctly.
+- EditCounter (T366397): Display review count instead of patrol count
+  for wikis with PageTriage installed.
+- EditCounter (T391753): Handle rev-deleted log entries in rights changes.
+- EditCounter (T270984): Scale timecard bubbles with the chart height.
+- ArticleInfo: Display time order correctly on RTL wikis in the PageInfo gadget.
+- PageInfo (T381941): add 'Vary: Origin' header to HTML pageinfo response.
+- EditCounter (T387210): Improve performance of latest log entry by bypassing
+  use of the log_timestamp index.
+- EditCounter (T177658): Add a logarithmic scale to the month/year charts.
+- EditCounter (T193838): Display automatic and manual right removal at the
+  same time in the rights changes section.
+- Localization updates.
+
 ## 3.20.3 ##
 - PageInfo (T380953): Typecast Twig input to string.
 - Localization updates.
