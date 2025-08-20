@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -36,20 +35,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
         'showAction',
     ];
 
-    protected CacheItemPoolInterface $cache;
-    protected I18nHelper $i18n;
-    protected LoggerInterface $crawlerLogger;
-    protected LoggerInterface $denylistLogger;
-    protected LoggerInterface $rateLimitLogger;
-    protected ParameterBagInterface $parameterBag;
     protected Request $request;
-    protected SessionInterface $session;
-
-    /** @var int Number of requests allowed in time period */
-    protected int $rateLimit;
-
-    /** @var int Number of minutes during which $rateLimit requests are permitted. */
-    protected int $rateDuration;
 
     /** @var string User agent string. */
     protected string $userAgent;
@@ -72,25 +58,16 @@ class RateLimitSubscriber implements EventSubscriberInterface
      * @param int $rateDuration
      */
     public function __construct(
-        I18nHelper $i18n,
-        CacheItemPoolInterface $cache,
-        ParameterBagInterface $parameterBag,
-        RequestStack $requestStack,
-        LoggerInterface $crawlerLogger,
-        LoggerInterface $denylistLogger,
-        LoggerInterface $rateLimitLogger,
-        int $rateLimit,
-        int $rateDuration
+        protected I18nHelper $i18n,
+        protected CacheItemPoolInterface $cache,
+        protected ParameterBagInterface $parameterBag,
+        protected RequestStack $requestStack,
+        protected LoggerInterface $crawlerLogger,
+        protected LoggerInterface $denylistLogger,
+        protected LoggerInterface $rateLimitLogger,
+        protected readonly int $rateLimit,
+        protected readonly int $rateDuration
     ) {
-        $this->i18n = $i18n;
-        $this->cache = $cache;
-        $this->parameterBag = $parameterBag;
-        $this->session = $requestStack->getSession();
-        $this->crawlerLogger = $crawlerLogger;
-        $this->denylistLogger = $denylistLogger;
-        $this->rateLimitLogger = $rateLimitLogger;
-        $this->rateLimit = $rateLimit;
-        $this->rateDuration = $rateDuration;
     }
 
     /**
@@ -135,7 +112,7 @@ class RateLimitSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $loggedIn = (bool)$this->session->get('logged_in_user');
+        $loggedIn = (bool)$this->requestStack->getSession()->get('logged_in_user');
         $isApi = 'ApiAction' === substr($action, -9);
 
         // No rate limits on lightweight pages, logged in users, subrequests or API requests.

@@ -9,15 +9,12 @@ use DateInterval;
 use MediaWiki\OAuthClient\Client;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Helper class for fetching semi-automated definitions.
  */
 class AutomatedEditsHelper
 {
-    protected SessionInterface $session;
-
     /** @var array The list of tools that are considered reverting. */
     protected array $revertTools = [];
 
@@ -31,11 +28,10 @@ class AutomatedEditsHelper
      * @param \GuzzleHttp\Client $guzzle
      */
     public function __construct(
-        RequestStack $requestStack,
+        protected RequestStack $requestStack,
         protected CacheItemPoolInterface $cache,
         protected \GuzzleHttp\Client $guzzle
     ) {
-        $this->session = $requestStack->getSession();
     }
 
     /**
@@ -93,12 +89,12 @@ class AutomatedEditsHelper
             'titles' => 'MediaWiki:XTools-AutoEdits.json' . ($useSandbox ? '/sandbox' : ''),
         ]);
 
-        if ($useSandbox && $this->session->get('logged_in_user')) {
+        if ($useSandbox && $this->requestStack->getSession()->get('logged_in_user')) {
             // Request via OAuth to get around server-side caching.
             /** @var Client $client */
-            $client = $this->session->get('oauth_client');
+            $client = $this->requestStack->getSession()->get('oauth_client');
             $resp = json_decode($client->makeOAuthCall(
-                $this->session->get('oauth_access_token'),
+                $this->requestStack->getSession()->get('oauth_access_token'),
                 $uri
             ));
         } else {

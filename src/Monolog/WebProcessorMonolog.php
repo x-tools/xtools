@@ -33,7 +33,7 @@ class WebProcessorMonolog
     {
         try {
             $session = $this->requestStack->getSession();
-        } catch (SessionNotFoundException $e) {
+        } catch (SessionNotFoundException) {
             return $record;
         }
         if (!$session->isStarted()) {
