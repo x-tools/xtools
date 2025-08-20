@@ -267,7 +267,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                             let newticks = [];
                             axis.ticks.forEach((x,i) => {
                                 // So we enforce 1.5* distance.
-                                if (i == 0 || newticks[newticks.length-1]*1.5 < x) {
+                                if (i == 0 || newticks[newticks.length-1]*1.5 < x || x*1.5 < newticks[newticks.length-1]) {
                                     newticks.push(x)
                                 }
                             });
