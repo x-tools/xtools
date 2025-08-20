@@ -153,7 +153,7 @@ class AutoEdits extends Model
      */
     public function getNonAutomatedEdits(bool $forJson = false): array
     {
-        if (!isset($this->nonAutomatedEdits) {
+        if (!isset($this->nonAutomatedEdits)) {
             $revs = $this->repository->getNonAutomatedEdits(
                 $this->project,
                 $this->user,
