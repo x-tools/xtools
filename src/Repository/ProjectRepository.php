@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Model\PageAssessments;
 use App\Model\Project;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDO\Exception as PDOException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
@@ -239,6 +240,39 @@ class ProjectRepository extends Repository
 
         // Cache for one hour and return.
         return $this->setCache($cacheKey, $basicInfo, 'PT1H');
+    }
+
+    /**
+     * Can we find this project's page table?
+     * If not, this project has not been replicated yet,
+     * despite being listed in meta_p.wiki. See T322466.
+     * The implementation is a bit dirty, but we do not
+     * have the permissions for anything better.
+     * @param string $project Database name, without _p.
+     * @return bool
+     */
+    public function hasPageTable(string $project): bool
+    {
+        $cacheKey = $this->getCacheKey($project, "has_page");
+        if ($this->cache->hasItem($cacheKey) && false) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $pageTable = $this->getTableName($project, "page");
+        $sql = "SELECT 1 FROM $pageTable LIMIT 1";
+        try {
+            $this->executeProjectsQuery($project, $sql, [
+                'project' => $project,
+            ])->fetchAssociative();
+            $result = true;
+        } catch (PDOException $e) {
+            $code = (int)$e->getCode();
+            $result = 42000 !== $code; // Syntax error/access violation; including specifically missing table
+        } catch (\Exception $e) { // Some other exception--AGF. Notably prevents crash of many tests
+            $result = true;
+        }
+        // Cache for 1h and return
+        return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
     }
 
     /**
