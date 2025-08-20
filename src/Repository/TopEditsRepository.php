@@ -351,7 +351,12 @@ class TopEditsRepository extends UserRepository
 
         $sql = "
             SELECT * FROM (
-                SELECT page_namespace as `namespace`, page_title, page_is_redirect as `redirect`, rev_page, count(rev_page) AS `count`,
+                SELECT
+                    page_namespace as `namespace`,
+                    page_title,
+                    page_is_redirect as `redirect`,
+                    rev_page,
+                    count(rev_page) AS `count`,
                     ROW_NUMBER() OVER (
                         PARTITION BY page_namespace
                         ORDER BY page_namespace ASC, `count` DESC
