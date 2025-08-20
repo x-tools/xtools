@@ -262,6 +262,11 @@ class Pages extends Model
             if (self::REDIR_NONE !== $this->redirects) {
                 $counts[$ns]['redirects'] = (int)$row['redirects'];
             }
+            if ($this->project->isPrpPage($ns)) {
+                foreach ([0, 1, 2, 3, 4] as $level) {
+                    $counts[$ns]["prp_quality$level"] = (int)$row["prp_quality$level"];
+                }
+            }
         }
 
         $this->countsByNamespace = $counts;
@@ -402,21 +407,6 @@ class Pages extends Model
         $summary = Edit::wikifyString($ret['comment_text'], $this->project, $this->page, true);
         $userpageUrl = $this->project->getUrlForPage("User:{$ret['actor_name']}");
         return "$timestampStr (<a target='_blank' href=\"$userpageUrl\">{$ret['actor_name']}</a>): <i>$summary</i>";
-    }
-
-    /**
-     * Check if a namespace is the PRP Page namespace.
-     * Sadly, we don't have a clean way of knowing that
-     * and the namespace ID varies between wikis,
-     * so we have to just look at the data and check
-     * if the first row has a quality set.
-     * @param int $namespace Namespace ID.
-     * @return bool
-     */
-    public function isProofreadPage(int $namespace): bool
-    {
-        return $this->pages[$namespace][0] &&
-            array_key_exists('prp_quality', $this->pages[$namespace][0]);
     }
 
     /**
