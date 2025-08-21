@@ -64,21 +64,6 @@ class EditCounterTest extends TestAdapter
     }
 
     /**
-     * Reset the EditCounter (notably prevents internal caching)
-     */
-    private function resetEditCounter(): void
-    {
-        $this->editCounter = new EditCounter(
-            $this->editCounterRepo,
-            $this->i18n,
-            $this->createMock(UserRights::class),
-            $this->project,
-            $this->user
-        );
-        $this->editCounter->setRepository($this->editCounterRepo);
-    }
-
-    /**
      * Log counts and associated getters.
      */
     public function testLogCounts(): void
@@ -154,7 +139,7 @@ class EditCounterTest extends TestAdapter
      */
     public function testFileCounts(): void
     {
-        $this->editCounterRepo->expects(static::any())
+        $this->editCounterRepo->expects(static::exactly(3))
             ->method('getFileCounts')
             ->willReturn([
                 'files_moved' => 1,
@@ -535,7 +520,6 @@ class EditCounterTest extends TestAdapter
      */
     public function testBlocks(array $blockLog, int $longestDuration, int $blockCount): void
     {
-        $this->resetEditCounter();
         $this->editCounterRepo->expects(static::once())
             ->method('getBlocksReceived')
             ->with($this->project, $this->user)
@@ -744,48 +728,51 @@ class EditCounterTest extends TestAdapter
 
     /**
      * Test counting of edit data
+     * @dataProvider editDataProvider
+     * @param array $data
+     * @param array $qualityChanges
+     * @param int|float $averageSize
      */
-    public function testEditData(): void
+    public function testEditData(array $data, array $qualityChanges, $averageSize): void
     {
-        $this->editData = [];
-        $this->editCounterRepo->expects(static::any())
+        $this->editCounterRepo->expects(static::once())
             ->method("getEditData")
-            ->will($this->returnCallBack(function () {
-                return $this->editData;
-            }));
+            ->willReturn($data);
+        static::assertEquals($qualityChanges, $this->editCounter->countQualityChanges());
+        static::assertEquals($averageSize, $this->editCounter->averageEditSize());
+    }
 
-        // PRP quality changes
-        $this->editData = [
-            'tag_lists' => [
-                [ 'randomtag', 'proofreadpage-quality1' ],
-                [ 'proofreadpage-quality2', 'proofreadpage-quality0' ], // Duplicates are intentionally discarded
-                [],
-                [ 'proofreadpage-quality2' ],
-                [ 'proofreadpage-quality3', 'a' ],
-                [ 'proofreadpagequality0', 'proofreadpage-quality3' ],
-                [ 'prp-quality0', 'proofreadpage-quality3' ],
+    /**
+     * Data for self::testEditData
+     * @return array
+     */
+    public function editDataProvider(): array
+    {
+        return [
+            [
+                [
+                    'tag_lists' => [
+                        [ 'randomtag', 'proofreadpage-quality1' ],
+                        [ 'proofreadpage-quality2', 'proofreadpage-quality0' ],
+                        [],
+                        [ 'proofreadpage-quality2' ],
+                        [ 'proofreadpage-quality3', 'a' ],
+                        [ 'proofreadpagequality0', 'proofreadpage-quality3' ],
+                        [ 'prp-quality0', 'proofreadpage-quality3' ],
+                    ],
+                    'average_size' => 3.1415926,
+                ],
+                [0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 0, 'total' => 6],
+                3.142,
+            ],
+            [
+                [
+                    'tag_lists' => [],
+                    'average_size' => 0,
+                ],
+                [0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 'total' => 0],
+                0,
             ],
         ];
-        static::assertEquals(
-            $this->editCounter->countQualityChanges(),
-            [ 0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 0, 'total' => 6 ],
-        );
-        $this->resetEditCounter();
-
-        // Average size rounding and default
-        $this->editData = [
-            'average_size' => 3.1415926,
-        ];
-        static::assertEquals(
-            $this->editCounter->averageEditSize(),
-            3.142
-        );
-        $this->resetEditCounter();
-        $this->editData = [];
-        static::assertEquals(
-            $this->editCounter->averageEditSize(),
-            0
-        );
-        $this->resetEditCounter();
     }
 }
