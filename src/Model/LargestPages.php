@@ -62,6 +62,8 @@ class LargestPages extends Model
     /**
      * Get the largest pages on the project.
      * @return Page[]
+     * Just returns a repository result.
+     * @codeCoverageIgnore
      */
     public function getResults(): array
     {
