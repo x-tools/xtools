@@ -42,7 +42,7 @@ class SimpleEditCounter extends Model
         $start = false,
         $end = false
     ) {
-        $this->repository = $repository;
+        $this->setRepository($repository);
         $this->project = $project;
         $this->user = $user;
 
