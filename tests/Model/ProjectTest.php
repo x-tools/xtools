@@ -248,7 +248,6 @@ class ProjectTest extends TestAdapter
     ): void {
         $project = new Project($dbName);
         $globalProject = new Project('metawiki');
-
         $globalProjectRepo = $this->createMock(ProjectRepository::class);
         $globalProjectRepo->expects(static::any())
             ->method('pageHasContent')

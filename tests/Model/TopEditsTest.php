@@ -193,16 +193,16 @@ class TopEditsTest extends TestAdapter
      */
     public function testNotOptedIn(): void
     {
-        $te = $this->getTopEdits(new Page($this->pageRepo, $this->project, 'Test page'));
-        $this->project = new Project('en.wikipedia.org');
-        $this->projectRepo = $this->createMock(ProjectRepository::class);
-        $this->projectRepo->method('getOne')
-            ->willReturn(['url' => 'https://en.wikipedia.org']);
-        $this->projectRepo->method('pageHasContent')
-            ->with($this->project, 2, 'Test user/EditCounterOptIn.js')
+        $project = $this->createMock(Project::class);
+        $project->expects(static::once())
+            ->method('userHasOptedIn')
             ->willReturn(false);
-        $this->project->setRepository($this->projectRepo);
-        $this->teRepo = $this->createMock(TopEditsRepository::class);
+        $te = new TopEdits(
+            $this->teRepo,
+            $this->autoEditsHelper,
+            $project,
+            $this->user
+        );
         $te->prepareData();
         static::assertEmpty($te->getTopEdits());
     }
