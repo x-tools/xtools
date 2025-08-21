@@ -127,6 +127,8 @@ class BlameTest extends TestAdapter
             ->willReturn($edit);
         $blame = new Blame($blameRepo, $this->page, 'Foo bar', $target);
         static::assertEquals($edit, $blame->getAsOf());
+        // Get a second time to check caching
+        static::assertEquals($edit, $blame->getAsOf());
     }
 
     /**
