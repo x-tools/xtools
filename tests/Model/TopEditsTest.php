@@ -87,6 +87,10 @@ class TopEditsTest extends TestAdapter
         $page = new Page($this->pageRepo, $this->project, 'Test page');
         $te->setPage($page);
         static::assertEquals($page, $te->getPage());
+
+        // Explicit pagination
+        $te = $this->getTopEdits(null, 'all', false, false, 20, 1);
+        static::assertEquals(1, $te->getPagination());
     }
 
     /**
@@ -119,6 +123,7 @@ class TopEditsTest extends TestAdapter
             'assessment' => [
                 'class' => 'List',
             ],
+            'pap_project_title' => '["Biography","India"]',
         ], $result[0][0]);
 
         // Fetching again should use value of class property.
@@ -132,25 +137,74 @@ class TopEditsTest extends TestAdapter
      */
     public function testTopEditsNamespace(): void
     {
-        $te = $this->getTopEdits(null, 3, false, false, 2);
-        $this->teRepo->expects($this->once())
+        $te = $this->getTopEdits(null, 0, false, false, 2);
+        $this->teRepo->expects(static::once())
             ->method('getTopEditsNamespace')
-            ->with($this->project, $this->user, 3, false, false, 2)
-            ->willReturn($this->topEditsNamespaceFactory()[3]);
+            ->with($this->project, $this->user, 0, false, false, 2)
+            ->willReturn($this->topEditsNamespaceFactory()[0]);
+        $this->teRepo->expects(static::once())
+            ->method('countEdits')
+            ->willReturn(42);
+        $this->teRepo->expects(static::once())
+            ->method('countPagesNamespace')
+            ->with($this->project, $this->user, 0)
+            ->willReturn(2);
         $te->setRepository($this->teRepo);
         $te->prepareData();
 
         $result = $te->getTopEdits();
-        static::assertEquals([3], array_keys($result));
+        static::assertEquals(42, $te->getNumTopEdits());
+        static::assertEquals([0], array_keys($result));
         static::assertEquals(1, count($result));
-        static::assertEquals(2, count($result[3]));
+        static::assertEquals(2, count($result[0]));
         static::assertEquals([
-            'namespace' => '3',
-            'page_title' => 'Jimbo Wales',
+            'namespace' => '0',
+            'page_title' => '101st Airborne Division',
             'redirect' => '0',
-            'count' => '1',
-            'full_page_title' => 'User talk:Jimbo Wales',
-        ], $result[3][1]);
+            'count' => '18',
+            'full_page_title' => '101st Airborne Division',
+            'pap_project_title' => null,
+            'assessment' => ['class' => 'C'],
+        ], $result[0][1]);
+        static::assertEquals([
+            [ 'pap_project_title' => 'Biography', 'count' => 24 ],
+            [ 'pap_project_title' => 'India', 'count' => 24 ],
+        ], $te->getProjectTotals(0));
+    }
+
+    /**
+     * Ensure we do default to a standalone query if there is more.
+     */
+    public function testProjectsStandalone(): void
+    {
+        $te = $this->getTopEdits(null, 0, false, false, 2);
+        $this->teRepo->expects(static::once())
+            ->method('countPagesNamespace')
+            ->with($this->project, $this->user, 0)
+            ->willReturn(3);
+        $this->teRepo->expects(static::once())
+            ->method('getProjectTotals')
+            ->willReturn(['What the repo gives.']);
+        static::assertEquals(['What the repo gives.'], $te->getProjectTotals(0));
+    }
+
+    /**
+     * Ensure we do not show any data if the user has not opted in.
+     */
+    public function testNotOptedIn(): void
+    {
+        $te = $this->getTopEdits(new Page($this->pageRepo, $this->project, 'Test page'));
+        $this->project = new Project('en.wikipedia.org');
+        $this->projectRepo = $this->createMock(ProjectRepository::class);
+        $this->projectRepo->method('getOne')
+            ->willReturn(['url' => 'https://en.wikipedia.org']);
+        $this->projectRepo->method('pageHasContent')
+            ->with($this->project, 2, 'Test user/EditCounterOptIn.js')
+            ->willReturn(false);
+        $this->project->setRepository($this->projectRepo);
+        $this->teRepo = $this->createMock(TopEditsRepository::class);
+        $te->prepareData();
+        static::assertEmpty($te->getTopEdits());
     }
 
     /**
@@ -168,6 +222,10 @@ class TopEditsTest extends TestAdapter
                   'count' => '24',
                   'pa_class' => 'List',
                   'full_page_title' => 'Foo_bar',
+                  'pap_project_title' => json_encode([
+                    'Biography',
+                    'India',
+                  ]),
                 ], [
                   'namespace' => '0',
                   'page_title' => '101st_Airborne_Division',
@@ -175,6 +233,7 @@ class TopEditsTest extends TestAdapter
                   'count' => '18',
                   'pa_class' => 'C',
                   'full_page_title' => '101st_Airborne_Division',
+                  'pap_project_title' => null,
                 ],
             ],
             3 => [
@@ -291,7 +350,8 @@ class TopEditsTest extends TestAdapter
         $namespace = 0,
         $start = false,
         $end = false,
-        ?int $limit = null
+        ?int $limit = null,
+        int $pagination = 0
     ): TopEdits {
         return new TopEdits(
             $this->teRepo,
@@ -302,7 +362,8 @@ class TopEditsTest extends TestAdapter
             $namespace,
             $start,
             $end,
-            $limit
+            $limit,
+            $pagination
         );
     }
 }

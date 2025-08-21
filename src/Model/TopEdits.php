@@ -184,9 +184,9 @@ class TopEdits extends Model
             // List of pages for this namespace
             $rows = $this->topEdits[$ns];
             foreach ($rows as $row) {
-                $num = $row["count"];
+                $num = $row['count'];
                 // May be null or nonexistent for assessment-less pages
-                $titles = $row["pap_project_title"] ?? "{}";
+                $titles = $row['pap_project_title'] ?? '{}';
                 // Had to use json to pass multiple values in SQL select
                 foreach (json_decode($titles) as $projectName) {
                     $counts_tmp[$projectName] ??= 0;
@@ -197,7 +197,7 @@ class TopEdits extends Model
             $counts_tmp = array_slice($counts_tmp, 0, 10);
             $projectTotals = [];
             foreach ($counts_tmp as $project => $count) {
-                $projectTotals[] = [ "pap_project_title" => $project, "count" => $count ];
+                $projectTotals[] = [ 'pap_project_title' => $project, 'count' => $count ];
             }
         }
         return $projectTotals;
@@ -388,10 +388,6 @@ class TopEdits extends Model
                     $this->project->getPageAssessments()->getClassAttrs($page['pa_class'])
                 );
                 unset($page['pa_class']);
-            }
-
-            if (array_key_exists('prp_quality', $page)) {
-                $page['prp_quality'] = (int)$page['prp_quality'];
             }
 
             if (isset($topEditedPages[$nsId])) {
