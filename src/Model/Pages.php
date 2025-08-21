@@ -291,11 +291,9 @@ class Pages extends Model
             foreach ($this->pages as $ns => $nsPages) {
                 if ($this->project->hasPageAssessments($ns)) {
                     foreach ($nsPages as $page) {
-                        if (!isset($counts[$page['assessment']['class'] ?: 'Unknown'])) {
-                            $counts[$page['assessment']['class'] ?: 'Unknown'] = 1;
-                        } else {
-                            $counts[$page['assessment']['class'] ?: 'Unknown']++;
-                        }
+                        $class = $page['assessment']['class'] ?: 'Unknown';
+                        $counts[$class] ??= 0;
+                        $counts[$class]++;
                     }
                 }
             }
