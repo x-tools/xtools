@@ -52,6 +52,7 @@ class ProjectTest extends TestAdapter
         $project->setRepository($this->projectRepo);
         static::assertEquals('test.example.org', $project->getDomain());
         static::assertEquals('test_wiki', $project->getDatabaseName());
+        static::assertEquals('test_wiki', $project->getCacheKey());
         static::assertEquals('https://test.example.org/', $project->getUrl());
         static::assertEquals('en', $project->getLang());
         static::assertEquals('/test_w', $project->getScriptPath());
@@ -60,6 +61,20 @@ class ProjectTest extends TestAdapter
         static::assertEquals('Test Wiki (test.example.org)', $project->getTitle());
         static::assertEquals('Test Main Page', $project->getMainPage());
         static::assertTrue($project->exists());
+    }
+
+    /**
+     * Test fallback behaviour when URL not found
+     */
+    public function testMetadataNoUrl(): void
+    {
+        $projectRepo = $this->createMock(ProjectRepository::class);
+        $projectRepo->expects(static::once())
+            ->method('getOne')
+            ->willReturn([]);
+        $project = new Project('testWiki');
+        $project->setRepository($projectRepo);
+        static::assertEquals('', $project->getMainPage());
     }
 
     /**
@@ -103,6 +118,9 @@ class ProjectTest extends TestAdapter
 
         // Tests that getMetadata was in fact called only once and cached afterwards
         static::assertEquals('', $project->getCanonicalNamespace(0));
+
+        // Ensure we default to '' when not found
+        static::assertEquals('', $project->getCanonicalNamespace(-1));
     }
 
     /**
@@ -137,7 +155,6 @@ class ProjectTest extends TestAdapter
         $project = new Project('disregarded_wiki_name');
         $project->setRepository($this->projectRepo);
         static::assertEquals('example_wiki', $project->getDatabaseName());
-        static::assertEquals('example_wiki', $project->getCacheKey());
         static::assertEquals('https://example.org/a-wiki/', $project->getUrl());
         static::assertEquals('en', $project->getLang());
     }
@@ -215,7 +232,8 @@ class ProjectTest extends TestAdapter
      * @param string[] $optedInProjects List of projects.
      * @param string $dbName The database name.
      * @param string $domain The domain name.
-     * @param array|null $ident Identification information.
+     * @param \stdClass|null $ident Identification information.
+     * @param bool $localExists
      * @param bool $globalExists
      * @param bool $hasOptedIn The result to check against.
      */
@@ -223,34 +241,35 @@ class ProjectTest extends TestAdapter
         array $optedInProjects,
         string $dbName,
         string $domain,
-        ?array $ident,
+        ?\stdClass $ident,
+        bool $localExists,
         bool $globalExists,
         bool $hasOptedIn
     ): void {
         $project = new Project($dbName);
         $globalProject = new Project('metawiki');
 
-        /** @var ProjectRepository|MockObject $globalProjectRepo */
         $globalProjectRepo = $this->createMock(ProjectRepository::class);
         $globalProjectRepo->expects(static::any())
             ->method('pageHasContent')
+            ->with($globalProject, 2, 'TestUser/EditCounterGlobalOptIn.js')
             ->willReturn($globalExists);
-
-        $this->projectRepo->expects(static::once())
+        $projectRepo = $this->createMock(ProjectRepository::class);
+        $projectRepo->expects(static::once())
             ->method('optedIn')
             ->willReturn($optedInProjects);
-        $this->projectRepo->expects(static::once())
+        $projectRepo->expects(static::once())
             ->method('getOne')
             ->willReturn([
                 'dbName' => $dbName,
                 'domain' => "https://$domain.org",
             ]);
-        $this->projectRepo->method('getGlobalProject')
+        $projectRepo->method('getGlobalProject')
             ->willReturn($globalProject);
-        $this->projectRepo->method('pageHasContent')
+        $projectRepo->method('pageHasContent')
             ->with($project, 2, 'TestUser/EditCounterOptIn.js')
-            ->willReturn($hasOptedIn);
-        $project->setRepository($this->projectRepo);
+            ->willReturn($localExists);
+        $project->setRepository($projectRepo);
         $globalProject->setRepository($globalProjectRepo);
 
         // Check that the user has opted in or not.
@@ -258,6 +277,7 @@ class ProjectTest extends TestAdapter
         $userRepo->expects(static::any())
             ->method('getXtoolsUserInfo')
             ->willReturn($ident);
+        static::assertEquals($ident, $userRepo->getXtoolsUserInfo());
         $user = new User($userRepo, 'TestUser');
         static::assertEquals($hasOptedIn, $project->userHasOptedIn($user));
     }
@@ -270,11 +290,12 @@ class ProjectTest extends TestAdapter
     {
         $optedInProjects = ['project1'];
         return [
-            [$optedInProjects, 'project1', 'test.example.org', null, false, true],
-            [$optedInProjects, 'project2', 'test2.example.org', null, false, false],
-            [$optedInProjects, 'project3', 'test3.example.org', null, false, false],
-            [$optedInProjects, 'project4', 'test4.example.org', [ 'username' => 'TestUser'], false, true],
-            [$optedInProjects, 'project5', 'test5.example.org', null, true, true],
+            [$optedInProjects, 'project1', 'test.example.org',  null, false, false, true],
+            [$optedInProjects, 'project2', 'test2.example.org', null, false, false, false],
+            [$optedInProjects, 'project3', 'test3.example.org', null, false, false, false],
+            [$optedInProjects, 'project4', 'test4.example.org', (object)['username' => 'TestUser'], false, false, true],
+            [$optedInProjects, 'project5', 'test5.example.org', null, true,  false, true],
+            [$optedInProjects, 'project6', 'test6.example.org', null, false, true,  true],
         ];
     }
 
