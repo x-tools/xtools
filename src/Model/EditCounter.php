@@ -337,11 +337,9 @@ class EditCounter extends Model
      */
     public function getLongestBlockSeconds()
     {
-        // @codeCoverageIgnoreStart
         if (isset($this->longestBlockSeconds)) {
             return $this->longestBlockSeconds;
         }
-        // @codeCoverageIgnoreEnd
 
         $blocks = $this->getBlocks('received', false);
         $this->longestBlockSeconds = false;
@@ -760,11 +758,9 @@ class EditCounter extends Model
      */
     public function timeCard(): array
     {
-        // @codeCoverageIgnoreStart
         if (isset($this->timeCardData)) {
             return $this->timeCardData;
         }
-        // @codeCoverageIgnoreEnd
         $totals = $this->repository->getTimeCard($this->project, $this->user);
 
         // Scale the radii: get the max, then scale each radius.
@@ -939,11 +935,9 @@ class EditCounter extends Model
      */
     public function yearCounts(?DateTime $currentTime = null): array
     {
-        // @codeCoverageIgnoreStart
         if (isset($this->yearCounts)) {
             return $this->yearCounts;
         }
-        // @codeCoverageIgnoreEnd
 
         $monthCounts = $this->monthCounts($currentTime);
         $yearCounts = [

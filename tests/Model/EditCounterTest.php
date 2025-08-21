@@ -471,6 +471,9 @@ class EditCounterTest extends TestAdapter
 
         // Assert that only active namespaces are reported.
         static::assertEquals([0, 1], array_keys($yearCountsWithNamespaces[2016]));
+
+        // Ensure we are caching that and will not make the query again
+        $this->editCounter->yearCounts(new DateTime('2017-04-30 23:59:59'));
     }
 
     /**
@@ -492,7 +495,7 @@ class EditCounterTest extends TestAdapter
                     'value' => 33,
                 ],
             ]);
-        $results = $this->editCounter->timecard();
+        $results = $this->editCounter->timeCard();
         $hours = range(0, 23);
         $days = range(1, 7);
         // The hours are seven cycles from 0 to 23
@@ -509,6 +512,9 @@ class EditCounterTest extends TestAdapter
         static::assertEmpty(
             array_filter($results, fn($row) => (int)$row['value'] < 0)
         );
+
+        // Ensure we are caching and will not query again
+        $this->editCounter->timeCard();
     }
 
     /**
@@ -530,6 +536,9 @@ class EditCounterTest extends TestAdapter
             fn($block) => !in_array($block['log_action'], ['block', 'reblock'])
         ));
         static::assertEquals($blockCount, $this->editCounter->countBlocksReceived());
+
+        // Ensure it is cached and we do not make that query a second time
+        $this->editCounter->getLongestBlockSeconds();
     }
 
     /**
