@@ -777,7 +777,6 @@ class EditCounterTest extends TestAdapter
             [
                 [
                     'tag_lists' => [],
-                    'average_size' => 0,
                 ],
                 [0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 'total' => 0],
                 0,

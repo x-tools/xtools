@@ -38,7 +38,6 @@ class Project extends Model
     /**
      * Get the associated PageAssessments model.
      * @return PageAssessments
-     * @codeCoverageIgnore
      */
     public function getPageAssessments(): PageAssessments
     {
@@ -48,7 +47,6 @@ class Project extends Model
     /**
      * @param PageAssessments $pageAssessments
      * @return Project
-     * @codeCoverageIgnore
      */
     public function setPageAssessments(PageAssessments $pageAssessments): Project
     {
@@ -60,7 +58,6 @@ class Project extends Model
      * Whether or not this project supports page assessments, or if they exist for the given namespace.
      * @param int|string|null $nsId Namespace ID, null if checking if project has page assessments for any namespace.
      * @return bool
-     * @codeCoverageIgnore
      */
     public function hasPageAssessments($nsId = null): bool
     {

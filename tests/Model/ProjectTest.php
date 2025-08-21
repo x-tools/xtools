@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Tests\Model;
 
 use App\Model\Page;
+use App\Model\PageAssessments;
 use App\Model\Project;
 use App\Model\User;
 use App\Repository\PageRepository;
@@ -224,6 +225,25 @@ class ProjectTest extends TestAdapter
         $project->setRepository($projectRepo);
         static::assertTrue($project->hasTempAccounts());
         static::assertEquals(["*$1", "~2$1"], $project->getTempAccountPatterns());
+    }
+
+    /**
+     * A project may use PageAssessments in specific namespaces
+     */
+    public function testPageAssessments(): void
+    {
+        $pa = $this->createMock(PageAssessments::class);
+        $pa->expects(static::once())
+            ->method('isSupportedNamespace')
+            ->willReturn(false);
+        $pa->expects(static::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $project = new Project('testWiki');
+        $project->setPageAssessments($pa);
+        static::assertEquals($project->getPageAssessments(), $pa);
+        static::assertTrue($project->hasPageAssessments());
+        static::assertFalse($project->hasPageAssessments(42));
     }
 
     /**
