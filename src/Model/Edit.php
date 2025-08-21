@@ -484,6 +484,8 @@ class Edit extends Model
     /**
      * Get HTML for the diff of this Edit.
      * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison could be made.
+     * Just returns a repository result.
+     * @codeCoverageIgnore
      */
     public function getDiffHtml(): ?string
     {

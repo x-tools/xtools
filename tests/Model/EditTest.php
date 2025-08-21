@@ -60,6 +60,9 @@ class EditTest extends TestAdapter
                 'general' => [
                     'articlePath' => '/wiki/$1',
                 ],
+                'namespaces' => [
+                    1 => 'Talk',
+                ],
             ]);
         $this->project->setRepository($this->projectRepo);
         $this->pageRepo = $this->createMock(PageRepository::class);
@@ -98,6 +101,9 @@ class EditTest extends TestAdapter
         static::assertEquals('abcdef', $edit->getSha());
         static::assertEquals('1', $edit->getCacheKey());
         static::assertFalse($edit->isReverted());
+        // Test fallback for invalid timestamp
+        $edit = $this->getEditFactory(['timestamp' => []]);
+        static::assertEquals(new DateTime('1970-01-01T00:00:00Z'), $edit->getTimestamp());
     }
 
     /**
@@ -139,6 +145,14 @@ class EditTest extends TestAdapter
         ]);
         static::assertEquals(
             '<a target="_blank" href="https://example.org">https://example.org</a>',
+            $edit->getWikifiedSummary()
+        );
+
+        $edit = $this->getEditFactory([
+            'comment' => 'see [[Article#Section|here]]',
+        ]);
+        static::assertEquals(
+            "see <a target='_blank' href='https://en.wikipedia.org/wiki/Article#Section'>here</a>",
             $edit->getWikifiedSummary()
         );
     }
@@ -197,13 +211,14 @@ class EditTest extends TestAdapter
      */
     public function testGetters(): void
     {
-        $edit = $this->getEditFactory();
+        $edit = $this->getEditFactory(['tags' => json_encode(['A', 'B'])]);
         static::assertEquals('2017', $edit->getYear());
         static::assertEquals('01', $edit->getMonth());
         static::assertEquals(12, $edit->getLength());
         static::assertEquals(2, $edit->getSize());
         static::assertEquals(2, $edit->getLengthChange());
         static::assertEquals('Testuser', $edit->getUser()->getUsername());
+        static::assertContains('A', $edit->getTags());
     }
 
     /**
@@ -248,13 +263,19 @@ class EditTest extends TestAdapter
 
     public function testGetForJson(): void
     {
+        $pageRepo = $this->createMock(PageRepository::class);
+        $pageRepo->method('getPageInfo')
+            ->willReturn([
+                'ns' => 1,
+            ]);
+        $this->page = new Page($pageRepo, $this->project, 'Talk:Test_page');
         $edit = $this->getEditFactory();
         static::assertEquals(
             [
                 'project' => 'en.wikipedia.org',
                 'username' => 'Testuser',
                 'page_title' => 'Test page',
-                'namespace' => $this->page->getNamespace(),
+                'namespace' => 1,
                 'rev_id' => 1,
                 'timestamp' => '2017-01-01T10:00:00Z',
                 'minor' => false,
