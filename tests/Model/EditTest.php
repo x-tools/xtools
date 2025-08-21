@@ -152,7 +152,8 @@ class EditTest extends TestAdapter
             'comment' => '/* Section */',
         ]);
         static::assertEquals(
-            "<a target='_blank' href='https://en.wikipedia.org/wiki/Test_page#Section'>&rarr;</a><em class='text-muted'>Section:</em>",
+            "<a target='_blank' href='https://en.wikipedia.org/wiki/Test_page#Section'>&rarr;</a>".
+                "<em class='text-muted'>Section:</em>",
             $edit->getWikifiedSummary()
         );
     }
