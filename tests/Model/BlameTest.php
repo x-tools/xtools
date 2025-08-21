@@ -81,7 +81,7 @@ class BlameTest extends TestAdapter
                                 'o_rev_id' => 4,
                                 'editor' => 'Alien333',
                                 'str' => 'bad',
-                            ]
+                            ],
                         ],
                     ],
                 ]],
@@ -104,7 +104,8 @@ class BlameTest extends TestAdapter
     /**
      * Test fallback for Wikiwho errors
      */
-    public function testPrepareFallback(): void {
+    public function testPrepareFallback(): void
+    {
         $this->blameRepo->expects(static::once())
             ->method('getData')
             ->willThrowException($this->createMock(RequestException::class));
