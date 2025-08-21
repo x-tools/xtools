@@ -149,10 +149,10 @@ class EditTest extends TestAdapter
         );
 
         $edit = $this->getEditFactory([
-            'comment' => 'see [[Article#Section|here]]',
+            'comment' => '/* Section */',
         ]);
         static::assertEquals(
-            "see <a target='_blank' href='https://en.wikipedia.org/wiki/Article#Section'>here</a>",
+            "<a target='_blank' href='https://en.wikipedia.org/wiki/Test_page#Section'>&rarr;</a><em class='text-muted'>Section:</em>",
             $edit->getWikifiedSummary()
         );
     }
