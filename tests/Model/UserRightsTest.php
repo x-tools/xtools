@@ -476,10 +476,20 @@ class UserRightsTest extends TestAdapter
             ],
         ], [ // Dataset #3: (none)s to splice out
             [
-                [ // removal of sysop
+                [ // none in old
                     'log_id' => '1234',
                     'log_timestamp' => '0',
-                    'log_params' => "(none)\nsysop,(none)",
+                    'log_params' => "(none)\nsysop",
+                    'log_action' => 'rights',
+                    'performer' => 'Random',
+                    'log_comment' => '...',
+                    'type' => 'local',
+                    'log_deleted' => 0,
+                ],
+                [ // none in new
+                    'log_id' => '5678',
+                    'log_timestamp' => '1',
+                    'log_params' => "sysop\n(none)",
                     'log_action' => 'rights',
                     'performer' => 'Random',
                     'log_comment' => '...',
@@ -489,12 +499,77 @@ class UserRightsTest extends TestAdapter
             ],
             false,
             [
-                [
+                0 => [
                     'logId' => '1234',
                     'performer' => 'Random',
                     'comment' => '...',
                     'added' => ['sysop'],
                     'removed' => [],
+                    'grantType' => 'manual',
+                    'type' => 'local',
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
+                ],
+                1 => [
+                    'logId' => '5678',
+                    'performer' => 'Random',
+                    'comment' => '...',
+                    'added' => [],
+                    'removed' => ['sysop'],
+                    'grantType' => 'manual',
+                    'type' => 'local',
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
+                ],
+            ],
+        ], [ // Dataset #4: removing pending auto removals on manual removal
+            [
+                [ // Temporary intadmin grant until timestamp 4
+                    'log_id' => '1234',
+                    'log_timestamp' => '0',
+                    'log_params' => 'a:4:{s:12:"4::oldgroups";a:0:{}s:12:"5::newgroups";a:1:{i:0;s:15:'.
+                        '"interface-admin";}s:11:"oldmetadata";a:0:{}s:11:"newmetadata";a:1:{i:0;a:1:'.
+                        '{s:6:"expiry";s:1:"8";}}}',
+                    'log_action' => 'rights',
+                    'performer' => 'Random',
+                    'log_comment' => 'One',
+                    'type' => 'local',
+                    'log_deleted' => 0,
+                ],
+                [ // One second before, removed manually
+                    'log_id' => '5678',
+                    'log_timestamp' => '3',
+                    'log_params' => 'a:4:{s:12:"4::oldgroups";a:1:{i:0;s:15:"interface-admin";}s:12:"5::newgroups";'.
+                        'a:0:{}s:11:"oldmetadata";a:1:{i:0;a:1:{s:6:"expiry";s:1:"4";}}s:11:"newmetadata";a:0:{}}',
+                    'log_action' => 'rights',
+                    'performer' => 'Random',
+                    'log_comment' => 'Two!',
+                    'type' => 'local',
+                    'log_deleted' => 0,
+                ],
+            ],
+            false,
+            [
+                0 => [
+                    'logId' => '1234',
+                    'performer' => 'Random',
+                    'comment' => 'One',
+                    'added' => ['interface-admin'],
+                    'removed' => [],
+                    'grantType' => 'manual',
+                    'type' => 'local',
+                    'paramsDeleted' => false,
+                    'commentDeleted' => false,
+                    'performerDeleted' => false,
+                ],
+                3 => [
+                    'logId' => '5678',
+                    'performer' => 'Random',
+                    'comment' => 'Two!',
+                    'added' => [],
+                    'removed' => ['interface-admin'],
                     'grantType' => 'manual',
                     'type' => 'local',
                     'paramsDeleted' => false,
