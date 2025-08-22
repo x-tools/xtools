@@ -362,6 +362,7 @@ class PageInfoRepository extends AutoEditsRepository
                         FROM $revTable
                         JOIN $actorTable ON actor_id = rev_actor
                         WHERE rev_page = :pageid
+                        AND rev_timestamp > 0 # Protects from weird revs with rev_timestamp containing only null bytes
                         ORDER BY rev_timestamp ASC
                         LIMIT 1
                     ) b,
@@ -372,6 +373,7 @@ class PageInfoRepository extends AutoEditsRepository
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
                         AND rev_id = page_latest
+                        AND rev_timestamp > 0 # Protects from weird revs with rev_timestamp containing only null bytes
                     ) c
                 )";
         $params = ['pageid' => $page->getId()];
