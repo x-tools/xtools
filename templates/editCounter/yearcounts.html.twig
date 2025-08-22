@@ -10,10 +10,6 @@
 
 {% if ec.yearTotals|length > 0 %}
 
-{% if not is_sub_request %}
-    {{ include('editCounter/externallegend.html.twig') }}
-{% endif %}
-
     <table class="sr-only">
         <thead>
             <tr>
@@ -76,6 +72,11 @@
             {{ msg('use-log-scale') }}
         </label>
     </div>
+
+{% if not is_sub_request %}
+    {{ include('editCounter/externallegend.html.twig') }}
+{% endif %}
+
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}

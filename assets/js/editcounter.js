@@ -251,7 +251,8 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                         // with log, it prevents a log(0) infinite loop
                         // fixed two minor chartjs versions later (2.7.2)
                         min: (type == "logarithmic" ? 1 : 0),
-                        reverse: i18nRTL,
+                        // Sadly, logarithmic breaks if reverse
+                        reverse: (type == "logarithmic" ? false : i18nRTL),
                         callback: function (value) {
                             if (Math.floor(value) === value) {
                                 return value.toLocaleString(i18nLang);
@@ -267,7 +268,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
                             let newticks = [];
                             axis.ticks.forEach((x,i) => {
                                 // So we enforce 1.5* distance.
-                                if (i == 0 || newticks[newticks.length-1]*1.5 < x) {
+                                if (i == 0 || newticks[newticks.length-1]*1.5 < x || x*1.5 < newticks[newticks.length-1]) {
                                     newticks.push(x)
                                 }
                             });
