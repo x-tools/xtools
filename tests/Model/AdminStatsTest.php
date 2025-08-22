@@ -35,9 +35,31 @@ class AdminStatsTest extends TestAdapter
         $this->asRepo = $this->createMock(AdminStatsRepository::class);
 
         // This logic is tested with integration tests.
-        // Here we just stub empty arrays so AdminStats won't error outl.
+        // Here we just stub empty arrays so AdminStats won't error out.
         $this->asRepo->method('getUserGroups')
             ->willReturn(['local' => [], 'global' => []]);
+    }
+
+    /**
+     * Test icons for each group.
+     * Note that this should be independant from everything,
+     * and so is static.
+     */
+    public function testGroupIcons(): void
+    {
+        $this->asRepo->expects(static::once())
+            ->method('getUserGroupIcons')
+            ->willReturn([
+                'sysop' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/18px-Mop.svg.png',
+            ]);
+        $as = new AdminStats($this->asRepo, $this->project, 0, 0, 'admin', []);
+        static::assertEquals([
+            'sysop' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/18px-Mop.svg.png',
+        ], $as->getUserGroupIcons());
+        // Test for wikitext; also implictly ensure we cache
+        static::assertEquals([
+            'sysop' => 'Mop.svg',
+        ], $as->getUserGroupIcons(true));
     }
 
     /**
@@ -62,7 +84,9 @@ class AdminStatsTest extends TestAdapter
         static::assertEquals(1483228800, $as->getStart());
         static::assertEquals(1488326400, $as->getEnd());
         static::assertEquals(60, $as->numDays());
+        static::assertEquals('admin', $as->getType());
         static::assertEquals(1, $as->getNumInRelevantUserGroup());
+        static::assertEquals(1, $as->getNumWithActions());
         static::assertEquals(1, $as->getNumWithActionsNotInGroup());
     }
 
@@ -84,6 +108,8 @@ class AdminStatsTest extends TestAdapter
             ],
             $as->getUsersAndGroups()
         );
+        // Ensure we cache
+        $as->getUsersAndGroups();
     }
 
     /**
@@ -115,6 +141,17 @@ class AdminStatsTest extends TestAdapter
 
         // At this point get stats should be the same.
         static::assertEquals($ret, $as->getStats());
+
+        static::assertEquals([
+            'delete',
+            'restore',
+            'block',
+            'unblock',
+            'protect',
+            'unprotect',
+            'rights',
+            'import',
+        ], array_values($as->getActions()));
     }
 
     /**
@@ -145,7 +182,7 @@ class AdminStatsTest extends TestAdapter
                 'unprotect' => 0,
                 'rights' => 0,
                 'import' => 0,
-                'total' => 0,
+                'total' => 20,
             ],
         ];
     }
@@ -171,7 +208,7 @@ class AdminStatsTest extends TestAdapter
                 'unprotect' => 2+0,
                 'rights' => 4+0,
                 'import' => 2+0,
-                'total' => 20+0,
+                'total' => 20+20,
             ],
             $as->getTotalsRow()
         );

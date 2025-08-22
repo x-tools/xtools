@@ -194,8 +194,6 @@ class AdminStats extends Model
      * adding in a key/value for user groups.
      * @param string[][] $data As retrieved by AdminStatsRepository::getStats
      * @return string[] Stats keyed by user name.
-     * Functionality covered in test for self::getStats().
-     * @codeCoverageIgnore
      */
     private function groupStatsByUsername(array $data): array
     {
