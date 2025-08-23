@@ -240,15 +240,16 @@ class PageInfoRepository extends AutoEditsRepository
 
         $project = $page->getProject();
         $pageTable = $project->getTableName('page');
-        $title = $page->getTitleWithoutNamespace();
+        $title = str_replace(' ', '_', $page->getTitleWithoutNamespace());
         $ns = $page->getNamespace();
 
         $sql = "SELECT COUNT(page_id) as `count`
             FROM $pageTable
-            WHERE page_title LIKE '$title/%'
-            AND page_namespace = $ns";
+            WHERE page_title LIKE :title
+            AND page_namespace = :namespace";
 
-        $result = $this->executeProjectsQuery($project, $sql)->fetchAllAssociative();
+        $result = $this->executeProjectsQuery($project, $sql, ['title' => $title . '/%', 'namespace' => $ns])
+            ->fetchAllAssociative();
 
         return $this->setCache($cacheKey, $result[0]['count']);
     }
