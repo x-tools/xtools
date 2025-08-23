@@ -10,6 +10,11 @@ use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DateTime;
+use Exception;
+use UnexpectedValueException;
+use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
+use PHPUnit\Framework\MockObject\Stub\Stub;
 
 /**
  * Tests for the User class.
@@ -31,6 +36,7 @@ class UserTest extends TestAdapter
     {
         $user = new User($this->userRepo, 'lowercasename');
         static::assertEquals('Lowercasename', $user->getUsername());
+        static::assertEquals(md5('Lowercasename'), $user->getCacheKey());
         $user2 = new User($this->userRepo, 'UPPERCASENAME');
         static::assertEquals('UPPERCASENAME', $user2->getUsername());
     }
@@ -42,7 +48,7 @@ class UserTest extends TestAdapter
     public function testUserHasIdOnProject(): void
     {
         // Set up stub user and project repositories.
-        $this->userRepo->expects($this->once())
+        $this->userRepo->expects($this->exactly(2))
             ->method('getIdAndRegistration')
             ->willReturn([
                 'userId' => 12,
@@ -58,6 +64,7 @@ class UserTest extends TestAdapter
         $project = new Project('wiki.example.org');
         $project->setRepository($projectRepo);
         static::assertEquals(12, $user->getId($project));
+        static::assertTrue($user->existsOnProject($project));
     }
 
     /**
@@ -148,7 +155,7 @@ class UserTest extends TestAdapter
      */
     public function testEditCount(): void
     {
-        $this->userRepo->expects($this->once())
+        $this->userRepo->expects(static::once())
             ->method('getEditCount')
             ->willReturn(12345);
         $user = new User($this->userRepo, 'TestUser');
@@ -177,6 +184,9 @@ class UserTest extends TestAdapter
         $this->userRepo->expects($this->exactly(3))
             ->method('maxEdits')
             ->willReturn(250000);
+        $this->userRepo->expects(static::once())
+            ->method('numEditsRequiringLogin')
+            ->willReturn(12344);
         $user = new User($this->userRepo, 'TestUser');
 
         $projectRepo = $this->createMock(ProjectRepository::class);
@@ -191,6 +201,9 @@ class UserTest extends TestAdapter
 
         // User::tooManyEdits()
         static::assertTrue($user->hasTooManyEdits($project));
+
+        // User:hasManyEdits()
+        static::assertTrue($user->hasManyEdits($project));
     }
 
     /**
@@ -203,6 +216,7 @@ class UserTest extends TestAdapter
         static::assertFalse($user->isIpRange());
         static::assertFalse($user->isIPv6());
         static::assertEquals('192.168.0.0', $user->getUsernameIdent());
+        static::assertTrue($user->isAnon($this->createMock(Project::class))); // should not call any Project methods
 
         $user = new User($this->userRepo, '74.24.52.13/20');
         static::assertTrue($user->isIP());
@@ -263,17 +277,30 @@ class UserTest extends TestAdapter
     /**
      * From Core's PatternTest https://w.wiki/BZQH (GPL-2.0-or-later)
      * @dataProvider provideIsTempUsername
+     * @param bool $hasTemp
      * @param string $stringPattern
      * @param string $name
      * @param bool $expected
      * @return void
      */
-    public function testIsTemp(string $stringPattern, string $name, bool $expected): void
+    public function testIsTemp(bool $hasTemp, string $stringPattern, string $name, bool $expected): void
     {
         $project = $this->createMock(Project::class);
-        $project->method('hasTempAccounts')->willReturn(true);
-        $project->method('getTempAccountPatterns')->willReturn([$stringPattern]);
-        static::assertSame($expected, User::isTempUsername($project, $name));
+        $project->expects(static::once())
+            ->method('hasTempAccounts')
+            ->willReturn($hasTemp);
+        $project->expects($hasTemp ? static::once() : static::never())
+            ->method('getTempAccountPatterns')
+            ->willReturn([$stringPattern]);
+        $user = new User($this->userRepo, $name);
+        try {
+            static::assertSame($expected, $user->isTemp($project));
+            // Check that if the pattern is invalid we errored
+            static::assertStringContainsString('$1', $stringPattern);
+        } catch (UnexpectedValueException $e) {
+            // Check that we get here only if the pattern is invalid
+            static::assertStringNotContainsString('$1', $stringPattern);
+        }
     }
 
     /**
@@ -283,44 +310,101 @@ class UserTest extends TestAdapter
     {
         return [
             'prefix mismatch' => [
+                'hasTemp' => true,
                 'pattern' => '*$1',
                 'name' => 'Test',
                 'expected' => false,
             ],
             'prefix match' => [
+                'hasTemp' => true,
                 'pattern' => '*$1',
                 'name' => '*Some user',
                 'expected' => true,
             ],
             'suffix only match' => [
+                'hasTemp' => true,
                 'pattern' => '$1*',
                 'name' => 'Some user*',
                 'expected' => true,
             ],
             'suffix only mismatch' => [
+                'hasTemp' => true,
                 'pattern' => '$1*',
                 'name' => 'Some user',
                 'expected' => false,
             ],
             'prefix and suffix match' => [
+                'hasTemp' => true,
                 'pattern' => '*$1*',
                 'name' => '*Unregistered 123*',
                 'expected' => true,
             ],
             'prefix and suffix mismatch' => [
+                'hasTemp' => true,
                 'pattern' => '*$1*',
                 'name' => 'Unregistered 123*',
                 'expected' => false,
             ],
             'prefix and suffix zero length match' => [
+                'hasTemp' => true,
                 'pattern' => '*$1*',
                 'name' => '**',
                 'expected' => true,
             ],
             'prefix and suffix overlapping' => [
+                'hasTemp' => true,
                 'pattern' => '*$1*',
                 'name' => '*',
                 'expected' => false,
+            ],
+            'no temp accounts' => [
+                'hasTemp' => false,
+                'pattern' => '*$1*',
+                'name' => '**',
+                'expected' => false,
+            ],
+            'invalid pattern' => [
+                'hasTemp' => true,
+                'pattern' => '',
+                'nam' => '*',
+                'expected' => false,
+            ],
+        ];
+    }
+
+    /**
+     * Test identification logic
+     * @dataProvider isCurrentlyLoggedInProvider
+     * @param Stub $userInfo
+     * @param bool $expected
+     */
+    public function testIsCurrentlyLoggedIn(Stub $userInfo, bool $expected): void
+    {
+        $this->userRepo->expects(static::once())
+            ->method('getXtoolsUserInfo')
+            ->will($userInfo);
+        $user = new User($this->userRepo, 'Foo');
+        static::assertEquals($expected, $user->isCurrentlyLoggedIn());
+    }
+
+    public function isCurrentlyLoggedInProvider(): array
+    {
+        return [
+            'not_logged_in' => [
+                new ExceptionStub(new Exception('')),
+                false,
+            ],
+            'malformed_ident' => [
+                new ReturnStub((object)[]),
+                false,
+            ],
+            'wrong_user' => [
+                new ReturnStub((object)['username' => 'Bar']),
+                false,
+            ],
+            'right_user' => [
+                new ReturnStub((object)['username' => 'Foo']),
+                true,
             ],
         ];
     }
