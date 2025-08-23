@@ -154,8 +154,8 @@ class PageAssessmentsTest extends TestAdapter
         static::assertNull($pa->getAssessments($page));
     }
 
-   public function testUnknownAssessment(): void
-   {
+    public function testUnknownAssessment(): void
+    {
         $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->method('getPageInfo')->willReturn([
             'title' => 'Test Page',
@@ -182,7 +182,7 @@ class PageAssessmentsTest extends TestAdapter
             'color' => '',
             'category' => 'Category:Unknown-importance articles',
             'weight' => 0,
-            'value' => '???'
+            'value' => '???',
         ], $pa->getImportanceFromAssessment(['importance' => '']));
     }
 
