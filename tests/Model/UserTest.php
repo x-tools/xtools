@@ -11,10 +11,10 @@ use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DateTime;
 use Exception;
-use UnexpectedValueException;
 use PHPUnit\Framework\MockObject\Stub\Exception as ExceptionStub;
 use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 use PHPUnit\Framework\MockObject\Stub\Stub;
+use UnexpectedValueException;
 
 /**
  * Tests for the User class.
