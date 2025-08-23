@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
-use App\Exception\BadGatewayException;
 use App\Helper\I18nHelper;
 use App\Model\Edit;
 use App\Model\Page;
