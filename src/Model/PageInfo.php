@@ -519,13 +519,11 @@ class PageInfo extends PageInfoApi
     {
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
-        // numRevisions is ignored if $limit is null.
         $revs = $this->page->getRevisions(
             null,
             $this->start,
             $this->end,
-            $limit,
-            $this->getNumRevisions()
+            $limit
         );
         $revCount = 0;
 

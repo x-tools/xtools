@@ -12,6 +12,7 @@ use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -61,6 +62,31 @@ class PageTest extends TestAdapter
     }
 
     /**
+     * A Page can be built through processing of a database row
+     */
+    public function testNewFromRow(): void
+    {
+        $pageRepo = $this->createMock(PageRepository::class);
+        $data = [
+            [['page_title' => 'A', 'namespace' => 0], 'A'],
+            [['page_title' => 'B', 'namespace' => 1, 'length' => 4,], 'Talk:B'],
+        ];
+        $project = $this->createMock(Project::class);
+        $project->expects(static::once())
+            ->method('getNamespaces')
+            ->willReturn([
+                0 => '',
+                1 => 'Talk',
+            ]);
+        foreach ($data as [$row, $fullPageTitle]) {
+            $page = Page::newFromRow($pageRepo, $project, $row);
+            static::assertEquals($row['namespace'], $page->getNamespace());
+            static::assertInstanceOf(Page::class, $page);
+            static::assertEquals($fullPageTitle, $page->getTitle(true));
+        }
+    }
+
+    /**
      * A page either exists or doesn't.
      */
     public function testExists(): void
@@ -99,6 +125,9 @@ class PageTest extends TestAdapter
                 'Talk',
                 'User',
             ]);
+        $project->expects(static::once())
+            ->method('getLang')
+            ->willReturn('en');
 
         $pageRepo = $this->createMock(PageRepository::class);
         $pageRepo->expects($this->once())
@@ -116,14 +145,18 @@ class PageTest extends TestAdapter
         $page = new Page($this->pageRepo, $project, 'User:Test:123');
         $page->setRepository($pageRepo);
 
+        static::assertEquals(2, $page->getNamespace()); // Should set the pageInfo
         static::assertEquals(42, $page->getId());
         static::assertEquals('https://example.org/User:Test:123', $page->getUrl());
         static::assertEquals(5000, $page->getWatchers());
         static::assertEquals(300, $page->getLength());
-        static::assertEquals(2, $page->getNamespace());
         static::assertEquals('User', $page->getNamespaceName());
         static::assertEquals('Q95', $page->getWikidataId());
         static::assertEquals('Test:123', $page->getTitleWithoutNamespace());
+        static::assertEquals('en', $page->getLang()); // Intentionally defaults to project lang
+        // Ensure caching
+        static::assertEquals(300, $page->getLength());
+        static::assertEquals(2, $page->getNamespace());
     }
 
     /**
@@ -138,6 +171,24 @@ class PageTest extends TestAdapter
         // and {{Main Page banner}} in particular should be there indefinitely, hopefully :)
         $content = $page->getWikitext();
         static::assertStringContainsString('{{Main Page banner}}', $content);
+    }
+
+    /**
+     * Test fetching of HTML
+     */
+    public function testHtml(): void
+    {
+        $page = new Page($this->pageRepo, $this->getMockEnwikiProject(), 'A');
+        $date = new \DateTime('20010101010101'); // 01:01:01 UTC, January 1, 2001
+        $this->pageRepo->expects(static::once())
+            ->method('getRevisionIdAtDate')
+            ->with($page, $date)
+            ->willReturn(1234);
+        $this->pageRepo->expects(static::once())
+            ->method('getHTMLContent')
+            ->with($page, 1234)
+            ->willReturn('<em>Hello</em>');
+        static::assertEquals('<em>Hello</em>', $page->getHTMLContent($date));
     }
 
     /**
@@ -170,6 +221,7 @@ class PageTest extends TestAdapter
         $page->setRepository($pageRepo);
 
         static::assertArraySubset($wikidataItems, $page->getWikidataItems());
+        static::assertEquals(2, $page->countWikidataItems()); // Ensure that we count the above
 
         // If no wikidata item...
         $pageRepo2 = $this->createMock(PageRepository::class);
@@ -221,7 +273,38 @@ class PageTest extends TestAdapter
         $page = new Page($this->pageRepo, new Project('exampleWiki'), 'Page');
         $user = new User($this->createMock(UserRepository::class), 'Testuser');
         static::assertCount(2, $page->getRevisions($user));
+        static::assertCount(2, $page->getRevisions($user)); // Test caching
         static::assertEquals(2, $page->getNumRevisions());
+    }
+
+    /**
+     * Cases for counting of number of edits
+     */
+    public function testNumRevisions(): void
+    {
+        $pageRepo = $this->createMock(PageRepository::class);
+        $pageRepo->expects(static::exactly(2))
+            ->method('getNumRevisions')
+            ->willReturn(42);
+        $pageRepo->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn([]);
+        $page = new Page($pageRepo, new Project('examplewiki'), 'Page');
+
+        // #1: user given, so we query repo and don't cache
+        static::assertEquals(42, $page->getNumRevisions($this->createMock(User::class)));
+
+        // #2: revisions happens to be set, so count that. doesn't query repo, but caches
+        static::assertEquals([], $page->getRevisions());
+        static::assertEquals(0, $page->getNumRevisions());
+        static::assertEquals(0, $page->getNumRevisions()); // Test caching
+
+        // #3: normal case, go out of our way to check
+        $page = new Page($pageRepo, new Project('examplewiki'), 'Page'); // reset caching
+        static::assertEquals(42, $page->getNumRevisions()); // queries repo for the second time
+
+        // #4: caching did work. If it doesn't we call the Repo method a third time
+        static::assertEquals(42, $page->getNumRevisions());
     }
 
     /**
@@ -280,10 +363,17 @@ class PageTest extends TestAdapter
         static::assertEquals(3500, $page->getLatestPageviews(30));
 
         // When the API fails.
-        $this->pageRepo->expects($this->once())
+        $this->pageRepo->expects(static::once())
             ->method('getPageviews')
             ->willThrowException($this->createMock(BadGatewayException::class));
         static::assertNull($page->getPageviews('20230101', '20230131'));
+        // 404, must return 0
+        $pageRepo = $this->createMock(PageRepository::class);
+        $pageRepo->expects(static::once())
+            ->method('getPageviews')
+            ->willThrowException($this->createMock(ClientException::class));
+        $page = new Page($pageRepo, new Project('exampleWiki'), 'Page');
+        static::assertEquals(0, $page->getPageviews('20230101', '20230131'));
     }
 
     /**
