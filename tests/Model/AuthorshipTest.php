@@ -10,6 +10,7 @@ use App\Model\Project;
 use App\Repository\AuthorshipRepository;
 use App\Repository\PageRepository;
 use App\Tests\TestAdapter;
+use DateTime;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -81,5 +82,18 @@ class AuthorshipTest extends TestAdapter
             'percentage' => 20.0,
             'numEditors' => 1,
         ], $authorship->getOthers());
+
+        // Test for a day-only target
+        $page = $this->createMock(Page::class);
+        $page->expects(static::once())
+            ->method('getRevisionIdAtDate')
+            ->with(new DateTime('20010203000000'))
+            ->willReturn(1234);
+        $authorship = new Authorship($authorshipRepo, $page, '2001-02-03', 2);
+        static::assertEquals(1234, $authorship->getTarget());
+
+        // Test for a raw ID target
+        $authorship = new Authorship($authorshipRepo, $page, '1234', 2);
+        static::assertEquals(1234, $authorship->getTarget());
     }
 }
