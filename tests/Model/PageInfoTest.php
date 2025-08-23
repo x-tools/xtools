@@ -50,7 +50,7 @@ class PageInfoTest extends TestAdapter
         $i18nHelper = static::getContainer()->get('app.i18n_helper');
         $this->project = $this->getMockEnwikiProject();
         $this->pageRepo = $this->createMock(PageRepository::class);
-        $this->page = new Page($this->pageRepo, $this->project, 'Test page');
+        $this->page = $this->createMock(Page::class);
         $this->editRepo = $this->createMock(EditRepository::class);
         $this->editRepo->method('getAutoEditsHelper')
             ->willReturn($autoEditsHelper);
@@ -75,9 +75,11 @@ class PageInfoTest extends TestAdapter
      */
     public function testNumRevisions(): void
     {
-        $this->pageRepo->expects($this->once())
+        $this->setupData();
+        $this->page->expects(static::once())
             ->method('getNumRevisions')
             ->willReturn(10);
+        $this->pageInfo->prepareData();
         static::assertEquals(10, $this->pageInfo->getNumRevisions());
         // Should be cached (will error out if repo's getNumRevisions is called again).
         static::assertEquals(10, $this->pageInfo->getNumRevisions());
@@ -91,7 +93,7 @@ class PageInfoTest extends TestAdapter
      */
     public function testRevisionsProcessed(int $numRevisions, int $assertion): void
     {
-        $this->pageRepo->method('getNumRevisions')->willReturn($numRevisions);
+        $this->page->method('getNumRevisions')->willReturn($numRevisions);
         static::assertEquals(
             $this->pageInfo->getNumRevisionsProcessed(),
             $assertion
@@ -115,7 +117,7 @@ class PageInfoTest extends TestAdapter
      */
     public function testTooManyRevisions(): void
     {
-        $this->pageRepo->expects($this->once())
+        $this->page->expects(static::once())
             ->method('getNumRevisions')
             ->willReturn(1000000);
         static::assertTrue($this->pageInfo->tooManyRevisions());
@@ -145,7 +147,9 @@ class PageInfoTest extends TestAdapter
 
     public function testLinksAndRedirects(): void
     {
-        $this->pageRepo->expects($this->once())
+        $this->setupData();
+        $this->pageInfo->prepareData(); // Ensure we don't call the revisions (the second time will complain).
+        $this->page->expects(static::once())
             ->method('countLinksAndRedirects')
             ->willReturn([
                 'links_ext_count' => 5,
@@ -153,7 +157,6 @@ class PageInfoTest extends TestAdapter
                 'links_in_count' => 10,
                 'redirects_count' => 0,
             ]);
-        $this->page->setRepository($this->pageRepo);
         static::assertEquals(5, $this->pageInfo->linksExtCount());
         static::assertEquals(3, $this->pageInfo->linksOutCount());
         static::assertEquals(10, $this->pageInfo->linksInCount());
@@ -165,7 +168,8 @@ class PageInfoTest extends TestAdapter
      */
     public function testGetters(): void
     {
-        $edits = $this->setupData();
+        $this->setupData();
+        $this->pageInfo->prepareData();
 
         static::assertEquals(3, $this->pageInfo->getNumEditors());
         static::assertEquals(2, $this->pageInfo->getAnonCount());
@@ -186,11 +190,11 @@ class PageInfoTest extends TestAdapter
         static::assertEquals(4, $this->pageInfo->getTopTenCount());
 
         static::assertEquals(
-            $edits[0]->getId(),
+            1,
             $this->pageInfo->getFirstEdit()->getId()
         );
         static::assertEquals(
-            $edits[4]->getId(),
+            60,
             $this->pageInfo->getLastEdit()->getId()
         );
 
@@ -198,7 +202,7 @@ class PageInfoTest extends TestAdapter
         static::assertEquals(32, $this->pageInfo->getMaxDeletion()->getId());
 
         static::assertEquals(
-            ['Mick Jagger', '192.168.0.1', '192.168.0.2'],
+            ['Mick Jagger', '192.168.0.2', '192.168.0.1'],
             array_keys($this->pageInfo->getEditors())
         );
         static::assertEquals(
@@ -242,6 +246,8 @@ class PageInfoTest extends TestAdapter
         );
 
         static::assertEquals(1, $this->pageInfo->numDeletedRevisions());
+        static::assertEquals(2, $this->pageInfo->getMobileCount());
+        static::assertEquals(2, $this->pageInfo->getVisualCount());
     }
 
     /**
@@ -250,6 +256,7 @@ class PageInfoTest extends TestAdapter
     public function testMonthYearCounts(): void
     {
         $this->setupData();
+        $this->pageInfo->prepareData();
 
         $yearMonthCounts = $this->pageInfo->getYearMonthCounts();
 
@@ -294,8 +301,9 @@ class PageInfoTest extends TestAdapter
     public function testLogEvents(): void
     {
         $this->setupData();
+        $this->pageInfo->prepareData();
 
-        $this->pageInfoRepo->expects($this->once())
+        $this->pageInfoRepo->expects(static::once())
             ->method('getLogEvents')
             ->willReturn([
                 [
@@ -327,17 +335,12 @@ class PageInfoTest extends TestAdapter
     }
 
     /**
-     * Use ReflectionClass to set up some data and populate the class properties for testing.
-     *
-     * We don't care that private methods "shouldn't" be tested...
-     * In PageInfo the update methods are all super test-worthy and otherwise fragile.
-     *
-     * @return Edit[] Array of Edit objects that represent the revision history.
+     * Set repository returns
      */
-    private function setupData(): array
+    private function setupData(): void
     {
-        $edits = [
-            new Edit($this->editRepo, $this->userRepo, $this->page, [
+        $revisions = [
+            [
                 'id' => 1,
                 'timestamp' => '20160701101205',
                 'minor' => '0',
@@ -346,8 +349,9 @@ class PageInfoTest extends TestAdapter
                 'username' => 'Mick Jagger',
                 'comment' => 'Foo bar',
                 'rev_sha1' => 'aaaaaa',
-            ]),
-            new Edit($this->editRepo, $this->userRepo, $this->page, [
+                'tags' => '["mobile edit"]',
+            ],
+            [
                 'id' => 32,
                 'timestamp' => '20160801000000',
                 'minor' => '1',
@@ -356,8 +360,9 @@ class PageInfoTest extends TestAdapter
                 'username' => 'Mick Jagger',
                 'comment' => 'Blah',
                 'rev_sha1' => 'bbbbbb',
-            ]),
-            new Edit($this->editRepo, $this->userRepo, $this->page, [
+                'tags' => '[]',
+            ],
+            [
                 'id' => 40,
                 'timestamp' => '20161003000000',
                 'minor' => '0',
@@ -366,8 +371,9 @@ class PageInfoTest extends TestAdapter
                 'username' => '192.168.0.1',
                 'comment' => 'Weeee using [[WP:AWB|AWB]]',
                 'rev_sha1' => 'cccccc',
-            ]),
-            new Edit($this->editRepo, $this->userRepo, $this->page, [
+                'tags' => '["mobile edit","visualeditor"]',
+            ],
+            [
                 'id' => 50,
                 'timestamp' => '20161003010000',
                 'minor' => '1',
@@ -376,8 +382,9 @@ class PageInfoTest extends TestAdapter
                 'username' => '192.168.0.2',
                 'comment' => 'I undo your edit cuz it bad',
                 'rev_sha1' => 'bbbbbb',
-            ]),
-            new Edit($this->editRepo, $this->userRepo, $this->page, [
+                'tags' => '["visualeditor"]',
+            ],
+            [
                 'id' => 60,
                 'timestamp' => '20161003020000',
                 'minor' => '1',
@@ -387,47 +394,21 @@ class PageInfoTest extends TestAdapter
                 'comment' => 'Weeee using [[WP:AWB|AWB]]',
                 'rev_sha1' => 'ddddd',
                 'rev_deleted' => Edit::DELETED_USER,
-            ]),
+                'tags' => '[]',
+            ],
         ];
-
-        $prevEdits = [
-            'prev' => null,
-            'prevSha' => null,
-            'maxAddition' => null,
-            'maxDeletion' => null,
-        ];
-
-        $prop = $this->reflectionClass->getProperty('firstEdit');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, $edits[0]);
-
-        $prop = $this->reflectionClass->getProperty('numRevisionsProcessed');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, 5);
-
-        $prop = $this->reflectionClass->getProperty('bots');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, [
-            'XtoolsBot' => ['count' => 1],
-        ]);
-
-        $prop = $this->reflectionClass->getProperty('numDeletedRevisions');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, 1);
-
-        $method = $this->reflectionClass->getMethod('updateCounts');
-        $method->setAccessible(true);
-        $prevEdits = $method->invoke($this->pageInfo, $edits[0], $prevEdits);
-        $prevEdits = $method->invoke($this->pageInfo, $edits[1], $prevEdits);
-        $prevEdits = $method->invoke($this->pageInfo, $edits[2], $prevEdits);
-        $prevEdits = $method->invoke($this->pageInfo, $edits[3], $prevEdits);
-        $method->invoke($this->pageInfo, $edits[4], $prevEdits);
-
-        $method = $this->reflectionClass->getMethod('doPostPrecessing');
-        $method->setAccessible(true);
-        $method->invoke($this->pageInfo);
-
-        return $edits;
+        $this->page->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn($revisions);
+        $this->pageInfoRepo->expects(static::exactly(count($revisions)))
+            ->method('getEdit')
+            ->willReturnCallback(fn($page, $rev) => new Edit($this->editRepo, $this->userRepo, $page, $rev));
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getBotData')
+            ->willReturn([['count' => 1, 'username' => 'XtoolsBot', 'current' => 1]]);
+        $this->pageInfoRepo->expects(static::any())
+            ->method('getMaxPageRevisions')
+            ->willReturn(10);
     }
 
     /**
@@ -440,10 +421,9 @@ class PageInfoTest extends TestAdapter
         $ret = $client->request('GET', 'https://en.wikipedia.org/api/rest_v1/page/html/Hanksy/747629772')
             ->getBody()
             ->getContents();
-        $this->pageRepo->expects($this->once())
+        $this->page->expects(static::once())
             ->method('getHTMLContent')
             ->willReturn($ret);
-        $this->page->setRepository($this->pageRepo);
 
         static::assertEquals([
             'bytes' => 1539,
@@ -461,6 +441,7 @@ class PageInfoTest extends TestAdapter
     public function testWithDates(): void
     {
         $this->setupData();
+        $this->pageInfo->prepareData();
 
         $prop = $this->reflectionClass->getProperty('start');
         $prop->setAccessible(true);
@@ -482,15 +463,9 @@ class PageInfoTest extends TestAdapter
         static::assertEquals(20, $this->pageInfo->getLength());
 
         // Pageviews with a date range.
-        $this->pageRepo->expects($this->once())
+        $this->page->expects(static::once())
             ->method('getPageviews')
-            ->with($this->page, '2016-06-30', '2016-10-14')
-            ->willReturn([
-                'items' => [
-                    ['views' => 1000],
-                    ['views' => 500],
-                ],
-            ]);
+            ->willReturn(1500);
         static::assertEquals(1500, $this->pageInfo->getPageviews()['count']);
     }
 
@@ -516,14 +491,12 @@ class PageInfoTest extends TestAdapter
 
     public function testPageviews(): void
     {
-        $this->pageRepo->expects($this->once())
+        $this->page->expects(static::exactly($this->pageInfo->hasDateRange() ? 1 : 0))
             ->method('getPageviews')
-            ->willReturn([
-                'items' => [
-                    ['views' => 1000],
-                    ['views' => 500],
-                ],
-            ]);
+            ->willReturn(1500);
+        $this->page->expects(static::exactly($this->pageInfo->hasDateRange() ? 0 : 1))
+            ->method('getLatestPageviews')
+            ->willReturn(1500);
 
         static::assertEquals([
             'count' => 1500,
@@ -536,9 +509,12 @@ class PageInfoTest extends TestAdapter
 
     public function testPageviewsFailing(): void
     {
-        $this->pageRepo->expects($this->once())
+        $this->page->expects(static::exactly($this->pageInfo->hasDateRange() ? 1 : 0))
             ->method('getPageviews')
-            ->willThrowException($this->createMock(BadGatewayException::class));
+            ->willReturn(null);
+        $this->page->expects(static::exactly($this->pageInfo->hasDateRange() ? 0 : 1))
+            ->method('getLatestPageviews')
+            ->willReturn(null);
 
         static::assertEquals([
             'count' => null,
