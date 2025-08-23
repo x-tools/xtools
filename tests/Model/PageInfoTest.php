@@ -15,6 +15,7 @@ use App\Repository\PageInfoRepository;
 use App\Repository\PageRepository;
 use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
+use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use GuzzleHttp;
 use ReflectionClass;
@@ -170,16 +171,24 @@ class PageInfoTest extends TestAdapter
         $this->setupData();
         $this->pageInfo->prepareData();
 
+        static::assertEquals(
+            32,
+            $this->pageInfo->getFirstEdit()->getId()
+        );
+        static::assertEquals(
+            60,
+            $this->pageInfo->getLastEdit()->getId()
+        );
         static::assertEquals(3, $this->pageInfo->getNumEditors());
         static::assertEquals(2, $this->pageInfo->getAnonCount());
         static::assertEquals(40, $this->pageInfo->anonPercentage());
         static::assertEquals(3, $this->pageInfo->getMinorCount());
         static::assertEquals(60, $this->pageInfo->minorPercentage());
         static::assertEquals(1, $this->pageInfo->getBotRevisionCount());
-        static::assertEquals(93, $this->pageInfo->getTotalDays());
-        static::assertEquals(18, (int) $this->pageInfo->averageDaysPerEdit());
+        static::assertEquals(63, $this->pageInfo->getTotalDays());
+        static::assertEquals(12, (int) $this->pageInfo->averageDaysPerEdit());
         static::assertEquals(0, (int) $this->pageInfo->editsPerDay());
-        static::assertEquals(1.6, $this->pageInfo->editsPerMonth());
+        static::assertEquals(2.4, $this->pageInfo->editsPerMonth());
         static::assertEquals(5, $this->pageInfo->editsPerYear());
         static::assertEquals(1.7, $this->pageInfo->editsPerEditor());
         static::assertEquals(2, $this->pageInfo->getAutomatedCount());
@@ -187,15 +196,6 @@ class PageInfoTest extends TestAdapter
 
         static::assertEquals(80, $this->pageInfo->topTenPercentage());
         static::assertEquals(4, $this->pageInfo->getTopTenCount());
-
-        static::assertEquals(
-            1,
-            $this->pageInfo->getFirstEdit()->getId()
-        );
-        static::assertEquals(
-            60,
-            $this->pageInfo->getLastEdit()->getId()
-        );
 
         static::assertEquals(1, $this->pageInfo->getMaxAddition()->getId());
         static::assertEquals(32, $this->pageInfo->getMaxDeletion()->getId());
@@ -250,6 +250,61 @@ class PageInfoTest extends TestAdapter
     }
 
     /**
+     * Make sure we don't divide by 0
+     */
+    public function testEmptyFallbacks(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn([
+            [
+                'id' => 1,
+                'timestamp' => '20010203040506',
+                'minor' => '0',
+                'length' => '30',
+                'length_change' => '30',
+                'username' => null,
+                'comment' => 'Foo bar',
+                'rev_sha1' => 'aaaaaa',
+                'tags' => '["mobile edit"]',
+            ],
+            ]);
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getEdit')
+            ->willReturnCallback(fn($page, $rev) => new Edit($this->editRepo, $this->userRepo, $page, $rev));
+        $this->pageInfo->prepareData();
+        static::assertEquals(0, $this->pageInfo->editsPerDay());
+        static::assertEquals(0, $this->pageInfo->editsPerMonth());
+        static::assertEquals(0, $this->pageInfo->editsPerYear());
+        static::assertEquals(0, $this->pageInfo->editsPerEditor());
+    }
+
+    public function testCountHistory(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn([
+            [
+                'id' => 1,
+                'timestamp' => (new DateTime('now'))->format('YmdHis'),
+                'minor' => '0',
+                'length' => '30',
+                'length_change' => '30',
+                'username' => null,
+                'comment' => 'Foo bar',
+                'rev_sha1' => 'aaaaaa',
+                'tags' => '["mobile edit"]',
+            ],
+            ]);
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getEdit')
+            ->willReturnCallback(fn($page, $rev) => new Edit($this->editRepo, $this->userRepo, $page, $rev));
+        $this->pageInfo->prepareData();
+        static::assertEquals([1, 1, 1, 1], array_values($this->pageInfo->getCountHistory()));
+    }
+
+
+    /**
      * Test that the data for each individual month and year is correct.
      */
     public function testMonthYearCounts(): void
@@ -270,21 +325,15 @@ class PageInfoTest extends TestAdapter
         ], $yearMonthCounts[2016]);
 
         static::assertEquals(
-            ['07', '08', '09', '10', '11', '12'],
+            ['08', '09', '10', '11', '12'],
             array_keys($yearMonthCounts[2016]['months'])
         );
         static::assertEquals(
-            ['2016-07', '2016-08', '2016-09', '2016-10', '2016-11', '2016-12'],
+            ['2016-08', '2016-09', '2016-10', '2016-11', '2016-12'],
             $this->pageInfo->getMonthLabels()
         );
 
         // Just test a few, not every month.
-        static::assertArraySubset([
-            'all' => 1,
-            'minor' => 0,
-            'anon' => 0,
-            'automated' => 0,
-        ], $yearMonthCounts[2016]['months']['07']);
         static::assertArraySubset([
             'all' => 3,
             'minor' => 2,
@@ -300,7 +349,6 @@ class PageInfoTest extends TestAdapter
     public function testLogEvents(): void
     {
         $this->setupData();
-        $this->pageInfo->prepareData();
 
         $this->pageInfoRepo->expects(static::once())
             ->method('getLogEvents')
@@ -319,10 +367,7 @@ class PageInfoTest extends TestAdapter
                 ],
             ]);
 
-        $method = $this->reflectionClass->getMethod('setLogsEvents');
-        $method->setAccessible(true);
-        $method->invoke($this->pageInfo);
-
+        $this->pageInfo->prepareData();
         $yearMonthCounts = $this->pageInfo->getYearMonthCounts();
 
         // Just test a few, not every month.
@@ -341,7 +386,7 @@ class PageInfoTest extends TestAdapter
         $revisions = [
             [
                 'id' => 1,
-                'timestamp' => '20160701101205',
+                'timestamp' => '20160801000001',
                 'minor' => '0',
                 'length' => '30',
                 'length_change' => '30',
@@ -442,13 +487,14 @@ class PageInfoTest extends TestAdapter
         $this->setupData();
         $this->pageInfo->prepareData();
 
-        $prop = $this->reflectionClass->getProperty('start');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, strtotime('2016-06-30'));
+        $start = $this->reflectionClass->getProperty('start');
+        $start->setValue($this->pageInfo, strtotime('2016-06-30'));
 
-        $prop = $this->reflectionClass->getProperty('end');
-        $prop->setAccessible(true);
-        $prop->setValue($this->pageInfo, strtotime('2016-10-14'));
+        $end = $this->reflectionClass->getProperty('end');
+        $end->setValue($this->pageInfo, strtotime('2016-10-14'));
+
+        $meth = $this->reflectionClass->getMethod('getLastDay');
+        $lastDayOfMonth = $meth->invoke($this->pageInfo);
 
         static::assertTrue($this->pageInfo->hasDateRange());
         static::assertEquals('2016-06-30', $this->pageInfo->getStartDate());
@@ -457,6 +503,7 @@ class PageInfoTest extends TestAdapter
             'start' => '2016-06-30',
             'end' => '2016-10-14',
         ], $this->pageInfo->getDateParams());
+        static::assertEquals(strtotime('2016-10-31'), $lastDayOfMonth);
 
         // Uses length of last edit because there is a date range.
         static::assertEquals(20, $this->pageInfo->getLength());
@@ -466,6 +513,15 @@ class PageInfoTest extends TestAdapter
             ->method('getPageviews')
             ->willReturn(1500);
         static::assertEquals(1500, $this->pageInfo->getPageviews()['count']);
+
+        // no dates
+        $start->setValue($this->pageInfo, null);
+        $end->setValue($this->pageInfo, null);
+        $this->page->expects(static::once())
+            ->method('getLength')
+            ->willReturn(42);
+        static::assertEquals([], $this->pageInfo->getDateParams());
+        static::assertEquals(42, $this->pageInfo->getLength());
     }
 
     /**

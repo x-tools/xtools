@@ -107,9 +107,8 @@ class PageInfo extends PageInfoApi
      */
     private function getLastDay(): int
     {
-        if (isset($this->end)) {
-            throw new \Exception('a');
-            return (new DateTime("@$this->end"))
+        if (is_int($this->end)) {
+            return (new DateTime("@".$this->end))
                 ->modify('last day of this month')
                 ->getTimestamp();
         } else {
@@ -418,6 +417,8 @@ class PageInfo extends PageInfoApi
     /**
      * Get the subpage count.
      * @return int
+     * Just returns a repository result.
+     * @codeCoverageIgnore
      */
     public function getSubpageCount(): int
     {
@@ -558,7 +559,6 @@ class PageInfo extends PageInfoApi
                 $this->firstEdit = $edit;
             }
 
-            //throw new \Exception('a');
             $prevEdits = $this->updateCounts($edit, $prevEdits);
 
             $revCount++;
