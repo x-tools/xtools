@@ -107,7 +107,8 @@ class PageInfo extends PageInfoApi
      */
     private function getLastDay(): int
     {
-        if (is_int($this->end)) {
+        if (isset($this->end)) {
+            throw new \Exception('a');
             return (new DateTime("@$this->end"))
                 ->modify('last day of this month')
                 ->getTimestamp();
