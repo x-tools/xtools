@@ -330,6 +330,53 @@ class PageInfoTest extends TestAdapter
     }
 
     /**
+     * Test max removal reverting.
+     * Could theoretically be done above but would require changing many values.
+     */
+    public function testMaxRemovalRevert(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn([
+                [
+                    'id' => 1,
+                    'timestamp' => '20010203040506',
+                    'minor' => '0',
+                    'length' => '30',
+                    'length_change' => '-1',
+                    'username' => null,
+                    'comment' => 'Foo bar',
+                    'rev_sha1' => 'aaaaaa',
+                ],
+                [
+                    'id' => 2,
+                    'timestamp' => '20010203040506',
+                    'minor' => '0',
+                    'length' => '30',
+                    'length_change' => '-2',
+                    'username' => null,
+                    'comment' => 'Foo bar',
+                    'rev_sha1' => 'bbbbbb',
+                ],
+                [
+                    'id' => 3,
+                    'timestamp' => '20010203040508',
+                    'minor' => '0',
+                    'length' => '30',
+                    'length_change' => '2',
+                    'username' => null,
+                    'comment' => 'Foo bar',
+                    'rev_sha1' => 'aaaaaa',
+                ],
+            ]);
+        $this->pageInfoRepo->expects(static::exactly(3))
+            ->method('getEdit')
+            ->willReturnCallback(fn($page, $rev) => new Edit($this->editRepo, $this->userRepo, $page, $rev));
+        $this->pageInfo->prepareData();
+        static::assertEquals(1, $this->pageInfo->getMaxDeletion()->getId());
+    }
+
+    /**
      * Make sure we don't divide by 0
      */
     public function testEmptyFallbacks(): void
