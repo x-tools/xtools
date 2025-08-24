@@ -686,6 +686,7 @@ class PageInfo extends PageInfoApi
         // @TODO: Test this against an edit war (use your sandbox).
         // Also remove as max added or deleted, if applicable.
         if ($this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId()) {
+            throw new \Exception('a');
             $this->maxAddition = $prevEdits['maxAddition'];
             $prevEdits['maxAddition'] = $prevEdits['prev']; // In the event of edit wars.
         } elseif ($this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId()) {
