@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Tests\Model;
 
+use App\Exception\BadGatewayException;
 use App\Helper\I18nHelper;
 use App\Model\Edit;
 use App\Model\Page;
@@ -65,8 +66,7 @@ class PageInfoTest extends TestAdapter
             $this->page
         );
 
-        // Don't care that private methods "shouldn't" be tested...
-        // In PageInfo they are all super test-worthy and otherwise fragile.
+        // Used to set a few private properties without having to recreate everything
         $this->reflectionClass = new ReflectionClass($this->pageInfo);
     }
 
@@ -124,11 +124,25 @@ class PageInfoTest extends TestAdapter
     }
 
     /**
-     * Getting the number of edits made to the page by current or former bots.
+     * Various bot-related methods
      */
-    public function testBotRevisionCount(): void
+    public function testBots(): void
     {
-        $bots = [
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getBotData')
+            ->willReturn([
+                [
+                    'username' => 'Foo',
+                    'count' => 3,
+                    'current' => '1',
+                ],
+                [
+                    'username' => 'Bar',
+                    'count' => 12,
+                    'current' => '0',
+                ],
+            ]);
+        static::assertEquals([
             'Foo' => [
                 'count' => 3,
                 'current' => true,
@@ -137,12 +151,68 @@ class PageInfoTest extends TestAdapter
                 'count' => 12,
                 'current' => false,
             ],
-        ];
+        ], $this->pageInfo->getBots());
+        static::assertEquals(2, $this->pageInfo->getNumBots());
+        static::assertEquals(15, $this->pageInfo->getBotRevisionCount());
+        static::assertEquals(15, $this->pageInfo->getBotRevisionCount()); // second time for caching
+    }
 
-        static::assertEquals(
-            15,
-            $this->pageInfo->getBotRevisionCount($bots)
-        );
+    public function testTopEditorsByEditCount(): void
+    {
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getTopEditorsByEditCount')
+            ->willReturn([
+                [
+                    'username' => 'Foo',
+                    'count' => 22,
+                    'minor' => 6,
+                    'first_revid' => 100,
+                    'first_timestamp' => '10000101000100',
+                    'latest_revid' => 300,
+                    'latest_timestamp' => '10000101000300',
+                ],
+                [
+                    'username' => 'Bar',
+                    'count' => 20,
+                    'minor' => 4,
+                    'first_revid' => 200,
+                    'first_timestamp' => '10000101000200',
+                    'latest_revid' => 400,
+                    'latest_timestamp' => '10000101000400',
+                ],
+            ]);
+        static::assertEquals([
+            [
+                'rank' => 1,
+                'username' => 'Foo',
+                'count' => 22,
+                'minor' => 6,
+                'first_edit' => [
+                    'id' => 100,
+                    'timestamp' => '1000-01-01T00:01:00Z',
+                ],
+                'latest_edit' => [
+                    'id' => 300,
+                    'timestamp' => '1000-01-01T00:03:00Z',
+                ],
+            ],
+            [
+                'rank' => 2,
+                'username' => 'Bar',
+                'count' => 20,
+                'minor' => 4,
+                'first_edit' => [
+                    'id' => 200,
+                    'timestamp' => '1000-01-01T00:02:00Z',
+                ],
+                'latest_edit' => [
+                    'id' => 400,
+                    'timestamp' => '1000-01-01T00:04:00Z',
+                ],
+            ],
+        ], $this->pageInfo->getTopEditorsByEditCount());
+        // Test caching
+        $this->pageInfo->getTopEditorsByEditCount();
     }
 
     public function testLinksAndRedirects(): void
@@ -161,6 +231,16 @@ class PageInfoTest extends TestAdapter
         static::assertEquals(3, $this->pageInfo->linksOutCount());
         static::assertEquals(10, $this->pageInfo->linksInCount());
         static::assertEquals(0, $this->pageInfo->redirectsCount());
+    }
+
+    public function testBugs(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getErrors')
+            ->willReturn([]);
+        static::assertSame([], $this->pageInfo->getBugs());
+        static::assertSame([], $this->pageInfo->getBugs()); // Ensure caching
+        static::assertEquals(0, $this->pageInfo->numBugs());
     }
 
     /**
@@ -362,6 +442,10 @@ class PageInfoTest extends TestAdapter
                     'timestamp' => '20160905000000',
                 ],
                 [
+                    'log_type' => 'delete',
+                    'timestamp' => '20160905000001',
+                ],
+                [
                     'log_type' => 'move',
                     'timestamp' => '20161005000000',
                 ],
@@ -373,9 +457,22 @@ class PageInfoTest extends TestAdapter
         // Just test a few, not every month.
         static::assertEquals([
             'protections' => 1,
-            'deletions' => 1,
+            'deletions' => 2,
             'moves' => 1,
         ], $yearMonthCounts[2016]['events']);
+    }
+
+    /**
+     * Make sure that setLogEvents does nothing when yearMonthCounts is not set
+     */
+    public function testLogEventsFallback(): void
+    {
+        // Intentionally don't setup, so addYearMonthCountEntry never gets called
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getLogEvents')
+            ->willReturn([['timestamp' => 'yesterday']]);
+        $this->pageInfo->prepareData(); // Will call setLogEvents under the hood
+        static::assertSame([], $this->pageInfo->getYearMonthCounts());
     }
 
     /**
@@ -411,7 +508,7 @@ class PageInfoTest extends TestAdapter
                 'timestamp' => '20161003000000',
                 'minor' => '0',
                 'length' => '15',
-                'length_change' => '-10',
+                'length_change' => '1000',
                 'username' => '192.168.0.1',
                 'comment' => 'Weeee using [[WP:AWB|AWB]]',
                 'rev_sha1' => 'cccccc',
@@ -422,7 +519,7 @@ class PageInfoTest extends TestAdapter
                 'timestamp' => '20161003010000',
                 'minor' => '1',
                 'length' => '25',
-                'length_change' => '10',
+                'length_change' => '-1000',
                 'username' => '192.168.0.2',
                 'comment' => 'I undo your edit cuz it bad',
                 'rev_sha1' => 'bbbbbb',
@@ -477,6 +574,46 @@ class PageInfoTest extends TestAdapter
             'unique_references' => 12,
             'sections' => 2,
         ], $this->pageInfo->getProseStats());
+        // Test caching
+        $this->pageInfo->getProseStats();
+    }
+
+    /**
+     * Ensure we react appropriately when getHTMLContent fails
+     */
+    public function testProseStatFallback(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getHTMLContent')
+            ->willThrowException($this->createMock(BadGateWayException::class));
+        static::assertNull($this->pageInfo->getProseStats());
+    }
+
+    /**
+     * Ensure we don't divide by 0 when the page had no added text
+     */
+    public function testZeroAddedBytes(): void
+    {
+        $this->page->expects(static::once())
+            ->method('getRevisions')
+            ->willReturn([
+                [
+                    'id' => 1,
+                    'timestamp' => '20160801000001',
+                    'minor' => '0',
+                    'length' => '0',
+                    'length_change' => '0',
+                    'username' => 'Mick Jagger',
+                    'comment' => 'Foo bar',
+                    'rev_sha1' => 'aaaaaa',
+                    'tags' => '["mobile edit"]',
+                ],
+            ]);
+        $this->pageInfoRepo->expects(static::once())
+            ->method('getEdit')
+            ->willReturnCallback(fn($page, $rev) => new Edit($this->editRepo, $this->userRepo, $page, $rev));
+        $this->pageInfo->prepareData();
+        static::assertEquals(0, $this->pageInfo->topTenEditorsByAdded()[0]['percentage']);
     }
 
     /**

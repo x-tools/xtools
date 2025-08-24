@@ -468,7 +468,7 @@ class PageInfo extends PageInfoApi
      */
     public function getYearMonthCounts(): array
     {
-        return $this->yearMonthCounts;
+        return $this->yearMonthCounts ?? [];
     }
 
     /**
@@ -568,7 +568,10 @@ class PageInfo extends PageInfoApi
 
         // Various sorts
         arsort($this->editors);
-        ksort($this->yearMonthCounts);
+        if (isset($this->yearMonthCounts)) {
+            // Might not be if there are no edits
+            ksort($this->yearMonthCounts);
+        }
         if ($this->tools) {
             arsort($this->tools);
         }
@@ -639,6 +642,7 @@ class PageInfo extends PageInfoApi
             $edit->setReverted(true);
             return $this->updateContentSizesRevert($prevEdits);
         } else {
+            $edit->setReverted(false);
             return $this->updateContentSizesNonRevert($edit, $prevEdits);
         }
     }
@@ -665,7 +669,10 @@ class PageInfo extends PageInfoApi
         $this->revertCount++;
 
         // Adjust addedBytes given this edit was a revert of the previous one.
-        if ($prevEdits['prev'] && false === $prevEdits['prev']->isReverted() && $prevEdits['prev']->getSize() > 0) {
+        if ($prevEdits['prev']
+            && false === $prevEdits['prev']->isReverted()
+            && $prevEdits['prev']->getSize() > 0
+        ) {
             $this->addedBytes -= $prevEdits['prev']->getSize();
 
             // Also deduct from the user's individual added byte count.
@@ -977,9 +984,8 @@ class PageInfo extends PageInfoApi
             }
 
             // Compute the percentage of minor edits the user made.
-            $this->editors[$editor]['minorPercentage'] = $info['all']
-                ? ($info['minor'] / $info['all']) * 100
-                : 0;
+            // Note: $info['all'] is ensured to be non-null because we ++ it as soon as we add the editor
+            $this->editors[$editor]['minorPercentage'] = ($info['minor'] / $info['all']) * 100;
 
             if ($info['all'] > 1) {
                 // Number of seconds/days between first and last edit.
