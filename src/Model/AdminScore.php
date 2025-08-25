@@ -10,6 +10,7 @@ use DateTime;
 /**
  * An AdminScore provides scores of logged actions and on-wiki activity made by a user,
  * to measure if they would be suitable as an administrator.
+ * @codeCoverageIgnore
  */
 class AdminScore extends Model
 {

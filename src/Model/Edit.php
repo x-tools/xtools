@@ -375,7 +375,7 @@ class Edit extends Model
             $sectionTitleLink = html_entity_decode(html_entity_decode(str_replace(' ', '_', $sectionTitle)));
 
             $sectionWikitext = "<a target='_blank' href='$pageUrl#$sectionTitleLink'>&rarr;</a>" .
-                "<em class='text-muted'>" . $sectionTitle . ":</em> ";
+                "<em class='text-muted'>" . $sectionTitle . ":</em>";
             $summary = str_replace($sectionMatch[0][0], $sectionWikitext, $summary);
         }
 
@@ -484,6 +484,8 @@ class Edit extends Model
     /**
      * Get HTML for the diff of this Edit.
      * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison could be made.
+     * Just returns a repository result.
+     * @codeCoverageIgnore
      */
     public function getDiffHtml(): ?string
     {

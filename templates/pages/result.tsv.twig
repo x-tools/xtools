@@ -5,6 +5,10 @@
 {% if project.hasPageAssessments and pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['assessment']) %}
 {% endif %}
+{% if project.hasProofreadPage and pages.deleted != 'deleted' %}
+{% set columns = columns|merge(['proofreadpage-quality']) %}
+{% set qualityNames = project.prpQualityNames %}
+{% endif %}
 {% for thKey in columns %}
 {{ msg(thKey) }}{% if not loop.last %}	{% endif %}
 {% endfor %}
@@ -12,7 +16,7 @@
 {% for ns in pages.results|keys %}
 {% for page in pages.results[ns] %}
 {% set pageTitle = titleWithNs(page.page_title, ns, project.namespaces) %}
-{{ ns }}	{{ pageTitle }}	{{ page.timestamp|date_format }}	{{ page.rev_length }}{% if pages.deleted != 'deleted' %}	{% if page.length is not null %}{{ page.length }}{% endif %}{% endif %}{% if project.hasPageAssessments %}	{{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}{% endif %}
+{{ ns }}	{{ pageTitle }}	{{ page.timestamp|date_format }}	{{ page.rev_length }}{% if pages.deleted != 'deleted' %}	{% if page.length is not null %}{{ page.length }}{% endif %}{% endif %}{% if project.hasPageAssessments %}	{{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}{% endif %}{% if project.hasProofreadPage %}	{{ page.prp_quality ? qualityNames[page.prp_quality] : '' }}{% endif %}
 
 {% endfor %}
 {% endfor %}
