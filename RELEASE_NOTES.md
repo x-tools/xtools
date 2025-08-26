@@ -1,5 +1,10 @@
 # Release Notes #
 
+## 3.22.1 ##
+- PageInfo (T402709): fix encoding errors in subpage count.
+- PageInfoApi: ensure rev_timestamp is a number
+- Localization updates.
+
 ## 3.22.0 ##
 - Require PHP >= 8.2 and update dependencies.
 - PageInfo: Remove the `last_edit_id`, `author`, `author_editcount` and `ip_edits`
