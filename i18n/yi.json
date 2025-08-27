@@ -3,6 +3,7 @@
 		"authors": [
 			"Har-wradim",
 			"Pacha Tchernof",
+			"Shvermer",
 			"פוילישער"
 		]
 	},
@@ -18,12 +19,12 @@
 	"download-label": "אַראָפלאָדן",
 	"editors": "רעדאַקטאָרן",
 	"feedback": "פֿידבעק",
-	"friday": "פֿרייטיג",
+	"friday": "פרייטאָג",
 	"hide": "באַהאַלטן",
 	"history": "היסטאָריע",
 	"latest-action": "לעצטע אַקציע אינעם לאָגבוך",
 	"links": "לינקען",
-	"monday": "מאָנטיג",
+	"monday": "מאָנטאָג",
 	"month": "מאָנאַט",
 	"more": "נאָך",
 	"namespace": "נאָמענטייל",
@@ -45,12 +46,13 @@
 	"performer": "אויספֿירער",
 	"projects": "פראיעקטן",
 	"size-kilobytes": "{{PLURAL:$1|איין קילאבייט|$1 קילאבייטן}}",
-	"sunday": "זונטיג",
+	"subpages": "סוב-בלעטער",
+	"sunday": "זונטאָג",
 	"talk": "שמועס",
 	"templates": "מוסטערן",
 	"text": "טעקסט",
 	"thank": "דאַנקען",
-	"thursday": "דאָנערשטאג",
+	"thursday": "דאָנערשטאָג",
 	"tool-about": "וועגן",
 	"words": "ווערטער",
 	"year": "יאָר"
