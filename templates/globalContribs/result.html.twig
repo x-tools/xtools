@@ -136,7 +136,7 @@
         {% set substr = user.ipSubstringFromCidr %}
         {% for edit in gc.globalEdits %}
             {% if edit.project.exists %}
-                <tr{% if edit.isReverted %} class="reverted-edit"{% endif %}>
+                <tr{% if (edit.isReverted or edit.isPending) %} class="{% if edit.isReverted %}reverted-edit{% endif %}{% if edit.isPending %} pending-edit{% endif %}"{% endif %}>
                     <td class="sort-entry--date contribs-row-date" data-value="{{ edit.utcTimestamp }}">
                         {{ wiki.diffLink(edit, edit.timestamp) }}
                     </td>
@@ -158,6 +158,7 @@
                     </td>
                     <td class="sort-entry--summary" data-value="{{ edit.comment }}">
                         {% if edit.isReverted %}<i class="text-info">({{ msg('reverted')|lower }})</i>&nbsp;{% endif %}
+                        {% if edit.isPending %}<i class="text-info">({{ msg('pending')|lower }})</i>&nbsp;{% endif %}
                         {% if edit.deletedSummary %}
                             <i class="text-muted">{{ msg('edit-summary-removed') }}</i>
                         {% else %}

@@ -249,18 +249,20 @@ class Project extends Model
     }
 
     /**
-     * List of extensions that are installed on the wiki.
+     * List of extensions that are installed on the given project instance (or this if not given).
+     * @param Project|null $project Optional, resorts to the current instance if not given.
      * @return string[]
      */
-    public function getInstalledExtensions(): array
+    public function getInstalledExtensions(?Project $project = null): array
     {
+        $project = $project ?? $this;
         // Quick cache, valid only for the same request.
         static $installedExtensions = null;
         if (is_array($installedExtensions)) {
             return $installedExtensions;
         }
 
-        return $installedExtensions = $this->getRepository()->getInstalledExtensions($this);
+        return $installedExtensions = $this->getRepository()->getInstalledExtensions($project);
     }
 
     /**
@@ -271,6 +273,17 @@ class Project extends Model
     {
         $extensions = $this->getInstalledExtensions();
         return in_array('PageTriage', $extensions);
+    }
+
+    /**
+     * Get if the given Project has the FlaggedRevs extensions
+     * (for pending changes)
+     * @return bool
+     */
+    public function projectHasFlaggedRevs(Project $project) : bool
+    {
+        $extensions = $this->getInstalledExtensions($project);
+        return in_array('FlaggedRevs', $extensions);
     }
 
     /**
