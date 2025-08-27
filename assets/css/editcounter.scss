@@ -26,6 +26,17 @@
         max-width: 1000px;
     }
 
+    .yearmonth-container {
+        display:flex;
+        flex-direction:row;
+        flex-wrap:wrap;
+        width:100%;
+    }
+
+    .yearmonth-chart-container {
+        flex-grow:1;
+    }
+
     #namespace-canvas {
         height: auto;
         width: auto;

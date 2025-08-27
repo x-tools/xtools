@@ -18,7 +18,6 @@ use App\Repository\UserRepository;
 use App\Tests\TestAdapter;
 use DateTime;
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use GuzzleHttp;
 use ReflectionClass;
 
 /**
@@ -605,7 +604,7 @@ class PageInfoTest extends TestAdapter
     public function testProseStats(): void
     {
         // We'll use a live page to better test the prose stats parser.
-        $client = new GuzzleHttp\Client();
+        $client = static::getContainer()->get('eight_points_guzzle.client.xtools');
         $ret = $client->request('GET', 'https://en.wikipedia.org/api/rest_v1/page/html/Hanksy/747629772')
             ->getBody()
             ->getContents();
