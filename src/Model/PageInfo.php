@@ -108,7 +108,7 @@ class PageInfo extends PageInfoApi
     private function getLastDay(): int
     {
         if (is_int($this->end)) {
-            return (new DateTime("@$this->end"))
+            return (new DateTime("@".$this->end))
                 ->modify('last day of this month')
                 ->getTimestamp();
         } else {
@@ -164,7 +164,6 @@ class PageInfo extends PageInfoApi
 
     /**
      * Fetch and store all the data we need to show the PageInfo view.
-     * @codeCoverageIgnore
      */
     public function prepareData(): void
     {
@@ -418,6 +417,8 @@ class PageInfo extends PageInfoApi
     /**
      * Get the subpage count.
      * @return int
+     * Just returns a repository result.
+     * @codeCoverageIgnore
      */
     public function getSubpageCount(): int
     {
@@ -467,7 +468,7 @@ class PageInfo extends PageInfoApi
      */
     public function getYearMonthCounts(): array
     {
-        return $this->yearMonthCounts;
+        return $this->yearMonthCounts ?? [];
     }
 
     /**
@@ -510,22 +511,16 @@ class PageInfo extends PageInfoApi
 
     /**
      * Parse the revision history, collecting our core statistics.
-     *
-     * Untestable because it relies on getting a PDO statement. All the important
-     * logic lives in other methods which are tested.
-     * @codeCoverageIgnore
      */
     private function parseHistory(): void
     {
         $limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
-        // numRevisions is ignored if $limit is null.
         $revs = $this->page->getRevisions(
             null,
             $this->start,
             $this->end,
-            $limit,
-            $this->getNumRevisions()
+            $limit
         );
         $revCount = 0;
 
@@ -555,18 +550,6 @@ class PageInfo extends PageInfoApi
             /** @var Edit $edit */
             $edit = $this->repository->getEdit($this->page, $rev);
 
-            if (0 !== $edit->getDeleted()) {
-                $this->numDeletedRevisions++;
-            }
-
-            if (in_array('mobile edit', $edit->getTags())) {
-                $this->mobileCount++;
-            }
-
-            if (in_array('visualeditor', $edit->getTags())) {
-                $this->visualCount++;
-            }
-
             if (0 === $revCount) {
                 $this->firstEdit = $edit;
             }
@@ -585,7 +568,10 @@ class PageInfo extends PageInfoApi
 
         // Various sorts
         arsort($this->editors);
-        ksort($this->yearMonthCounts);
+        if (isset($this->yearMonthCounts)) {
+            // Might not be if there are no edits
+            ksort($this->yearMonthCounts);
+        }
         if ($this->tools) {
             arsort($this->tools);
         }
@@ -617,6 +603,18 @@ class PageInfo extends PageInfoApi
         // Update figures regarding content addition/removal, and the revert count.
         $prevEdits = $this->updateContentSizes($edit, $prevEdits);
 
+        if (0 !== $edit->getDeleted()) {
+            $this->numDeletedRevisions++;
+        }
+
+        if (in_array('mobile edit', $edit->getTags())) {
+            $this->mobileCount++;
+        }
+
+        if (in_array('visualeditor', $edit->getTags())) {
+            $this->visualCount++;
+        }
+
         // Now that we've updated all the counts, we can reset
         // the prev and last edits, which are used for tracking.
         // But first, let's copy over the SHA of the actual previous edit
@@ -644,6 +642,7 @@ class PageInfo extends PageInfoApi
             $edit->setReverted(true);
             return $this->updateContentSizesRevert($prevEdits);
         } else {
+            $edit->setReverted(false);
             return $this->updateContentSizesNonRevert($edit, $prevEdits);
         }
     }
@@ -670,7 +669,10 @@ class PageInfo extends PageInfoApi
         $this->revertCount++;
 
         // Adjust addedBytes given this edit was a revert of the previous one.
-        if ($prevEdits['prev'] && false === $prevEdits['prev']->isReverted() && $prevEdits['prev']->getSize() > 0) {
+        if ($prevEdits['prev']
+            && false === $prevEdits['prev']->isReverted()
+            && $prevEdits['prev']->getSize() > 0
+        ) {
             $this->addedBytes -= $prevEdits['prev']->getSize();
 
             // Also deduct from the user's individual added byte count.
@@ -702,7 +704,7 @@ class PageInfo extends PageInfoApi
      */
     private function updateContentSizesNonRevert(Edit $edit, array $prevEdits): array
     {
-        $editSize = $this->getEditSize($edit, $prevEdits);
+        $editSize = $edit->getSize();
 
         // Edit was not a revert, so treat size > 0 as content added.
         if ($editSize > 0) {
@@ -729,25 +731,6 @@ class PageInfo extends PageInfoApi
         }
 
         return $prevEdits;
-    }
-
-    /**
-     * Get the size of the given edit, based on the previous edit (if present).
-     * We also don't return the actual edit size if last revision had a length of null.
-     * This happens when the edit follows other edits that were revision-deleted.
-     * @see T148857 for more information.
-     * @todo Remove once T101631 is resolved.
-     * @param Edit $edit
-     * @param Edit[] $prevEdits With 'prev', 'prevSha', 'maxAddition' and 'maxDeletion'.
-     * @return int|null
-     */
-    private function getEditSize(Edit $edit, array $prevEdits): ?int
-    {
-        if ($prevEdits['prev'] && null === $prevEdits['prev']->getLength()) {
-            return 0;
-        } else {
-            return $edit->getSize();
-        }
     }
 
     /**
@@ -1001,9 +984,8 @@ class PageInfo extends PageInfoApi
             }
 
             // Compute the percentage of minor edits the user made.
-            $this->editors[$editor]['minorPercentage'] = $info['all']
-                ? ($info['minor'] / $info['all']) * 100
-                : 0;
+            // Note: $info['all'] is ensured to be non-null because we ++ it as soon as we add the editor
+            $this->editors[$editor]['minorPercentage'] = ($info['minor'] / $info['all']) * 100;
 
             if ($info['all'] > 1) {
                 // Number of seconds/days between first and last edit.

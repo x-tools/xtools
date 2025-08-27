@@ -329,4 +329,23 @@ $tooltip-shadow: #333;
     filter:invert(1) hue-rotate(180deg);
   }
 
+  .prp-qualitytext {
+    color:white; /* needed to have enough contrast */
+  }
+  .prp-quality0 {
+    background-color:#55585e;
+  }
+  .prp-quality1 {
+    background-color:#971602;
+  }
+  .prp-quality2 {
+    background-color:#40408c;
+  }
+  .prp-quality3 {
+    background-color:#5C5C00;
+  }
+  .prp-quality4 {
+    background-color:#00662e;
+  }
+
 }
