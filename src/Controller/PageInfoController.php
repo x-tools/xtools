@@ -36,12 +36,11 @@ class PageInfoController extends XtoolsController
 
     /**
      * The search form.
-     * @Route("/pageinfo", name="PageInfo")
-     * @Route("/pageinfo/{project}", name="PageInfoProject")
-     * @Route("/articleinfo", name="PageInfoLegacy")
-     * @Route("/articleinfo/index.php", name="PageInfoLegacyPhp")
-     * @return Response
      */
+    #[Route('/pageinfo', name: 'PageInfo')]
+    #[Route('/pageinfo/{project}', name: 'PageInfoProject')]
+    #[Route('/articleinfo', name: 'PageInfoLegacy')]
+    #[Route('/articleinfo/index.php', name: 'PageInfoLegacyPhp')]
     public function indexAction(): Response
     {
         if (isset($this->params['project']) && isset($this->params['page'])) {
@@ -88,12 +87,10 @@ class PageInfoController extends XtoolsController
      * Generate PageInfo gadget script for use on-wiki. This automatically points the
      * script to this installation's API.
      *
-     * @Route("/pageinfo-gadget.js", name="PageInfoGadget")
      * @link https://www.mediawiki.org/wiki/XTools/PageInfo_gadget
-     *
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route('/pageinfo-gadget.js', name: 'PageInfoGadget')]
     public function gadgetAction(): Response
     {
         $rendered = $this->renderView('pageInfo/pageinfo.js.twig');
@@ -104,35 +101,34 @@ class PageInfoController extends XtoolsController
 
     /**
      * Display the results in given date range.
-     * @Route(
-     *    "/pageinfo/{project}/{page}/{start}/{end}", name="PageInfoResult",
-     *     requirements={
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *     }
-     * )
-     * @Route(
-     *     "/articleinfo/{project}/{page}/{start}/{end}", name="PageInfoResultLegacy",
-     *      requirements={
-     *          "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *          "start"="|\d{4}-\d{2}-\d{2}",
-     *          "end"="|\d{4}-\d{2}-\d{2}",
-     *      },
-     *      defaults={
-     *          "start"=false,
-     *          "end"=false,
-     *      }
-     *  )
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/pageinfo/result/{project}/{page}/{start}/{end}',
+        name: 'PageInfoResult',
+        requirements: [
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+        ]
+    )]
+    #[Route(
+        '/articleinfo/result/{project}/{page}/{start}/{end}',
+        name: 'PageInfoResultLegacy',
+        requirements: [
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+        ]
+    )]
     public function resultAction(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -197,12 +193,8 @@ class PageInfoController extends XtoolsController
 
     /**
      * Check if there were any revisions of given page in given date range.
-     * @param Page $page
-     * @param false|int $start
-     * @param false|int $end
-     * @return bool
      */
-    private function isDateRangeValid(Page $page, $start, $end): bool
+    private function isDateRangeValid(Page $page, false|int $start, false|int $end): bool
     {
         return $page->getNumRevisions(null, $start, $end) > 0;
     }
@@ -211,18 +203,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get basic information about a page.
-     * @Route(
-     *     "/api/page/pageinfo/{project}/{page}",
-     *     name="PageApiPageInfo",
-     *     requirements={"page"=".+"},
-     *     methods={"GET"}
-     * )
-     * @Route(
-     *      "/api/page/articleinfo/{project}/{page}",
-     *      name="PageApiPageInfoLegacy",
-     *      requirements={"page"=".+"},
-     *      methods={"GET"}
-     *  )
      * @OA\Get(description="Get basic information about the history of a page.
             See also the [pageviews](https://w.wiki/6o9k) and [edit data](https://w.wiki/6o9m) REST APIs.")
      * @OA\Tag(name="Page API")
@@ -262,16 +242,25 @@ class PageInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return Response|JsonResponse
      * See PageInfoControllerTest::testPageInfoApi()
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/pageinfo/{project}/{page}',
+        name: 'PageApiPageInfo',
+        requirements: ['page' => '.+'],
+        methods: ['GET']
+    )]
+    #[Route(
+        '/api/page/articleinfo/{project}/{page}',
+        name: 'PageApiPageInfoLegacy',
+        requirements: ['page' => '.+'],
+        methods: ['GET']
+    )]
     public function pageInfoApiAction(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
-    ): Response {
+    ): Response|JsonResponse {
         $this->recordApiUsage('page/pageinfo');
 
         $this->setupPageInfo($pageInfoRepo, $autoEditsHelper);
@@ -279,7 +268,7 @@ class PageInfoController extends XtoolsController
 
         try {
             $data = $this->pageInfo->getPageInfoApiData($this->project, $this->page);
-        } catch (ServerException $e) {
+        } catch (ServerException) {
             // The Wikimedia action API can fail for any number of reasons. To our users
             // any ServerException means the data could not be fetched, so we capture it here
             // to avoid the flood of automated emails when the API goes down, etc.
@@ -323,12 +312,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get prose statistics for the given page.
-     * @Route(
-     *     "/api/page/prose/{project}/{page}",
-     *     name="PageApiProse",
-     *     requirements={"page"=".+"},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/XTools/Page_History#Prose")
      * @OA\Get(description="Get statistics about the [prose](https://en.wiktionary.org/wiki/prose) (characters,
@@ -351,11 +334,14 @@ class PageInfoController extends XtoolsController
      *     )
      * )
      * @OA\Response(response=404, ref="#/components/responses/404")
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/prose/{project}/{page}',
+        name: 'PageApiProse',
+        requirements: ['page' => '.+'],
+        methods: ['GET']
+    )]
     public function proseStatsApiAction(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -376,12 +362,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get the page assessments of one or more pages, along with various related metadata.
-     * @Route(
-     *     "/api/page/assessments/{project}/{pages}",
-     *     name="PageApiAssessments",
-     *     requirements={"pages"=".+"},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\Get(description="Get [assessment data](https://w.wiki/6oAM) of the given pages, including the overall
        quality classifications, along with a list of the WikiProjects and their classifications and importance levels.")
@@ -409,10 +389,14 @@ class PageInfoController extends XtoolsController
      *     )
      * )
      * @OA\Response(response=404, ref="#/components/responses/404")
-     * @param string $pages May be multiple pages separated by pipes, e.g. Foo|Bar|Baz
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/assessments/{project}/{pages}',
+        name: 'PageApiAssessments',
+        requirements: ['pages' => '.+'],
+        methods: ['GET']
+    )]
     public function assessmentsApiAction(string $pages): JsonResponse
     {
         $this->recordApiUsage('page/assessments');
@@ -442,12 +426,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get number of in and outgoing links, external links, and redirects to the given page.
-     * @Route(
-     *     "/api/page/links/{project}/{page}",
-     *     name="PageApiLinks",
-     *     requirements={"page"=".+"},
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Page")
@@ -467,9 +445,14 @@ class PageInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/links/{project}/{page}',
+        name: 'PageApiLinks',
+        requirements: ['page' => '.+'],
+        methods: ['GET']
+    )]
     public function linksApiAction(): JsonResponse
     {
         $this->recordApiUsage('page/links');
@@ -478,21 +461,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get the top editors (by number of edits) of a page.
-     * @Route(
-     *     "/api/page/top_editors/{project}/{page}/{start}/{end}/{limit}", name="PageApiTopEditors",
-     *     requirements={
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "limit"="\d+"
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *         "limit"=20,
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Page")
@@ -533,11 +501,24 @@ class PageInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/top_editors/{project}/{page}/{start}/{end}/{limit}',
+        name: 'PageApiTopEditors',
+        requirements: [
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?(?:\/(\d+))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+            'limit' => '\d+',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+            'limit' => 20,
+        ],
+        methods: ['GET']
+    )]
     public function topEditorsApiAction(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -557,19 +538,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get data about bots that have edited a page.
-     * @Route(
-     *     "/api/page/bot_data/{project}/{page}/{start}/{end}", name="PageApiBotData",
-     *     requirements={
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\Get(description="List bots that have edited a page, with edit counts and whether the account
            is still in the `bot` user group.")
@@ -599,11 +567,22 @@ class PageInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/bot_data/{project}/{page}/{start}/{end}',
+        name: 'PageApiBotData',
+        requirements: [
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+        ],
+        methods: ['GET']
+    )]
     public function botDataApiAction(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper
@@ -620,19 +599,6 @@ class PageInfoController extends XtoolsController
 
     /**
      * Get counts of (semi-)automated tools that were used to edit the page.
-     * @Route(
-     *     "/api/page/automated_edits/{project}/{page}/{start}/{end}", name="PageApiAutoEdits",
-     *     requirements={
-     *         "page"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-     *         "start"="|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Page API")
      * @OA\Get(description="Get counts of the number of times known (semi-)automated tools were used to edit the page.")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -654,11 +620,22 @@ class PageInfoController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param PageInfoRepository $pageInfoRepo
-     * @param AutomatedEditsHelper $autoEditsHelper
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/api/page/auto_edits/{project}/{page}/{start}/{end}',
+        name: 'PageApiAutoEdits',
+        requirements: [
+            'page' => '(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+        ],
+        methods: ['GET']
+    )]
     public function getAutoEdits(
         PageInfoRepository $pageInfoRepo,
         AutomatedEditsHelper $autoEditsHelper

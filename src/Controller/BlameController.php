@@ -36,10 +36,9 @@ class BlameController extends XtoolsController
 
     /**
      * The search form.
-     * @Route("/blame", name="Blame")
-     * @Route("/blame/{project}", name="BlameProject")
-     * @return Response
      */
+    #[Route("/blame", name: "Blame")]
+    #[Route("/blame/{project}", name: "BlameProject")]
     public function indexAction(): Response
     {
         $this->params['target'] = $this->request->query->get('target', '');
@@ -72,19 +71,17 @@ class BlameController extends XtoolsController
     }
 
     /**
-     * @Route(
-     *     "/blame/{project}/{page}/{target}",
-     *     name="BlameResult",
-     *     requirements={
-     *         "page"="(.+?)",
-     *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={"target"="latest"}
-     * )
-     * @param string $target
-     * @param BlameRepository $blameRepo
-     * @return Response
+     * The results page.
      */
+    #[Route(
+        "/blame/{project}/{page}/{target}",
+        name: "BlameResult",
+        requirements: [
+            "page" => "(.+?)",
+            "target" => "|latest|\d+|\d{4}-\d{2}-\d{2}",
+        ],
+        defaults: ["target" => "latest"]
+    )]
     public function resultAction(string $target, BlameRepository $blameRepo): Response
     {
         if (!isset($this->params['q'])) {
