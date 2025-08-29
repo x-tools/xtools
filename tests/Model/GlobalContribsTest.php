@@ -90,6 +90,8 @@ class GlobalContribsTest extends TestAdapter
                 'dbName' => 'wiki1',
                 'url' => 'https://wiki1.example.org',
             ]);
+        $wiki1Repo->method('hasPageTable')
+            ->willReturn(true);
         $wiki1 = new Project('wiki1');
         $wiki1->setRepository($wiki1Repo);
 
