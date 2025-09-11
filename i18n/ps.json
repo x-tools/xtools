@@ -132,6 +132,7 @@
 	"error-authorship-non-mainspace": "د ليکوالۍ شمارنې يوازې د ارتشيال ليکنو لپاره د لاسرسي وړ دي.",
 	"error-authorship-unsupported-project": "$1 نه ملاتړکېدونکې پروژه ده.",
 	"error-deleted-data-link": "له ټول‌کتنې نه لرې‌کول",
+	"error-login": "ننوتل نابرياله شو! مهرباني وکړئ بيا هڅه وکړئ.",
 	"error-pageinfo-api": "د بیاکتنې ډاټا راوړلو توان نلري.",
 	"error-server-message": "سرور وايي: $1",
 	"events": "پېښې",
