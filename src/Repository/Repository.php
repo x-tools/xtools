@@ -8,9 +8,9 @@ use App\Exception\BadGatewayException;
 use App\Model\Project;
 use DateInterval;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
@@ -392,7 +392,7 @@ abstract class Repository
      * @param array $params Parameters to bound to the prepared query.
      * @param int|null $timeout Maximum statement time in seconds. null will use the
      *   default specified by the APP_QUERY_TIMEOUT env variable.
-     * @return ResultStatement
+     * @return Result
      * @throws DriverException
      * @codeCoverageIgnore
      */
@@ -401,7 +401,7 @@ abstract class Repository
         string $sql,
         array $params = [],
         ?int $timeout = null
-    ): ResultStatement {
+    ): Result {
         try {
             $timeout = $timeout ?? $this->queryTimeout;
             $sql = "SET STATEMENT max_statement_time = $timeout FOR\n".$sql;

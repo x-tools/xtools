@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -27,9 +28,9 @@ use Twig\Error\RuntimeError;
 class ExceptionListener
 {
     protected Environment $templateEngine;
-    protected FlashBagInterface $flashBag;
     protected I18nHelper $i18n;
     protected LoggerInterface $logger;
+    protected ?FlashBagInterface $flashBag;
 
     /** @var string The environment. */
     protected string $environment;
@@ -38,20 +39,19 @@ class ExceptionListener
      * Constructor for the ExceptionListener.
      * @param Environment $templateEngine
      * @param LoggerInterface $logger
-     * @param FlashBagInterface $flashBag
      * @param I18nHelper $i18n
      * @param string $environment
      */
     public function __construct(
         Environment $templateEngine,
+        RequestStack $requestStack,
         LoggerInterface $logger,
-        FlashBagInterface $flashBag,
         I18nHelper $i18n,
         string $environment = 'prod'
     ) {
         $this->templateEngine = $templateEngine;
+        $this->flashBag = $requestStack->getSession()?->getFlashBag();
         $this->logger = $logger;
-        $this->flashBag = $flashBag;
         $this->i18n = $i18n;
         $this->environment = $environment;
     }

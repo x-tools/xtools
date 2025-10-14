@@ -125,12 +125,11 @@ class EditCounterController extends XtoolsController
 
     /**
      * The initial GET request that displays the search form.
-     * @Route("/ec", name="EditCounter")
-     * @Route("/ec/index.php", name="EditCounterIndexPhp")
-     * @Route("/ec/{project}", name="EditCounterProject")
-     * @return RedirectResponse|Response
      */
-    public function indexAction()
+    #[Route("/ec", name: "EditCounter")]
+    #[Route("/ec/index.php", name: "EditCounterIndexPhp")]
+    #[Route("/ec/{project}", name: "EditCounterProject")]
+    public function indexAction(): Response|RedirectResponse
     {
         if (isset($this->params['project']) && isset($this->params['username'])) {
             return $this->redirectFromSections();
@@ -232,24 +231,20 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display all results.
-     * @Route(
-     *     "/ec/{project}/{username}",
-     *     name="EditCounterResult",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response|RedirectResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec/index.php/{project}/{username}",
+        name: "EditCounterResultIndexPhp",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function resultAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
         RequestStack $requestStack
-    ) {
+    ): Response|RedirectResponse {
         $this->setUpEditCounter($editCounterRepo, $userRightsRepo, $requestStack);
 
         if (1 === count($this->sections)) {
@@ -277,21 +272,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the general statistics section.
-     * @Route(
-     *     "/ec-generalstats/{project}/{username}",
-     *     name="EditCounterGeneralStats",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param GlobalContribsRepository $globalContribsRepo
-     * @param EditRepository $editRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-generalstats/{project}/{username}",
+        name: "EditCounterGeneralStats",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function generalStatsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -325,15 +314,14 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for general stats.
-     * @Route(
-     *     "/ec-generalstats",
-     *     name="EditCounterGeneralStatsIndex",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @return Response
      */
+    #[Route(
+        "/ec-generalstats",
+        name: "EditCounterGeneralStatsIndex",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function generalStatsIndexAction(): Response
     {
         $this->sections = ['general-stats'];
@@ -342,19 +330,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the namespace totals section.
-     * @Route(
-     *     "/ec-namespacetotals/{project}/{username}",
-     *     name="EditCounterNamespaceTotals",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-namespacetotals/{project}/{username}",
+        name: "EditCounterNamespaceTotals",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function namespaceTotalsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -378,9 +362,8 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for namespace totals.
-     * @Route("/ec-namespacetotals", name="EditCounterNamespaceTotalsIndex")
-     * @return Response
      */
+    #[Route("/ec-namespacetotals", name: "EditCounterNamespaceTotalsIndex")]
     public function namespaceTotalsIndexAction(): Response
     {
         $this->sections = ['namespace-totals'];
@@ -389,19 +372,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the timecard section.
-     * @Route(
-     *     "/ec-timecard/{project}/{username}",
-     *     name="EditCounterTimecard",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-timecard/{project}/{username}",
+        name: "EditCounterTimecard",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function timecardAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -426,9 +405,8 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for timecard.
-     * @Route("/ec-timecard", name="EditCounterTimecardIndex")
-     * @return Response
      */
+    #[Route("/ec-timecard", name: "EditCounterTimecardIndex")]
     public function timecardIndexAction(): Response
     {
         $this->sections = ['timecard'];
@@ -437,19 +415,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the year counts section.
-     * @Route(
-     *     "/ec-yearcounts/{project}/{username}",
-     *     name="EditCounterYearCounts",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-timecard/{project}/{username}",
+        name: "EditCounterYearCounts",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function yearCountsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -473,9 +447,9 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for year counts.
-     * @Route("/ec-yearcounts", name="EditCounterYearCountsIndex")
      * @return Response
      */
+    #[Route("/ec-yearcounts", name: "EditCounterYearCountsIndex")]
     public function yearCountsIndexAction(): Response
     {
         $this->sections = ['year-counts'];
@@ -484,19 +458,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the month counts section.
-     * @Route(
-     *     "/ec-monthcounts/{project}/{username}",
-     *     name="EditCounterMonthCounts",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-monthcounts/{project}/{username}",
+        name: "EditCounterMonthCounts",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function monthCountsAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -521,9 +491,8 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for month counts.
-     * @Route("/ec-monthcounts", name="EditCounterMonthCountsIndex")
-     * @return Response
      */
+    #[Route("/ec-monthcounts", name: "EditCounterMonthCountsIndex")]
     public function monthCountsIndexAction(): Response
     {
         $this->sections = ['month-counts'];
@@ -532,19 +501,15 @@ class EditCounterController extends XtoolsController
 
     /**
      * Display the user rights changes section.
-     * @Route(
-     *     "/ec-rightschanges/{project}/{username}",
-     *     name="EditCounterRightsChanges",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     }
-     * )
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/ec-rightschanges/{project}/{username}",
+        name: "EditCounterRightsChanges",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ]
+    )]
     public function rightsChangesAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -571,9 +536,8 @@ class EditCounterController extends XtoolsController
 
     /**
      * Search form for rights changes.
-     * @Route("/ec-rightschanges", name="EditCounterRightsChangesIndex")
-     * @return Response
      */
+    #[Route("/ec-rightschanges", name: "EditCounterRightsChangesIndex")]
     public function rightsChangesIndexAction(): Response
     {
         $this->sections = ['rights-changes'];
@@ -584,14 +548,6 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get counts of various log actions made by the user.
-     * @Route(
-     *     "/api/user/log_counts/{project}/{username}",
-     *     name="UserApiLogCounts",
-     *     requirements={
-     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get counts of various logged actions made by a user. The keys of the returned `log_counts`
            property describe the log type and log action in the form of _type-action_.
@@ -619,12 +575,16 @@ class EditCounterController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/log_counts/{project}/{username}",
+        name: "UserApiLogCounts",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ],
+        methods: ["GET"]
+    )]
     public function logCountsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -639,14 +599,6 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the number of edits made by the user to each namespace.
-     * @Route(
-     *     "/api/user/namespace_totals/{project}/{username}",
-     *     name="UserApiNamespaceTotals",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get edit counts of a user broken down by [namespace](https://w.wiki/6oKq).")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -665,12 +617,16 @@ class EditCounterController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/namespace_totals/{project}/{username}",
+        name: "UserApiNamespaceTotals",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ],
+        methods: ["GET"]
+    )]
     public function namespaceTotalsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -685,14 +641,6 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the number of edits made by the user for each month, grouped by namespace.
-     * @Route(
-     *     "/api/user/month_counts/{project}/{username}",
-     *     name="UserApiMonthCounts",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get the number of edits a user has made grouped by namespace and month.")
      * @OA\Parameter(ref="#/components/parameters/Project")
@@ -721,12 +669,16 @@ class EditCounterController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/month_counts/{project}/{username}",
+        name: "UserApiMonthCounts",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ],
+        methods: ["GET"]
+    )]
     public function monthCountsApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
@@ -748,14 +700,6 @@ class EditCounterController extends XtoolsController
 
     /**
      * Get the total number of edits made by a user during each hour of day and day of week.
-     * @Route(
-     *     "/api/user/timecard/{project}/{username}",
-     *     name="UserApiTimeCard",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get the raw number of edits made by a user during each hour of day and day of week. The
             `scale` is a value that indicates the number of edits made relative to other hours and days of the week.")
@@ -781,12 +725,16 @@ class EditCounterController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param EditCounterRepository $editCounterRepo
-     * @param UserRightsRepository $userRightsRepo
-     * @param RequestStack $requestStack
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/timecard/{project}/{username}",
+        name: "UserApiTimeCard",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+        ],
+        methods: ["GET"]
+    )]
     public function timecardApiAction(
         EditCounterRepository $editCounterRepo,
         UserRightsRepository $userRightsRepo,
