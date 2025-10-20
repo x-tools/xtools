@@ -7,7 +7,6 @@ namespace App\Repository;
 use App\Model\PageAssessments;
 use App\Model\Project;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDO\Exception as PDOException;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
@@ -263,7 +262,7 @@ class ProjectRepository extends Repository
         $queryResult = $this->executeProjectsQuery($dbSlice, $sql, [
             'project' => $project . "_p",
         ])->fetchAssociative();
-        $result = (count($queryResult) == 1);
+        $result = (1 == count($queryResult));
         // Cache for 1h and return
         return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
     }
