@@ -243,34 +243,27 @@ class ProjectRepository extends Repository
     }
 
     /**
-     * Can we find this project's page table?
-     * If not, this project has not been replicated yet,
+     * Is this project actually replicated? Sometimes projets aren't,
      * despite being listed in meta_p.wiki. See T322466.
-     * The implementation is a bit dirty, but we do not
-     * have the permissions for anything better.
      * @param string $project Database name, without _p.
      * @return bool
      */
-    public function hasPageTable(string $project): bool
+    public function hasTables(string $project): bool
     {
-        $cacheKey = $this->getCacheKey($project, "has_page");
-        if ($this->cache->hasItem($cacheKey) && false) {
+        $cacheKey = $this->getCacheKey($project, "has_tables");
+        if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
-
-        $pageTable = $this->getTableName($project, "page");
-        $sql = "SELECT 1 FROM $pageTable LIMIT 1";
-        try {
-            $this->executeProjectsQuery($project, $sql, [
-                'project' => $project,
-            ])->fetchAssociative();
-            $result = true;
-        } catch (PDOException $e) {
-            $code = (int)$e->getCode();
-            $result = 42000 !== $code; // Syntax error/access violation; including specifically missing table
-        } catch (\Exception $e) { // Some other exception--AGF. Notably prevents crash of many tests
-            $result = true;
-        }
+        $dbList = $this->getDbList();
+        $dbSlice = $dbList[$project];
+        $sql = "SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = :project
+                LIMIT 1";
+        $queryResult = $this->executeProjectsQuery($dbSlice, $sql, [
+            'project' => $project . "_p",
+        ])->fetchAssociative();
+        $result = (count($queryResult) == 1);
         // Cache for 1h and return
         return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
     }
