@@ -471,8 +471,7 @@ class EditCounter extends Model
     {
         $logCounts = $this->getLogCounts();
         return ($logCounts['protect-modify'] ?? 0)
-            + ($logCounts['stable-modify'] ?? 0)
-            + ($logCounts['stable-move_stable'] ?? 0);
+            + ($logCounts['stable-modify'] ?? 0);
     }
 
     /**
