@@ -29,6 +29,9 @@ class GlobalContribsTest extends TestAdapter
     public function setUp(): void
     {
         $this->globalContribsRepo = $this->createMock(GlobalContribsRepository::class);
+        $this->globalContribsRepo->expects(static::once())
+            ->method('checkReplicationAllProjects')
+            ->willReturn([]);
         $userRepo = $this->createMock(UserRepository::class);
         $this->globalContribs = new GlobalContribs(
             $this->globalContribsRepo,
@@ -90,7 +93,7 @@ class GlobalContribsTest extends TestAdapter
                 'dbName' => 'wiki1',
                 'url' => 'https://wiki1.example.org',
             ]);
-        $wiki1Repo->method('hasTables')
+        $wiki1Repo->method('checkReplication')
             ->willReturn(true);
         $wiki1 = new Project('wiki1');
         $wiki1->setRepository($wiki1Repo);

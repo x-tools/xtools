@@ -32,7 +32,7 @@ class TestAdapter extends WebTestCase
                 'dbName' => 'test_wiki',
                 'lang' => 'en',
             ]);
-        $repo->method('hasTables')
+        $repo->method('checkReplication')
             ->willReturn(true);
         return $repo;
     }
