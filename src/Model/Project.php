@@ -116,7 +116,8 @@ class Project extends Model
      */
     public function exists(): bool
     {
-        return !empty($this->getDomain()) && $this->repository->checkReplication($this->getBasicInfo()['dbName']);
+        return (!empty($this->getDomain()))
+            && $this->repository->checkReplication($this->getBasicInfo()['dbName']);
     }
 
     /**

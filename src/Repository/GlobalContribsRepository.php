@@ -137,9 +137,9 @@ class GlobalContribsRepository extends Repository
         while ($exists) {
             $i += 1;
             try {
-                $queryResult = $this->executeProjetsQuery("s$i", $sql)->fetchFirstColumn();
+                $queryResult = $this->executeProjectsQuery("s$i", $sql)->fetchFirstColumn();
                 $result = array_merge($result, $queryResult);
-            } catch (Exception) {
+            } catch (\Throwable) {
                 $exists = false;
             }
         }

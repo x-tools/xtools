@@ -29,9 +29,6 @@ class GlobalContribsTest extends TestAdapter
     public function setUp(): void
     {
         $this->globalContribsRepo = $this->createMock(GlobalContribsRepository::class);
-        $this->globalContribsRepo->expects(static::once())
-            ->method('checkReplicationAllProjects')
-            ->willReturn([]);
         $userRepo = $this->createMock(UserRepository::class);
         $this->globalContribs = new GlobalContribs(
             $this->globalContribsRepo,

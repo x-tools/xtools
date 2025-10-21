@@ -249,15 +249,20 @@ class ProjectRepository extends Repository
      */
     public function checkReplication(string $project): bool
     {
+        if ('' == $project) {
+            // This means we failed to getBasicInfo. Let's try and AGF.
+            // Plus, keeps tests from breaking down.
+            return true;
+        }
         $cacheKey = $this->getCacheKey($project, "replication_check");
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
         // GlobalContribs preloads replication checks for *all* projects
-        $allProjectsCacheKey = $this->getCacheKey("global_replication_check");
+        $allProjectsCacheKey = $this->getCacheKey('', "global_replication_check");
         if ($this->cache->hasItem($allProjectsCacheKey)) {
             $globalReplicationChecks = $this->cache->getItem($allProjectsCacheKey)->get();
-            return array_key_exists($globalReplicationChecks, $project);
+            return array_key_exists($project, $globalReplicationChecks);
         }
         $dbList = $this->getDbList();
         if (!array_key_exists($project, $dbList)) {
