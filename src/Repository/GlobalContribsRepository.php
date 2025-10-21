@@ -125,7 +125,7 @@ class GlobalContribsRepository extends Repository
      */
     public function checkReplicationAllProjects(): array
     {
-        $cacheKey = $this->getCacheKey("global_replicationn_check");
+        $cacheKey = $this->getCacheKey("global_replication_check");
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
         }
