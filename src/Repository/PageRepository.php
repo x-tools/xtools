@@ -105,7 +105,8 @@ class PageRepository extends Repository
      * @param false|int $end
      * @param int|null $limit
      * @param int|null $numRevisions
-     * @return string[] Each member with keys: id, timestamp, length.
+     * @return string[] Each member with keys: id, timestamp, length,
+     *   minor, length_change, user_id, username, comment, sha, deleted, tags.
      */
     public function getRevisions(
         Page $page,
@@ -154,6 +155,8 @@ class PageRepository extends Repository
         );
         $commentTable = $page->getProject()->getTableName('comment');
         $actorTable = $page->getProject()->getTableName('actor');
+        $ctTable = $page->getProject()->getTableName('change_tag');
+        $ctdTable = $page->getProject()->getTableName('change_tag_def');
         $userClause = $user ? "revs.rev_actor = :actorId AND " : "";
 
         $limitClause = '';
@@ -174,7 +177,14 @@ class PageRepository extends Repository
                         actor_name AS username,
                         comment_text AS `comment`,
                         revs.rev_sha1 AS `sha`,
-                        revs.rev_deleted AS `deleted`
+                        revs.rev_deleted AS `deleted`,
+                        (
+                            SELECT JSON_ARRAYAGG(ctd_name)
+                            FROM $ctTable
+                            JOIN $ctdTable
+                            ON ct_tag_id = ctd_id
+                            WHERE ct_rev_id = revs.rev_id
+                        ) as `tags`
                     FROM $revTable AS revs
                     LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)

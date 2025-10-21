@@ -1,5 +1,34 @@
 # Release Notes #
 
+## 3.22.1 ##
+- PageInfo (T402709): fix encoding errors in subpage count.
+- PageInfoApi: ensure rev_timestamp is a number
+- Localization updates.
+
+## 3.22.0 ##
+- Require PHP >= 8.2 and update dependencies.
+- PageInfo: Remove the `last_edit_id`, `author`, `author_editcount` and `ip_edits`
+  properties from the `/page/pageinfo` API response that were deprecated since 3.20.0.
+- PageInfo (T208543): Improve performance by caching all queries.
+- PageInfo (T395765): Add subpages count to general stats section.
+- TopEdits (T247792): Fix unknown assessment discarding.
+- PageInfo (T376210): Fix bug with /api/page/ endpoint where null values may
+  be returned unnecessarily when the most recent revision was revision-deleted.
+- EditCounter (T396216): Include page moves over redirect in the count of total
+  pages moved.
+- SimpleEditCounter (T229581): Show the number of pages created.
+- TopEdits, Pages (T344464): add list of the top 10 WikiProjects.
+- TopEdits (T218531): Add summary section with the count of total unique pages edited.
+- AutoEdits (T382773): Fix issues with `tag_excludes` option.
+- AutoEdits (T257723): Don't count tools with contribs=true as automated tools.
+- AdminStats (T395311): Show a "totals" row at the top.
+- (T257723): Show "Loading…" timer when clicking on links within XTools.
+- (T218267): Localize numerals in charts.
+- (T261904): Fix html entity escaping in summaries.
+- (T401360): Sign action API requests with OAuth, providing privileged data access
+  when applicable, such as seeing the number of page watchers if less than 50.
+- Localization updates.
+
 ## 3.21.1 ##
 - EditCounter (T236087): Add edit size histogram to the general stats.
 - EditCounter (T392731): Improve performance of chart dataset creation.

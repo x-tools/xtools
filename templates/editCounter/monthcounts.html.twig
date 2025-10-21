@@ -10,9 +10,6 @@
 {% if not project.userHasOptedIn(user) %}
     {{ wiki.userOptedOut(project, user) }}
 {% elseif ec.monthCounts.monthLabels|length > 0 %}
-{% if not is_sub_request %}
-    {{ include('editCounter/externallegend.html.twig') }}
-{% endif %}
 
     <table class="sr-only">
         <thead>
@@ -37,45 +34,54 @@
         </tbody>
     </table>
 
-    {# Set height of chart based on how many months (horizontal rows) are being reported. #}
-    {# the pointer events is to not capture legend clicks #}
-    <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.monthCounts.monthLabels|length + 1) }}px">
-        <canvas id="monthcounts-canvas" style="pointer-events:all;"></canvas>
+    <div class="yearmonth-container">
+        {% if not is_sub_request %}
+            {{ include('editCounter/externallegend.html.twig') }}
+        {% endif %}
+
+        <div class="yearmonth-chart-container">
+            {# Set height of chart based on how many months (horizontal rows) are being reported. #}
+            {# the pointer events is to not capture legend clicks #}
+            <div style="position:relative; pointer-events:none; height:{{ 30 * (ec.monthCounts.monthLabels|length + 1) }}px">
+                <canvas id="monthcounts-canvas" style="pointer-events:all;"></canvas>
+            </div>
+
+            <script type="text/javascript">
+                $(function() {
+                    /** @type {Array} The labels for the y-axis. */
+                    var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
+
+                    /** @type {Number} Max value of the year totals */
+                    var maxTotal = {{ max(ec.monthCounts.totals|map(x => max(x))) }};
+
+                    /** @type {Array} To be passed into Chart.js */
+                    var datasets = [
+                    // Format data for use in charts.
+                    {% for nsId,namespaceData in ec.monthCounts.totals %}
+                        {
+                            label: "{{ nsName(nsId, project.namespaces) }}",
+                            backgroundColor: "{{ color(nsId) }}",
+                            data: Object.values({{ namespaceData|json_encode()|raw }}),
+                        },
+                    {% endfor %}
+                    ];
+
+                    var showLegend = false;
+                    window.namespaces = {{ project.namespaces|json_encode()|raw }};
+                    window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
+                    xtools.editcounter.setupMonthYearChart('month', datasets, labels, maxTotal);
+                });
+            </script>
+
+            <div class="checkbox log-scale">
+                <label>
+                    <input type="checkbox" data-value="log" class="use-log-scale" />
+                    {{ msg('use-log-scale') }}
+                </label>
+            </div>
+        </div>
     </div>
 
-    <script type="text/javascript">
-        $(function() {
-            /** @type {Array} The labels for the y-axis. */
-            var labels = {{ ec.monthCounts.monthLabels|json_encode|raw }};
-
-            /** @type {Number} Max value of the year totals */
-            var maxTotal = {{ max(ec.monthCounts.totals|map(x => max(x))) }};
-
-            /** @type {Array} To be passed into Chart.js */
-            var datasets = [
-            // Format data for use in charts.
-            {% for nsId,namespaceData in ec.monthCounts.totals %}
-                {
-                    label: "{{ nsName(nsId, project.namespaces) }}",
-                    backgroundColor: "{{ color(nsId) }}",
-                    data: Object.values({{ namespaceData|json_encode()|raw }}),
-                },
-            {% endfor %}
-            ];
-
-            var showLegend = false;
-            window.namespaces = {{ project.namespaces|json_encode()|raw }};
-            window.namespaceTotals = {{ ec.namespaceTotals|json_encode()|raw }};
-            xtools.editcounter.setupMonthYearChart('month', datasets, labels, maxTotal);
-        });
-    </script>
-    
-    <div class="checkbox log-scale">
-        <label>
-            <input type="checkbox" data-value="log" class="use-log-scale" />
-            {{ msg('use-log-scale') }}
-        </label>
-    </div>
 {% else %}
     <div class="alert alert-info">
         {{ msg('no-contribs') }}

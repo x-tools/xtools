@@ -72,7 +72,8 @@ class TestAdapter extends WebTestCase
         $session = $this->createSession($client);
         return new AutomatedEditsHelper(
             $this->getRequestStack($session),
-            static::getContainer()->get('cache.app')
+            static::getContainer()->get('cache.app'),
+            static::getContainer()->get('eight_points_guzzle.client.xtools')
         );
     }
 }

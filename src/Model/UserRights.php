@@ -29,6 +29,9 @@ class UserRights extends Model
     /** @var array The current and former rights of the user. */
     protected array $rightsStates = [];
 
+    /** @var bool Whether there are impossible logs (removals without addition) */
+    protected bool $impossibleLogs = false;
+
     /**
      * @param UserRightsRepository $repository
      * @param User $user
@@ -225,6 +228,11 @@ class UserRights extends Model
     {
         $rightsChanges = [];
 
+        // Keep track of the theoretical rights of the user
+        // So that if a removal happens without a corresponding addition
+        // We can explain that in the UI
+        $tempRights = [];
+
         foreach ($logData as $row) {
             // Happens when the log entry has been partially deleted.
             // This is when comment or performer was deleted.
@@ -305,6 +313,17 @@ class UserRights extends Model
                 $added = array_values($added);
                 $removed = array_values($removed);
             }
+
+            if (array_diff($removed, $tempRights)) {
+                // Then we're removing something which isn't there.
+                $this->impossibleLogs = true;
+            }
+            // Keep up to date our temporary rights list:
+            // Filter out those that are in $removed,
+            $tempRights = array_diff($tempRights, $removed);
+            // Then append those that are in $added.
+            // (Doesn't take care of duplicates, but that should be impossible.)
+            $tempRights = array_merge($tempRights, $added);
             
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
@@ -380,6 +399,16 @@ class UserRights extends Model
                 }
             }
         }
+    }
+
+    /**
+     * Get whether during parsing, we have encoutered
+     * impossible logs (removal before addition).
+     * @return bool
+     */
+    public function hasImpossibleLogs(): bool
+    {
+        return $this->impossibleLogs;
     }
 
     /**

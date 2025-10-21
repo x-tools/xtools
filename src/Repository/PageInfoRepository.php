@@ -227,6 +227,34 @@ class PageInfoRepository extends AutoEditsRepository
     }
 
     /**
+     * Get the number of subpages
+     * @param Page $page
+     * @return int
+     */
+    public function getSubpageCount(Page $page): int
+    {
+        $cacheKey = $this->getCacheKey(func_get_args(), 'page_subpagecount');
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+
+        $project = $page->getProject();
+        $pageTable = $project->getTableName('page');
+        $title = str_replace(' ', '_', $page->getTitleWithoutNamespace());
+        $ns = $page->getNamespace();
+
+        $sql = "SELECT COUNT(page_id) as `count`
+            FROM $pageTable
+            WHERE page_title LIKE :title
+            AND page_namespace = :namespace";
+
+        $result = $this->executeProjectsQuery($project, $sql, ['title' => $title . '/%', 'namespace' => $ns])
+            ->fetchAllAssociative();
+
+        return $this->setCache($cacheKey, $result[0]['count']);
+    }
+
+    /**
      * Get the top editors to the page by edit count.
      * @param Page $page
      * @param false|int $start
@@ -335,6 +363,7 @@ class PageInfoRepository extends AutoEditsRepository
                         FROM $revTable
                         JOIN $actorTable ON actor_id = rev_actor
                         WHERE rev_page = :pageid
+                        AND rev_timestamp > 0 # Protects from weird revs with rev_timestamp containing only null bytes
                         ORDER BY rev_timestamp ASC
                         LIMIT 1
                     ) b,
@@ -345,6 +374,7 @@ class PageInfoRepository extends AutoEditsRepository
                         JOIN $pageTable ON page_id = rev_page
                         WHERE rev_page = :pageid
                         AND rev_id = page_latest
+                        AND rev_timestamp > 0 # Protects from weird revs with rev_timestamp containing only null bytes
                     ) c
                 )";
         $params = ['pageid' => $page->getId()];
