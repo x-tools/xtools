@@ -46,6 +46,9 @@ class Edit extends Model
     /** @var bool|null Whether this edit was later reverted. */
     protected ?bool $reverted;
 
+    /** @var bool|null Whether this edit is pending review (FlaggedRevs extension). */
+    protected ?bool $pending;
+
     /** @var int Deletion status of the revision. */
     protected int $deleted;
 
@@ -104,6 +107,9 @@ class Edit extends Model
         // Note that the Edit class knows nothing about it's value, and
         // is not capable of detecting whether the given edit was actually reverted.
         $this->reverted = isset($attrs['reverted']) ? (bool)$attrs['reverted'] : null;
+
+        // for FlaggedRevs
+        $this->pending = isset($attrs['is_pending']) ? (bool)$attrs['is_pending'] : null;
     }
 
     /**
@@ -268,6 +274,15 @@ class Edit extends Model
     public function getSha(): ?string
     {
         return $this->sha;
+    }
+
+    /**
+     * Is this edit pending? (from flaggedrevs)
+     * @return bool|null
+     */
+    public function isPending(): ?bool
+    {
+        return $this->pending;
     }
 
     /**
