@@ -572,6 +572,8 @@ class EditCounterRepository extends Repository
         // Prepare the queries and execute them.
         $revisionTable = $project->getTableName('revision');
         $pageTable = $project->getTableName('page');
+        $ctTable = $project->getTableName('change_tag');
+        $ctdTable = $project->getTableName('change_tag_def');
         $ipcJoin = '';
         $whereClause = 'revs.rev_actor = :actorId';
         $params = ['actorId' => $user->getActorId($project)];
@@ -583,21 +585,34 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS size
-                FROM $revisionTable AS revs
-                JOIN $pageTable ON revs.rev_page = page_id
-                $ipcJoin
-                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                WHERE $whereClause
-                ORDER BY revs.rev_timestamp DESC
-                LIMIT 5000";
-        $data = $this->executeProjectsQuery($project, $sql, $params)->fetchFirstColumn();
-        $results = $data;
-        $results['average_size'] = count($data) > 0 ? array_sum($data)/count($data) : 0;
+        $sql = "SELECT JSON_ARRAYAGG(data.size) as sizes,
+                JSON_ARRAYAGG(data.tags) as tag_lists
+                FROM (
+                    SELECT CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0) AS size,
+                    (
+                        SELECT JSON_ARRAYAGG(ctd_name)
+                        FROM $ctTable
+                        JOIN $ctdTable
+                        ON ct_tag_id = ctd_id
+                        WHERE ct_rev_id = revs.rev_id
+                    ) as tags
+                    FROM $revisionTable AS revs
+                    JOIN $pageTable ON revs.rev_page = page_id
+                    $ipcJoin
+                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                    WHERE $whereClause
+                    ORDER BY revs.rev_timestamp DESC
+                    LIMIT 5000
+                ) data";
+        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
+        $results['sizes'] = json_decode($results['sizes']);
+        $results['average_size'] = count($results['sizes']) > 0
+            ? array_sum($results['sizes'])/count($results['sizes'])
+            : 0;
         $isSmall = fn($n) => abs(intval($n)) < 20;
         $isLarge = fn($n) => abs(intval($n)) > 1000;
-        $results['small_edits'] = count(array_filter($data, $isSmall));
-        $results['large_edits'] = count(array_filter($data, $isLarge));
+        $results['small_edits'] = count(array_filter($results['sizes'], $isSmall));
+        $results['large_edits'] = count(array_filter($results['sizes'], $isLarge));
 
         // Cache and return.
         return $this->setCache($cacheKey, $results);
