@@ -213,7 +213,6 @@ class EditCounterRepository extends Repository
             'stable-config',
             'stable-reset',
             'stable-modify',
-            'stable-move_stable',
         ];
         foreach ($requiredCounts as $req) {
             if (!isset($logCounts[$req])) {
