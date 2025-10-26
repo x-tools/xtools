@@ -381,7 +381,7 @@ class Edit extends Model
 
         $linkMatch = null;
 
-        while (preg_match_all("/\[\[:?(.*?)]]/", $summary, $linkMatch)) {
+        while (preg_match_all("/\[\[:?([^\[\]]*?)]]/", $summary, $linkMatch)) {
             $wikiLinkParts = explode('|', $linkMatch[1][0]);
             $wikiLinkPath = htmlspecialchars($wikiLinkParts[0]);
             $wikiLinkText = htmlspecialchars(
