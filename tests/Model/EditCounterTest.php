@@ -34,6 +34,7 @@ class EditCounterTest extends TestAdapter
     protected ProjectRepository $projectRepo;
     protected User $user;
     protected UserRepository $userRepo;
+    protected AutomatedEditsHelper $autoEdits;
 
     /**
      * Set up shared mocks and class instances.
@@ -53,6 +54,7 @@ class EditCounterTest extends TestAdapter
 
         $this->userRepo = $this->createMock(UserRepository::class);
         $this->user = new User($this->userRepo, 'Testuser');
+        $this->autoEdits = $this->createMock(AutomatedEditsHelper::class);
 
         $this->editCounter = new EditCounter(
             $this->editCounterRepo,
@@ -60,7 +62,7 @@ class EditCounterTest extends TestAdapter
             $this->createMock(UserRights::class),
             $this->project,
             $this->user,
-            $this->createMock(AutomatedEditsHelper::class)
+            $this->autoEdits,
         );
         $this->editCounter->setRepository($this->editCounterRepo);
     }
@@ -744,13 +746,23 @@ class EditCounterTest extends TestAdapter
      * @param array $qualityChanges
      * @param int|float $averageSize
      */
-    public function testEditData(array $data, array $qualityChanges, $averageSize): void
-    {
+    public function testEditData(
+        array $data,
+        array $qualityChanges,
+        $averageSize,
+        int $autoEdits,
+    ): void {
+        $this->autoEdits->expects(isset($data['tag_lists']) ? static::once() : static::exactly(0))
+            ->method("getTags")
+            ->willReturn([
+                'AWB',
+            ]);
         $this->editCounterRepo->expects(static::once())
             ->method("getEditData")
             ->willReturn($data);
         static::assertEquals($qualityChanges, $this->editCounter->countQualityChanges());
         static::assertEquals($averageSize, $this->editCounter->averageEditSize());
+        static::assertEquals($autoEdits, $this->editCounter->countAutoEdits());
     }
 
     /**
@@ -765,8 +777,8 @@ class EditCounterTest extends TestAdapter
                     'tag_lists' => [
                         [ 'randomtag', 'proofreadpage-quality1' ],
                         [ 'proofreadpage-quality2', 'proofreadpage-quality0' ],
-                        [],
-                        [ 'proofreadpage-quality2' ],
+                        [ 'AWB' ],
+                        [ 'proofreadpage-quality2', 'AWB' ],
                         [ 'proofreadpage-quality3', 'a' ],
                         [ 'proofreadpagequality0', 'proofreadpage-quality3' ],
                         [ 'prp-quality0', 'proofreadpage-quality3' ],
@@ -775,12 +787,14 @@ class EditCounterTest extends TestAdapter
                 ],
                 [0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 0, 'total' => 6],
                 3.142,
+                2,
             ],
             [
                 [
-                    'tag_lists' => [],
+                    // Empty
                 ],
                 [0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 'total' => 0],
+                0,
                 0,
             ],
         ];

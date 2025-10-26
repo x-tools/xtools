@@ -389,7 +389,7 @@ class EditCounter extends Model
             } elseif ('reblock' === $block['log_action'] && -1 !== $lastBlock[1]) {
                 // The last block was modified.
                 // $lastBlock is left unchanged if its duration was indefinite.
-                
+
                 // If this reblock set the block to infinite, set lastBlock manually to infinite
                 if (-1 === $duration) {
                     $lastBlock[1] = -1;
@@ -708,7 +708,7 @@ class EditCounter extends Model
         $reviewedArticle = $logCounts['pagetriage-curation-reviewed-article'] ?: 0;
         return ($reviewed + $reviewedRedirect + $reviewedArticle);
     }
-    
+
     /**
      * Get the total number of accounts created by the user.
      * @return int
@@ -1036,7 +1036,7 @@ class EditCounter extends Model
      */
     public function countQualityChanges(): array
     {
-        $tagLists = $this->getEditData()['tag_lists'];
+        $editData = $this->getEditData();
         $res = [
             0 => 0,
             1 => 0,
@@ -1045,6 +1045,10 @@ class EditCounter extends Model
             4 => 0,
             'total' => 0,
         ];
+        if (!isset($editData['tag_lists'])) {
+            return $res;
+        }
+        $tagLists = $editData['tag_lists'];
         foreach ($tagLists as $list) {
             if (null !== $list) {
                 $found = false;
@@ -1069,15 +1073,15 @@ class EditCounter extends Model
      */
     public function countAutoEdits(): int
     {
-        $editSizeData = $this->getEditSizeData();
-        if (!isset($editSizeData['tag_lists'])) {
+        $editData = $this->getEditData();
+        if (!isset($editData['tag_lists'])) {
             return 0;
         }
-        $tags = json_decode($editSizeData['tag_lists']);
+        $tagLists = $editData['tag_lists'];
         $autoTags = $this->autoEditsHelper->getTags($this->project);
         return count( // Number
             array_filter(
-                $tags, // of revisions
+                $tagLists, // of revisions
                 fn($a) => null !== $a && // with tags
                 count( // where the number of tags
                     array_filter(

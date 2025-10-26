@@ -244,7 +244,7 @@ class UserRights extends Model
             // Nothing was deleted.
             } else {
                 $unserialized = @unserialize($row['log_params']);
-    
+
                 if (false !== $unserialized) {
                     $old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
                     $new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
@@ -252,21 +252,21 @@ class UserRights extends Model
                     $removed = array_diff($old, $new);
                     $oldMetadata = $unserialized['oldmetadata'] ?? $unserialized['oldMetadata'] ?? null;
                     $newMetadata = $unserialized['newmetadata'] ?? $unserialized['newMetadata'] ?? null;
-    
+
                     // Check for changes only to expiry.
                     // If such exists, treat it as added. Various issets are safeguards.
                     if (empty($added) && empty($removed) && isset($oldMetadata) && isset($newMetadata)) {
                         foreach ($old as $index => $right) {
                             $oldExpiry = $oldMetadata[$index]['expiry'] ?? null;
                             $newExpiry = $newMetadata[$index]['expiry'] ?? null;
-    
+
                             // Check if an expiry was added, removed, or modified.
                             if ((null !== $oldExpiry && null === $newExpiry) ||
                                 (null === $oldExpiry && null !== $newExpiry) ||
                                 (null !== $oldExpiry && null !== $newExpiry)
                             ) {
                                 $added[$index] = $right;
-    
+
                                 // Remove the last auto-removal(s), which must exist.
                                 foreach (array_reverse($rightsChanges, true) as $timestamp => $change) {
                                     if (in_array($right, $change['removed']) && !in_array($right, $change['added']) &&
@@ -278,12 +278,12 @@ class UserRights extends Model
                             }
                         }
                     }
-    
+
                     // If a right was removed, remove any previously pending auto-removals.
                     if (count($removed) > 0) {
                         $this->unsetAutoRemoval($rightsChanges, $removed);
                     }
-    
+
                     $this->setAutoRemovals($rightsChanges, $row, $unserialized, $added);
                 } else {
                     // This is the old school format that most likely contains
@@ -296,7 +296,7 @@ class UserRights extends Model
                     $added = array_diff($new, $old);
                     $removed = array_diff($old, $new);
                 }
-    
+
                 // Remove '(none)'.
                 if (in_array('(none)', $added)) {
                     array_splice($added, array_search('(none)', $added), 1);
@@ -318,7 +318,7 @@ class UserRights extends Model
             // Then append those that are in $added.
             // (Doesn't take care of duplicates, but that should be impossible.)
             $tempRights = array_merge($tempRights, $added);
-            
+
             $rightsChanges[$row['log_timestamp']] = [
                 'logId' => $row['log_id'],
                 'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
@@ -462,7 +462,11 @@ class UserRights extends Model
                 $thresholds['wgAutoConfirmCount']
             );
             if ($this->acTimestamp) {
-                $this->acTimestamp = $this->acTimestamp->format('YmdHis');
+                if (is_string($this->acTimestamp)) {
+                    $this->acTimestamp = new \DateTime($this->acTimestamp)->format('YmdHis');
+                } else {
+                    $this->acTimestamp = $this->acTimestamp->format('YmdHis');
+                }
             }
         }
 
