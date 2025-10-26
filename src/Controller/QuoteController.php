@@ -55,8 +55,8 @@ class QuoteController extends XtoolsController
             'quote/index.html.twig',
             [
                 'xtPage' => 'Quote',
-                'xtPageTitle' => 'tool-bash',
-                'xtSubtitle' => 'tool-bash-desc',
+                'xtPageTitle' => 'tool-quote',
+                'xtSubtitle' => 'tool-quote-desc',
             ]
         );
     }

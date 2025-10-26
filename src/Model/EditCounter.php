@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Model;
 
+use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\EditCounterRepository;
 use DateInterval;
@@ -67,6 +68,7 @@ class EditCounter extends Model
      * @param I18nHelper $i18n
      * @param UserRights $userRights
      * @param Project $project The base project to count edits
+     * @param AutomatedEditsHelper
      * @param User $user
      */
     public function __construct(
@@ -74,13 +76,15 @@ class EditCounter extends Model
         I18nHelper $i18n,
         UserRights $userRights,
         Project $project,
-        User $user
+        User $user,
+        AutomatedEditsHelper $autoEditsHelper
     ) {
         $this->repository = $repository;
         $this->i18n = $i18n;
         $this->userRights = $userRights;
         $this->project = $project;
         $this->user = $user;
+        $this->autoEditsHelper = $autoEditsHelper;
     }
 
     /**
@@ -1057,6 +1061,32 @@ class EditCounter extends Model
             }
         }
         return $res;
+    }
+
+    /**
+     * Get the number of edits that have automated tags in the user's past 5000 edits.
+     * @return int
+     */
+    public function countAutoEdits(): int
+    {
+        $editSizeData = $this->getEditSizeData();
+        if (!isset($editSizeData['tag_lists'])) {
+            return 0;
+        }
+        $tags = json_decode($editSizeData['tag_lists']);
+        $autoTags = $this->autoEditsHelper->getTags($this->project);
+        return count( // Number
+            array_filter(
+                $tags, // of revisions
+                fn($a) => null !== $a && // with tags
+                count( // where the number of tags
+                    array_filter(
+                        $a,
+                        fn($t) => in_array($t, $autoTags) // that mean these edits are auto
+                    )
+                ) > 0 // is greater than 0
+            )
+        );
     }
 
     /**

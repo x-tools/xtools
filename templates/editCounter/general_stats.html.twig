@@ -171,6 +171,15 @@
             </td>
         </tr>
         <tr>
+            <td>{{ msg('auto-edits-tagged') }}*</td>
+            <td>
+                {{ ec.countAutoEdits|num_format }}
+                {% if ec.countLast5000 %}
+                    &middot;
+                    ({{ ((ec.countAutoEdits / ec.countLast5000) * 100)|percent_format }} )
+                {% endif %}
+            </td>
+        <tr>
             <td>{{ msg('small-edits') }}*</td>
             <td>
                 {{ ec.editData.small_edits|num_format }}
