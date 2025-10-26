@@ -463,7 +463,7 @@ class UserRights extends Model
             );
             if ($this->acTimestamp) {
                 if (is_string($this->acTimestamp)) {
-                    $this->acTimestamp = new \DateTime($this->acTimestamp)->format('YmdHis');
+                    $this->acTimestamp = (new \DateTime($this->acTimestamp))->format('YmdHis');
                 } else {
                     $this->acTimestamp = $this->acTimestamp->format('YmdHis');
                 }
