@@ -160,6 +160,7 @@
 	"error-login": "Error shown when logging in failed.",
 	"error-login-required": "Error shown when the user must be logged in to use the tool.",
 	"error-login-required-link": "Link text for logging in when the user must be logged in to use the tool.",
+	"error-lost-connection": "Error message shown for when the database connection was lost.",
 	"error-pageinfo-api": "Error shown when the PageInfo API was unable to fetch any data about the revisions to the page.",
 	"error-pagepile-too-large": "Error shown when a PagePile could not be created from the Pages Created tool. PagePile is another tool used to make lists of pages. In some cases we can't create a PagePile because there are too many pages.",
 	"error-param": "Error shown when an invalid value is passed for a parameter.",
