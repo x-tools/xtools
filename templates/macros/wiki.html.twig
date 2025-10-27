@@ -94,10 +94,12 @@
         {% else %}
             {% set username = user %}
         {% endif %}
+        {% set prefix = username|split('>')|first ? (username|split('>')|first ~ ':') : ''%}
+        {% set username = username|split('>')|last %}
         {% if isUserAnon(project, username) %}
-            {% set path = project.articlePath|replace({'$1': 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
+            {% set path = project.articlePath|replace({'$1': prefix ~ 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
         {% else %}
-            {% set path = project.articlePath|replace({'$1': 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
+            {% set path = project.articlePath|replace({'$1': prefix ~ 'User:' ~ username|replace({' ': '_'})|escape('url')}) %}
         {% endif %}
         <bdi>{{ extLink((project.url|trim('/')) ~ path, username, label) }}</bdi>
     {% endif %}
@@ -112,10 +114,12 @@
     {% else %}
         {% set username = user %}
     {% endif %}
+    {% set prefix = username|split('>')|first ? (username|split('>')|first ~ ':') : ''%}
+    {% set username = username|split('>')|last %}
     {% if isUserAnon(project, username) %}
-        {% set path = '[[Special:Contributions/' ~ username|replace({' ': '_'}) %}
+        {% set path = '[[' ~ prefix ~ 'Special:Contributions/' ~ username|replace({' ': '_'}) %}
     {% else %}
-        {% set path = '[[User:' ~ username|replace({' ': '_'}) %}
+        {% set path = '[[' ~ prefix ~ 'User:' ~ username|replace({' ': '_'}) %}
     {% endif %}
     {{ path ~ (label is not empty ? '|' ~ label : '') ~ ']]' }}
 {% endapply %}{% endmacro %}
