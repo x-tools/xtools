@@ -331,6 +331,8 @@
 	"priority": "Priority",
 	"project": "Project",
 	"projects": "Projects",
+	"proofreadpage-quality": "Page status",
+	"proofreadpage-qualitychanges": "Proportions of ProofreadPage quality changes",
 	"prose": "Prose",
 	"protect": "Protect",
 	"proxy-check": "Proxy check",

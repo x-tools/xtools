@@ -64,7 +64,7 @@
         {% for i in 0..6 %}
             {
                 backgroundColor: "{{ chartColor(i) }}",
-                data: {{ ec.timeCard|slice(i*24, 24)|json_encode()|raw }}
+                data: {{ ec.timecard|slice(i*24, 24)|json_encode()|raw }}
             },
         {% endfor %}
         ];

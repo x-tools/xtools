@@ -102,7 +102,7 @@ class PageAssessments extends Model
         } elseif (isset($config['class']['Unknown'])) {
             $url = 'https://upload.wikimedia.org/wikipedia/commons/'.$config['class']['Unknown']['badge'];
         } else {
-            $url = "";
+            $url = '';
         }
 
         if ($filenameOnly) {
@@ -260,7 +260,7 @@ class PageAssessments extends Model
      * @param  array $assessment
      * @return array|null Decorated importance assessment. Null if importance could not be determined.
      */
-    private function getImportanceFromAssessment(array $assessment): ?array
+    public function getImportanceFromAssessment(array $assessment): ?array
     {
         $importanceValue = $assessment['importance'];
 
