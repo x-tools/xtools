@@ -147,6 +147,7 @@
 	"error-login": "Giriş alınmadı! Zəhmət olmasa, bir daha cəhd edin.",
 	"error-login-required": "Performans səbəblərinə görə, tələb olunan məlumatlar yalnız giriş etmiş istifadəçilər üçün əlçatandır.",
 	"error-login-required-link": "Zəhmət olmasa, davam etmək üçün daxil olun.",
+	"error-lost-connection": "Verilənlər bazası bağlantısı qopdu. Böyük ehtimalla çox data istənildiyi üçün server tərəfindən dayandırılıb.",
 	"error-pageinfo-api": "Statistika əldə edilə bilmir.",
 	"error-pagepile-too-large": "Üzr istəyirik, PagePile-ə ixrac etmək üçün çox səhifə var. Manual PagePile yarada və ya müəyyən bir ad fəzası və ya zaman çərçivəsi ilə məhdudlaşaraq nəticəni daraltmağa cəhd edə bilərsiniz.",
 	"error-param": "'$1' '$2' parametri üçün uyğun gələn göstərici deyil",

@@ -158,6 +158,7 @@
 	"error-login": "登入失敗！請重試。",
 	"error-login-required": "出於效能因素，請求的資料僅對已登入使用者可用。",
 	"error-login-required-link": "請先登入以繼續。",
+	"error-lost-connection": "遺失資料庫連線。這可能是請求的資料太多被伺服器終止。",
 	"error-pageinfo-api": "無法取得修訂資料內容。",
 	"error-pagepile-too-large": "很抱歉，目前有太多頁面匯出到 PagePile 上。您可以手動建立一個 PagePile，或嘗試透過特定命名空間或時間範圍的限制來減少結果集合。",
 	"error-param": "對參數「$2」來說「$1」不是有效值",

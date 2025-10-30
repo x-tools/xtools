@@ -178,6 +178,7 @@
 	"error-login": "登录失败！请重试。",
 	"error-login-required": "出于效能因素，请求的资料仅供已登入用户使用。",
 	"error-login-required-link": "请登录以继续。",
+	"error-lost-connection": "数据库连接丢失。很可能是被服务器终止了，这意味着请求的数据太多。",
 	"error-pageinfo-api": "无法取得修订版本数据。",
 	"error-pagepile-too-large": "对不起，要导出至页面堆的页面太多。您可以手动创建页面堆，或尝试通过限制为指定命名空间或时间范围缩小结果集。",
 	"error-param": "“$1”不是“$2”参数的有效值",
