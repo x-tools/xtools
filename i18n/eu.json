@@ -209,7 +209,7 @@
 	"num-bytes": "{{PLURAL:$1|byte bat|$1 byte}}",
 	"num-categories": "{{PLURAL:$1|kategoria bat|$1 kategoria}}",
 	"num-days": "{{PLURAL:$1|egun bat|$1 egun}}",
-	"num-deletions": "{{PLURAL:$1|ezabaketa|ezabaketak}}",
+	"num-deletions": "{{PLURAL:$1|ezabaketa|ezabaketa}}",
 	"num-editors": "{{PLURAL:$1|editore $1|editore}}",
 	"num-edits": "{{PLURAL:$1|edizio bat|$1 edizio}}",
 	"num-hours": "{{PLURAL: $1|ordu|ordu}}",
