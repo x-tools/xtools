@@ -414,12 +414,12 @@ class TopEditsRepository extends UserRepository
         $commentTable = $project->getTableName('comment');
         $tagTable = $project->getTableName('change_tag');
         $tagDefTable = $project->getTableName('change_tag_def');
-
+        // sha1 temporarily disabled, see T407814/T389026
         if ($childRevs) {
             $childSelect = ", (
                     CASE WHEN
-                        childrevs.rev_sha1 = parentrevs.rev_sha1
-                        OR (
+                        /* childrevs.rev_sha1 = parentrevs.rev_sha1
+                        OR */ (
                             SELECT 1
                             FROM $tagTable
                             WHERE ct_rev_id = revs.rev_id

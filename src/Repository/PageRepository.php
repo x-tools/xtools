@@ -166,6 +166,7 @@ class PageRepository extends Repository
 
         $dateConditions = $this->getDateConditions($start, $end, false, 'revs.');
 
+        // sha1 temporarily disabled, see T407814/T389026
         $sql = "SELECT * FROM (
                     SELECT
                         revs.rev_id AS `id`,
@@ -176,7 +177,7 @@ class PageRepository extends Repository
                         actor_user AS user_id,
                         actor_name AS username,
                         comment_text AS `comment`,
-                        revs.rev_sha1 AS `sha`,
+                        /* revs.rev_sha1 AS `sha`, */
                         revs.rev_deleted AS `deleted`,
                         (
                             SELECT JSON_ARRAYAGG(ctd_name)
