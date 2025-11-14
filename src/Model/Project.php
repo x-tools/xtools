@@ -69,6 +69,33 @@ class Project extends Model
     }
 
     /**
+     * Whether or not this namespace is the Page namespace (of ProofreadPage).
+     * Or true if it is 'all'.
+     * @param int|string $namespace Namespace ID, or 'all'.
+     * @return bool
+     */
+    public function isPrpPage($namespace): bool
+    {
+        return $this->hasProofreadPage() &&
+            (
+                !is_numeric($namespace) ||
+                'Page' === $this->getCanonicalNamespace($namespace)
+            );
+    }
+
+    /**
+     * Get the list of the names of each ProofreadPage
+     * quality level. Keys are 0, 1, 2, 3, and 4.
+     * @return string[]
+     * Just returns a Repository result.
+     * @codeCoverageIgnore
+     */
+    public function getPrpQualityNames(): array
+    {
+        return $this->repository->getPrpQualityNames($this);
+    }
+
+    /**
      * Unique identifier this Project, to be used in cache keys.
      * @see Repository::getCacheKey()
      * @return string
@@ -239,6 +266,22 @@ class Project extends Model
     }
 
     /**
+     * Get the canonical namespace name for a namespace ID.
+     * Or '' if the namespace does not exist.
+     * @param int $namespace
+     * @return string
+     */
+    public function getCanonicalNamespace($namespace): string
+    {
+        $canonicalNamespaces = $this->getMetadata()['canonical_namespaces'];
+        if (array_key_exists($namespace, $canonicalNamespaces)) {
+            return $canonicalNamespaces[$namespace];
+        } else {
+            return '';
+        }
+    }
+
+    /**
      * Get the title of the Main Page.
      * @return string
      */
@@ -255,12 +298,12 @@ class Project extends Model
     public function getInstalledExtensions(): array
     {
         // Quick cache, valid only for the same request.
-        static $installedExtensions = null;
-        if (is_array($installedExtensions)) {
-            return $installedExtensions;
+        if (!isset($this->installedExtensions) ||
+            !is_array($this->installedExtensions)
+        ) {
+            $this->installedExtensions = $this->getRepository()->getInstalledExtensions($this);
         }
-
-        return $installedExtensions = $this->getRepository()->getInstalledExtensions($this);
+        return $this->installedExtensions;
     }
 
     /**
@@ -271,6 +314,16 @@ class Project extends Model
     {
         $extensions = $this->getInstalledExtensions();
         return in_array('PageTriage', $extensions);
+    }
+
+    /**
+     * Get if this Wiki has the ProofreadPage extension.
+     * @return bool
+     */
+    public function hasProofreadPage(): bool
+    {
+        $extensions = $this->getInstalledExtensions();
+        return in_array('ProofreadPage', $extensions);
     }
 
     /**

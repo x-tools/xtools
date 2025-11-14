@@ -9,6 +9,7 @@ use App\Model\Project;
 use App\Repository\AdminStatsRepository;
 use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
 /**
  * Tests of the AdminStats class.
@@ -16,6 +17,8 @@ use App\Tests\TestAdapter;
  */
 class AdminStatsTest extends TestAdapter
 {
+    use ArraySubsetAsserts;
+
     protected AdminStatsRepository $asRepo;
     protected Project $project;
     protected ProjectRepository $projectRepo;
@@ -35,9 +38,31 @@ class AdminStatsTest extends TestAdapter
         $this->asRepo = $this->createMock(AdminStatsRepository::class);
 
         // This logic is tested with integration tests.
-        // Here we just stub empty arrays so AdminStats won't error outl.
+        // Here we just stub empty arrays so AdminStats won't error out.
         $this->asRepo->method('getUserGroups')
             ->willReturn(['local' => [], 'global' => []]);
+    }
+
+    /**
+     * Test icons for each group.
+     * Note that this should be independant from everything,
+     * and so is static.
+     */
+    public function testGroupIcons(): void
+    {
+        $this->asRepo->expects(static::once())
+            ->method('getUserGroupIcons')
+            ->willReturn([
+                'sysop' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/18px-Mop.svg.png',
+            ]);
+        $as = new AdminStats($this->asRepo, $this->project, 0, 0, 'admin', []);
+        static::assertEquals([
+            'sysop' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mop.svg/18px-Mop.svg.png',
+        ], $as->getUserGroupIcons());
+        // Test for wikitext; also implictly ensure we cache
+        static::assertEquals([
+            'sysop' => 'Mop.svg',
+        ], $as->getUserGroupIcons(true));
     }
 
     /**
@@ -62,8 +87,10 @@ class AdminStatsTest extends TestAdapter
         static::assertEquals(1483228800, $as->getStart());
         static::assertEquals(1488326400, $as->getEnd());
         static::assertEquals(60, $as->numDays());
+        static::assertEquals('admin', $as->getType());
         static::assertEquals(1, $as->getNumInRelevantUserGroup());
-        static::assertEquals(1, $as->getNumWithActionsNotInGroup());
+        static::assertEquals(1, $as->getNumWithActions());
+        static::assertEquals(2, $as->getNumWithActionsNotInGroup());
     }
 
     /**
@@ -84,6 +111,8 @@ class AdminStatsTest extends TestAdapter
             ],
             $as->getUsersAndGroups()
         );
+        // Ensure we cache
+        $as->getUsersAndGroups();
     }
 
     /**
@@ -99,7 +128,7 @@ class AdminStatsTest extends TestAdapter
         $ret = $as->prepareStats();
 
         // Test results.
-        static::assertEquals(
+        static::assertArraySubset(
             [
                 'Bob' => array_merge(
                     $this->adminStatsFactory()[0],
@@ -115,6 +144,17 @@ class AdminStatsTest extends TestAdapter
 
         // At this point get stats should be the same.
         static::assertEquals($ret, $as->getStats());
+
+        static::assertEquals([
+            'delete',
+            'restore',
+            'block',
+            'unblock',
+            'protect',
+            'unprotect',
+            'rights',
+            'import',
+        ], array_values($as->getActions()));
     }
 
     /**
@@ -145,6 +185,18 @@ class AdminStatsTest extends TestAdapter
                 'unprotect' => 0,
                 'rights' => 0,
                 'import' => 0,
+                'total' => 20,
+            ],
+            [
+                'username' => 'Alice',
+                'delete' => 0,
+                'restore' => 0,
+                'block' => 0,
+                'unblock' => 0,
+                'protect' => 0,
+                'unprotect' => 0,
+                'rights' => 0,
+                'import' => 0,
                 'total' => 0,
             ],
         ];
@@ -163,15 +215,15 @@ class AdminStatsTest extends TestAdapter
         $as->prepareStats();
         static::assertEquals(
             [
-                'delete' => 5+1,
-                'restore' => 3+0,
-                'block' => 0+0,
-                'unblock' => 1+0,
-                'protect' => 3+0,
-                'unprotect' => 2+0,
-                'rights' => 4+0,
-                'import' => 2+0,
-                'total' => 20+0,
+                'delete' => 5+1+0,
+                'restore' => 3+0+0,
+                'block' => 0+0+0,
+                'unblock' => 1+0+0,
+                'protect' => 3+0+0,
+                'unprotect' => 2+0+0,
+                'rights' => 4+0+0,
+                'import' => 2+0+0,
+                'total' => 20+20+0,
             ],
             $as->getTotalsRow()
         );
