@@ -153,6 +153,8 @@ class PageRepository extends Repository
             'revision',
             $user ? null : '' // Use 'revision' if there's no user, otherwise default to revision_userindex
         );
+        $slotsTable = $page->getProject()->getTableName('slots');
+        $contentTable = $page->getProject()->getTableName('content');
         $commentTable = $page->getProject()->getTableName('comment');
         $actorTable = $page->getProject()->getTableName('actor');
         $ctTable = $page->getProject()->getTableName('change_tag');
@@ -166,7 +168,6 @@ class PageRepository extends Repository
 
         $dateConditions = $this->getDateConditions($start, $end, false, 'revs.');
 
-        // sha1 temporarily disabled, see T407814/T389026
         $sql = "SELECT * FROM (
                     SELECT
                         revs.rev_id AS `id`,
@@ -177,7 +178,7 @@ class PageRepository extends Repository
                         actor_user AS user_id,
                         actor_name AS username,
                         comment_text AS `comment`,
-                        /* revs.rev_sha1 AS `sha`, */
+                        content_sha1 AS `sha`,
                         revs.rev_deleted AS `deleted`,
                         (
                             SELECT JSON_ARRAYAGG(ctd_name)
@@ -187,6 +188,8 @@ class PageRepository extends Repository
                             WHERE ct_rev_id = revs.rev_id
                         ) as `tags`
                     FROM $revTable AS revs
+                    JOIN $slotsTable ON slot_revision_id = revs.rev_id
+                    JOIN $contentTable ON slot_content_id = content_id
                     LEFT JOIN $actorTable ON revs.rev_actor = actor_id
                     LEFT JOIN $revTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
                     LEFT OUTER JOIN $commentTable ON comment_id = revs.rev_comment_id
