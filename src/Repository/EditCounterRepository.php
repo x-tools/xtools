@@ -608,7 +608,7 @@ class EditCounterRepository extends Repository
                     LIMIT 5000
                 ) data";
         $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAssociative();
-        $results['sizes'] = json_decode($results['sizes']);
+        $results['sizes'] = json_decode($results['sizes'] ?? '[]');
         $results['average_size'] = count($results['sizes']) > 0
             ? array_sum($results['sizes'])/count($results['sizes'])
             : 0;
