@@ -94,7 +94,7 @@
         {% else %}
             {% set username = user %}
         {% endif %}
-        {% set prefix = username|split('>')|first ? (username|split('>')|first ~ ':') : ''%}
+        {% set prefix = username|split('>')|length > 1 ? (username|split('>')|first ~ ':') : ''%}
         {% set username = username|split('>')|last %}
         {% if isUserAnon(project, username) %}
             {% set path = project.articlePath|replace({'$1': prefix ~ 'Special:Contributions/' ~ username|replace({' ': '_'})|escape('url')}) %}
@@ -114,7 +114,7 @@
     {% else %}
         {% set username = user %}
     {% endif %}
-    {% set prefix = username|split('>')|first ? (username|split('>')|first ~ ':') : ''%}
+    {% set prefix = username|split('>')|length > 1 ? (username|split('>')|first ~ ':') : ''%}
     {% set username = username|split('>')|last %}
     {% if isUserAnon(project, username) %}
         {% set path = '[[' ~ prefix ~ 'Special:Contributions/' ~ username|replace({' ': '_'}) %}
