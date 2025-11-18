@@ -1,7 +1,7 @@
 # Release Notes #
 
 ## 3.22.3 ##
-- EditCounter (T410391): Fix username duplication in linking macros.
+- (T410391) Fix username duplication in linking macros.
 
 ## 3.22.2 ##
 - PageInfo (T407814): Fix the "Top 10 by added text" chart following the removal of
