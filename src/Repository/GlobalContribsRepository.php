@@ -60,6 +60,7 @@ class GlobalContribsRepository extends Repository
 
         // Pre-populate all projects' metadata, to prevent each project call from fetching it.
         $this->caProject->getRepository()->getAll();
+        $this->checkReplicationAllProjects();
 
         // Compile the output.
         $out = [];
@@ -115,6 +116,34 @@ class GlobalContribsRepository extends Repository
 
         // Cache and return.
         return $this->setCache($cacheKey, $out);
+    }
+
+    /**
+     * Get, slice by slice, the list of projects that are actually replicated.
+     * Takes about 0.5s per slice.
+     * @return bool[] Keyed by database name, all values are true.
+     */
+    public function checkReplicationAllProjects(): array
+    {
+        $cacheKey = $this->getCacheKey("global_replication_check");
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        $result = [];
+        $exists = true;
+        $i = 0;
+        $sql = "SELECT DISTINCT table_schema
+                FROM information_schema.tables";
+        while ($exists) {
+            $i += 1;
+            try {
+                $queryResult = $this->executeProjectsQuery("s$i", $sql)->fetchFirstColumn();
+                $result = array_merge($result, $queryResult);
+            } catch (\Throwable) {
+                $exists = false;
+            }
+        }
+        return $this->setCache($cacheKey, $result, 'PT1H');
     }
 
     /**
