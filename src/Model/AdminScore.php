@@ -94,10 +94,13 @@ class AdminScore extends Model
             // WMF Replica databases are returning binary control characters
             // This is specifically shown with WikiData.
             // More details: T197165
-            $value = str_replace("\x00", "", $value);
+            $isnull = (null == $value);
+            if (!$isnull) {
+                $value = str_replace("\x00", "", $value);
+            }
 
             if ('account-age' === $key) {
-                if (null == $value) {
+                if ($isnull) {
                     $value = 0;
                 } else {
                     $now = new DateTime();
