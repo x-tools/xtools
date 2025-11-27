@@ -3,7 +3,8 @@
 		"authors": [
 			"Nerogaf",
 			"Red Winged Duck",
-			"Renessaince"
+			"Renessaince",
+			"Ucukor"
 		]
 	},
 	"abusefilter": "Фільтар злоўжываньняў",
@@ -472,7 +473,7 @@
 	"username-or-ip": "Імя {{GENDER:{{BASEPAGENAME}}|ўдзельніка|ўдзельніцы}}, IPv4 або IPv6",
 	"username-removed": "(імя карыстальніка выдаленае)",
 	"version": "Вэрсія $1",
-	"view-source": "Паказаць крыніцу",
+	"view-source": "Прагляд коду",
 	"view-wikitext": "Праглядзець як вікітэкст",
 	"web-chat": "Злучыцца",
 	"wednesday": "Серада",
