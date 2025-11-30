@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.22.4 ##
+- EditCounter (T411310): Fix last interval in edit size histogram.
+- Localization updates.
+
 ## 3.22.3 ##
 - (T410391) Fix username duplication in linking macros.
 
