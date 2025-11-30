@@ -1,6 +1,7 @@
 # Release Notes #
 
 ## 3.22.4 ##
+- AdminScore (T410809): Fix null argument to str_replace.
 - EditCounter (T411310): Fix last interval in edit size histogram.
 - Localization updates.
 
