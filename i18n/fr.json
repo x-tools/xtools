@@ -165,6 +165,7 @@
 	"error-login": "Échec de connexion ! Veuillez essayer à nouveau.",
 	"error-login-required": "Pour des raisons de performances, les données demandées ne sont disponibles que pour les utilisateurs connectés.",
 	"error-login-required-link": "Veuillez vous connecter pour continuer.",
+	"error-lost-connection": "La connexion à la base de données a été perdue. Elle a probablement été interrompue par le serveur, ce qui indique qu'une quantité excessive de données a été demandée.",
 	"error-pageinfo-api": "Impossible de récupérer les informations de version.",
 	"error-pagepile-too-large": "Désolé, il y a trop de pages à exporter vers PagePile. Vous pouvez créer manuellement une PagePile ou essayer de réduire l’ensemble des résultats en vous limitant plus spécifiquement à un espace de noms ou à une période donnée.",
 	"error-param": "'$1' n’est pas une valeur valide pour le paramètre '$2'",
