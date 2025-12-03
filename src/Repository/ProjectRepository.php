@@ -242,6 +242,47 @@ class ProjectRepository extends Repository
     }
 
     /**
+     * Is this project actually replicated? Sometimes projets aren't,
+     * despite being listed in meta_p.wiki. See T322466.
+     * @param string $project Database name, without _p.
+     * @return bool
+     */
+    public function checkReplication(string $project): bool
+    {
+        if ('' == $project) {
+            // This means we failed to getBasicInfo. Let's try and AGF.
+            // Plus, keeps tests from breaking down.
+            return true;
+        }
+        $cacheKey = $this->getCacheKey($project, "replication_check");
+        if ($this->cache->hasItem($cacheKey)) {
+            return $this->cache->getItem($cacheKey)->get();
+        }
+        // GlobalContribs preloads replication checks for *all* projects
+        $allProjectsCacheKey = $this->getCacheKey('', "global_replication_check");
+        if ($this->cache->hasItem($allProjectsCacheKey)) {
+            $globalReplicationChecks = $this->cache->getItem($allProjectsCacheKey)->get();
+            return array_key_exists($project, $globalReplicationChecks);
+        }
+        $dbList = $this->getDbList();
+        if (!array_key_exists($project, $dbList)) {
+            $result = false;
+        } else {
+            $dbSlice = $dbList[$project];
+            $sql = "SELECT 1
+                    FROM information_schema.tables
+                    WHERE table_schema = :project
+                    LIMIT 1";
+            $queryResult = $this->executeProjectsQuery($dbSlice, $sql, [
+                'project' => $project . "_p",
+            ])->fetchAssociative();
+            $result = (1 == count($queryResult));
+        }
+        // Cache for 1h and return
+        return $this->setCache($cacheKey, $result, 'PT1H'); // feels long to me, but as long as getOne
+    }
+
+    /**
      * Get metadata about a project, including the 'dbName', 'url' and 'lang'
      *
      * @param string $projectUrl The project's URL.
