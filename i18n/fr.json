@@ -65,6 +65,7 @@
 	"auto-contribs-use-tool": "Afficher uniquement les modifications utilisant l’outil :",
 	"auto-edits": "Modifications (semi-)automatisées",
 	"auto-edits-bot": "Cet utilisateur est un robot. Toutes les modifications pourraient être des modifications programmées. Les statistiques affichées ci-dessous sont basées sur les modifications réalisées en utilisant les outils connus.",
+	"auto-edits-tagged": "Modifications balisées (semi-)automatisées",
 	"auto-edits-counts-desc": "Certains usages des outils se chevauchent (par ex. revenir à une version qui est une redirection compte à la fois comme Annulation et comme Redirection), de telle sorte que le nombre total de modifications faites avec chaque outil peut différer du $1.",
 	"auto-edits-counts-desc-grand-total": "grand total",
 	"auto-edits-logged-out": "Vous devez vous connecter pour utiliser la configuration du bac à sable. Sinon, vous utilisez la configuration de production.",
