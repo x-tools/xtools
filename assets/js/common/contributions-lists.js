@@ -37,9 +37,14 @@ xtools.application.loadContributions = function (endpointFunc, apiTitle) {
         endpoint = endpointFunc(params),
         limit = parseInt(params.limit, 10) || 50,
         urlParams = new URLSearchParams(window.location.search),
-        newUrl = xtBaseUrl + endpoint + '/' + xtools.application.vars.offset,
+        // T403566 : Something, we have yet to figure where, replaces consecutive slashes in urls with single slashes
+        // That causes crashes in pages & globalcontribs
+        // This '-' is only a hack to prevent crashes
+        newUrl = (xtBaseUrl + endpoint + '/' + xtools.application.vars.offset)
+            .replaceAll(/\/(?=\/)/g, "/-"),
         oldToolPath = location.pathname.split('/')[1],
         newToolPath = newUrl.split('/')[1];
+    console.log("newurl: " + newUrl);
 
     // Gray out contributions list.
     $contributionsContainer.addClass('contributions-container--loading')
@@ -131,6 +136,7 @@ xtools.application.setupContributionsNavListeners = function (endpointFunc, apiT
 
     // Next arrow.
     $('.contributions--next').off('click').one('click', function (e) {
+        console.log("test");
         e.preventDefault();
         if (xtools.application.vars.offset) {
             xtools.application.vars.prevOffsets.push(xtools.application.vars.offset);

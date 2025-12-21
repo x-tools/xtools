@@ -35,9 +35,9 @@ class GlobalContribs extends Model
      * @param EditRepository $editRepo
      * @param User $user
      * @param string|int|null $namespace Namespace ID or 'all'.
-     * @param false|int $start As Unix timestamp.
-     * @param false|int $end As Unix timestamp.
-     * @param false|int $offset As Unix timestamp.
+     * @param false|string|int $start As Unix timestamp.
+     * @param false|string|int $end As Unix timestamp.
+     * @param false|string|int $offset As Unix timestamp.
      * @param int|null $limit Number of results to return.
      */
     public function __construct(
@@ -58,9 +58,10 @@ class GlobalContribs extends Model
         $this->editRepo = $editRepo;
         $this->user = $user;
         $this->namespace = '' == $namespace ? 0 : $namespace;
-        $this->start = $start;
-        $this->end = $end;
-        $this->offset = $offset;
+        // see T403566 for the '-' mess
+        $this->start = '-' == $start ? false : $start;
+        $this->end = '-' == $end ? false : $end;
+        $this->offset = '-' == $offset ? false : $offset;
         $this->limit = $limit ?? self::PAGE_SIZE;
     }
 
