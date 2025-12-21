@@ -44,7 +44,6 @@ xtools.application.loadContributions = function (endpointFunc, apiTitle) {
             .replaceAll(/\/(?=\/)/g, "/-"),
         oldToolPath = location.pathname.split('/')[1],
         newToolPath = newUrl.split('/')[1];
-    console.log("newurl: " + newUrl);
 
     // Gray out contributions list.
     $contributionsContainer.addClass('contributions-container--loading')
@@ -136,7 +135,6 @@ xtools.application.setupContributionsNavListeners = function (endpointFunc, apiT
 
     // Next arrow.
     $('.contributions--next').off('click').one('click', function (e) {
-        console.log("test");
         e.preventDefault();
         if (xtools.application.vars.offset) {
             xtools.application.vars.prevOffsets.push(xtools.application.vars.offset);
