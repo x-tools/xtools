@@ -229,6 +229,7 @@ class PageTest extends TestAdapter
      */
     public function testErrors(): void
     {
+        $this->markTestSkipped( 'Broken until T413013 is fixed' );
         $checkWikiErrors = [
             [
                 'error' => '61',

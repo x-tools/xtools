@@ -379,7 +379,9 @@ class Page extends Model
      */
     public function getCheckWikiErrors(): array
     {
-        return $this->repository->getCheckWikiErrors($this);
+        return [];
+        // FIXME: Re-enable after solving T413013
+        // return $this->repository->getCheckWikiErrors($this);
     }
 
     /**
