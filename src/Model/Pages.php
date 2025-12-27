@@ -42,9 +42,9 @@ class Pages extends Model
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of the Pages::REDIR_ constants.
      * @param string $deleted One of the Pages::DEL_ constants.
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @param int|false $offset Unix timestamp. Used for pagination.
+     * @param int|string|false $start Start date as Unix timestamp.
+     * @param int|string|false $end End date as Unix timestamp.
+     * @param int|string|false $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
         PagesRepository $repository,
@@ -61,11 +61,11 @@ class Pages extends Model
         $this->project = $project;
         $this->user = $user;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-        $this->start = $start;
-        $this->end = $end;
+        $this->start = '-' == $start ? false : $start;
+        $this->end = '-' == $end ? false : $end;
+        $this->offset = '-' == $offset ? false : $offset;
         $this->redirects = $redirects ?: self::REDIR_NONE;
         $this->deleted = $deleted ?: self::DEL_ALL;
-        $this->offset = $offset;
     }
 
     /**

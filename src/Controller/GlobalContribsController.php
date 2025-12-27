@@ -126,10 +126,10 @@ class GlobalContribsController extends XtoolsController
      *     name="GlobalContribsResult",
      *     requirements={
      *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+     *         "namespace"="|\-|all|\d+",
+     *         "start"="|\-|\d*|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\-|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\-|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"="all",
@@ -172,9 +172,9 @@ class GlobalContribsController extends XtoolsController
      *     requirements={
      *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
      *         "namespace"="|all|\d+",
-     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+     *         "start"="|\-|\d*|\d{4}-\d{2}-\d{2}",
+     *         "end"="|\-|\d{4}-\d{2}-\d{2}",
+     *         "offset"="|\-|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
      *     },
      *     defaults={
      *         "namespace"="all",

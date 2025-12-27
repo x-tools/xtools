@@ -143,7 +143,16 @@
         {##### PAGINATION #####}
         {% if not(pages.multiNamespace) and pages.results[pages.namespaces[0]]|length == pages.resultsPerPage %}
             <div class="contributions-nav clearfix">
-                <a href="{{ path('PagesResult', {project: project.domain, username: user.usernameIdent, namespace: pages.namespace, redirects: pages.redirects, deleted: pages.deleted, start: pages.startDate, end: pages.endDate, offset: pages.lastTimestamp}) }}" class="pull-right contributions--next">
+                <a href="{{ path('PagesResult', {
+                    project: project.domain,
+                    username: user.usernameIdent,
+                    namespace: pages.namespace,
+                    redirects: pages.redirects,
+                    deleted: pages.deleted,
+                    start: (pages.startDate ? pages.startDate : '-'),
+                    end: (pages.endDate ? pages.endDate : '-'),
+                    offset: (pages.lastTimestamp ? pages.lastTimestamp : '-')
+                }) }}" class="pull-right contributions--next">
                     {{ msg('pager-older-n', [pages.resultsPerPage])|ucfirst }}
                     <span class="glyphicon glyphicon-arrow-{% if isRTL() %}left{% else %}right{% endif %}"></span>
                 </a>

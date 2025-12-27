@@ -37,7 +37,11 @@ xtools.application.loadContributions = function (endpointFunc, apiTitle) {
         endpoint = endpointFunc(params),
         limit = parseInt(params.limit, 10) || 50,
         urlParams = new URLSearchParams(window.location.search),
-        newUrl = xtBaseUrl + endpoint + '/' + xtools.application.vars.offset,
+        // T403566 : Something, we have yet to figure where, replaces consecutive slashes in urls with single slashes
+        // That causes crashes in pages & globalcontribs
+        // This '-' is only a hack to prevent crashes
+        newUrl = (xtBaseUrl + endpoint + '/' + xtools.application.vars.offset)
+            .replaceAll(/\/(?=\/)/g, "/-"),
         oldToolPath = location.pathname.split('/')[1],
         newToolPath = newUrl.split('/')[1];
 
