@@ -122,16 +122,6 @@ class TopEditsRepository extends UserRepository
                     LIMIT 1
                 ) AS pa_class"
             : '';
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
-        $paProjectsSelect = $hasPageAssessments
-            ? ", (
-                    SELECT JSON_ARRAYAGG(pap_project_title)
-                    FROM $paTable
-                    JOIN $paProjectsTable
-                    ON pa_project_id = pap_project_id
-                    WHERE pa_page_id = page_id
-                ) AS pap_project_title"
-            : '';
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -147,7 +137,6 @@ class TopEditsRepository extends UserRepository
         $sql = "SELECT page_namespace AS `namespace`, page_title,
                     page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
                     $paSelect
-                    $paProjectsSelect
                 FROM $pageTable
 
                 JOIN $revisionTable ON page_id = rev_page
@@ -309,17 +298,6 @@ class TopEditsRepository extends UserRepository
                     LIMIT 1
                 ) AS pa_class"
             : '';
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
-        $paProjectsSelect = $hasPageAssessments
-            ? ", (
-                    SELECT JSON_ARRAYAGG(pap_project_title)
-                    FROM $pageAssessmentsTable
-                    JOIN $paProjectsTable
-                    ON pa_project_id = pap_project_id
-                    WHERE pa_page_id = e.page_id
-                ) AS pap_project_title"
-            : '';
-
 
         $ipcJoin = '';
         $whereClause = 'rev_actor = :actorId';
@@ -332,7 +310,7 @@ class TopEditsRepository extends UserRepository
         }
 
         $sql = "SELECT c.page_namespace AS `namespace`, e.page_title,
-                    c.page_is_redirect AS `redirect`, c.count $paSelect $paProjectsSelect
+                    c.page_is_redirect AS `redirect`, c.count $paSelect
                 FROM
                 (
                     SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
