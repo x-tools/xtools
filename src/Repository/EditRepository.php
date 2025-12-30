@@ -20,22 +20,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class EditRepository extends Repository
 {
-    protected AutomatedEditsHelper $autoEditsHelper;
-    protected PageRepository $pageRepo;
-
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        AutomatedEditsHelper $autoEditsHelper,
-        PageRepository $pageRepo
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected AutomatedEditsHelper $autoEditsHelper,
+        protected PageRepository $pageRepo
     ) {
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->pageRepo = $pageRepo;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 

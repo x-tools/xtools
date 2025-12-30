@@ -7,6 +7,7 @@ namespace App\Model;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\EditCounterRepository;
+use App\Repository\Repository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -16,9 +17,6 @@ use DateTime;
  */
 class EditCounter extends Model
 {
-    protected I18nHelper $i18n;
-    protected UserRights $userRights;
-
     /** @var int[] Revision and page counts etc. */
     protected array $pairData;
 
@@ -64,27 +62,21 @@ class EditCounter extends Model
 
     /**
      * EditCounter constructor.
-     * @param EditCounterRepository $repository
+     * @param Repository|EditCounterRepository $repository
      * @param I18nHelper $i18n
      * @param UserRights $userRights
      * @param Project $project The base project to count edits
-     * @param AutomatedEditsHelper
-     * @param User $user
+     * @param ?User $user
+     * @param ?AutomatedEditsHelper $autoEditsHelper
      */
     public function __construct(
-        EditCounterRepository $repository,
-        I18nHelper $i18n,
-        UserRights $userRights,
-        Project $project,
-        User $user,
-        AutomatedEditsHelper $autoEditsHelper
+        protected Repository|EditCounterRepository $repository,
+        protected I18nHelper $i18n,
+        protected UserRights $userRights,
+        protected Project $project,
+        protected ?User $user,
+        protected ?AutomatedEditsHelper $autoEditsHelper
     ) {
-        $this->repository = $repository;
-        $this->i18n = $i18n;
-        $this->userRights = $userRights;
-        $this->project = $project;
-        $this->user = $user;
-        $this->autoEditsHelper = $autoEditsHelper;
     }
 
     /**
@@ -387,7 +379,7 @@ class EditCounter extends Model
             } elseif ('reblock' === $block['log_action'] && -1 !== $lastBlock[1]) {
                 // The last block was modified.
                 // $lastBlock is left unchanged if its duration was indefinite.
-                
+
                 // If this reblock set the block to infinite, set lastBlock manually to infinite
                 if (-1 === $duration) {
                     $lastBlock[1] = -1;
@@ -721,7 +713,7 @@ class EditCounter extends Model
         $reviewedArticle = $logCounts['pagetriage-curation-reviewed-article'] ?: 0;
         return ($reviewed + $reviewedRedirect + $reviewedArticle);
     }
-    
+
     /**
      * Get the total number of accounts created by the user.
      * @return int

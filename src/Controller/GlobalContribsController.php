@@ -11,7 +11,7 @@ use App\Repository\GlobalContribsRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the search form and results for the Global Contributions tool.
@@ -40,13 +40,8 @@ class GlobalContribsController extends XtoolsController
 
     /**
      * The search form.
-     * @Route("/globalcontribs", name="GlobalContribs")
-     * @Route("/ec-latestglobal", name="EditCounterLatestGlobalIndex")
-     * @Route("/ec-latestglobal-contributions", name="EditCounterLatestGlobalContribsIndex")
-     * @Route("/ec-latestglobaledits", name="EditCounterLatestGlobalEditsIndex")
-     * @param string $centralAuthProject
-     * @return Response
      */
+    #[Route('/globalcontribs', name: 'GlobalContribs')]
     public function indexAction(string $centralAuthProject): Response
     {
         // Redirect if username is given.
@@ -74,9 +69,6 @@ class GlobalContribsController extends XtoolsController
     }
 
     /**
-     * @param GlobalContribsRepository $globalContribsRepo
-     * @param EditRepository $editRepo
-     * @return GlobalContribs
      * @codeCoverageIgnore
      */
     public function getGlobalContribs(
@@ -99,51 +91,25 @@ class GlobalContribsController extends XtoolsController
 
     /**
      * Display the latest global edits tool. First two routes are legacy.
-     * @Route(
-     *     "/ec-latestglobal-contributions/{project}/{username}",
-     *     name="EditCounterLatestGlobalContribs",
-     *     requirements={
-     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     defaults={
-     *         "project"="",
-     *         "namespace"="all"
-     *     }
-     * )
-     * @Route(
-     *     "/ec-latestglobal/{project}/{username}",
-     *     name="EditCounterLatestGlobal",
-     *     requirements={
-     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *     },
-     *     defaults={
-     *         "project"="",
-     *         "namespace"="all"
-     *     }
-     * ),
-     * @Route(
-     *     "/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
-     *     name="GlobalContribsResult",
-     *     requirements={
-     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-     *     },
-     *     defaults={
-     *         "namespace"="all",
-     *         "start"=false,
-     *         "end"=false,
-     *         "offset"=false,
-     *     }
-     * ),
-     * @param GlobalContribsRepository $globalContribsRepo
-     * @param EditRepository $editRepo
-     * @param string $centralAuthProject
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "GlobalContribsResult",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d*|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+        ],
+        defaults: [
+            "namespace" => "all",
+            "start" => false,
+            "end" => false,
+            "offset" => false,
+        ]
+    )]
     public function resultsAction(
         GlobalContribsRepository $globalContribsRepo,
         EditRepository $editRepo,
@@ -166,25 +132,6 @@ class GlobalContribsController extends XtoolsController
 
     /**
      * Get global edits made by a user, IP or IP range.
-     * @Route(
-     *     "/api/user/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
-     *     name="UserApiGlobalContribs",
-     *     requirements={
-     *         "username"="(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace"="|all|\d+",
-     *         "start"="|\d*|\d{4}-\d{2}-\d{2}",
-     *         "end"="|\d{4}-\d{2}-\d{2}",
-     *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-     *     },
-     *     defaults={
-     *         "namespace"="all",
-     *         "start"=false,
-     *         "end"=false,
-     *         "offset"=false,
-     *         "limit"=50,
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Get(description="Get contributions made by a user, IP or IP range across all Wikimedia projects.")
      * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
@@ -212,12 +159,27 @@ class GlobalContribsController extends XtoolsController
      * @OA\Response(response=501, ref="#/components/responses/501")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param GlobalContribsRepository $globalContribsRepo
-     * @param EditRepository $editRepo
-     * @param string $centralAuthProject
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        "/api/user/globalcontribs/{username}/{namespace}/{start}/{end}/{offset}",
+        name: "UserApiGlobalContribs",
+        requirements: [
+            "username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+            "namespace" => "|all|\d+",
+            "start" => "|\d*|\d{4}-\d{2}-\d{2}",
+            "end" => "|\d{4}-\d{2}-\d{2}",
+            "offset" => "|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
+        ],
+        defaults: [
+            "namespace" => "all",
+            "start" => false,
+            "end" => false,
+            "offset" => false,
+            "limit" => 50,
+        ],
+        methods: ["GET"]
+    )]
     public function resultsApiAction(
         GlobalContribsRepository $globalContribsRepo,
         EditRepository $editRepo,

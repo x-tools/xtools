@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Repository\PagesRepository;
+use App\Repository\Repository;
 use DateTime;
 
 /**
@@ -36,9 +37,9 @@ class Pages extends Model
 
     /**
      * Pages constructor.
-     * @param PagesRepository $repository
+     * @param Repository|PagesRepository $repository
      * @param Project $project
-     * @param User $user
+     * @param ?User $user
      * @param string|int $namespace Namespace ID or 'all'.
      * @param string $redirects One of the Pages::REDIR_ constants.
      * @param string $deleted One of the Pages::DEL_ constants.
@@ -47,25 +48,19 @@ class Pages extends Model
      * @param int|false $offset Unix timestamp. Used for pagination.
      */
     public function __construct(
-        PagesRepository $repository,
-        Project $project,
-        User $user,
-        $namespace = 0,
+        protected Repository|PagesRepository $repository,
+        protected Project $project,
+        protected ?User $user,
+        string|int $namespace = 0,
         string $redirects = self::REDIR_NONE,
         string $deleted = self::DEL_ALL,
-        $start = false,
-        $end = false,
-        $offset = false
+        protected int|false $start = false,
+        protected int|false $end = false,
+        protected int|false $offset = false
     ) {
-        $this->repository = $repository;
-        $this->project = $project;
-        $this->user = $user;
         $this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-        $this->start = $start;
-        $this->end = $end;
         $this->redirects = $redirects ?: self::REDIR_NONE;
         $this->deleted = $deleted ?: self::DEL_ALL;
-        $this->offset = $offset;
     }
 
     /**

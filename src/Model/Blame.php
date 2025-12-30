@@ -5,15 +5,13 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Repository\BlameRepository;
+use App\Repository\Repository;
 
 /**
  * A Blame will search the given page for the given text and return the relevant revisions and authors.
  */
 class Blame extends Authorship
 {
-    /** @var string Text to search for. */
-    protected string $query;
-
     /** @var array|null Matches, keyed by revision ID, each with keys 'edit' <Edit> and 'tokens' <string[]>. */
     protected ?array $matches;
 
@@ -22,19 +20,19 @@ class Blame extends Authorship
 
     /**
      * Blame constructor.
-     * @param BlameRepository $repository
-     * @param Page $page The page to process.
+     * @param Repository|BlameRepository $repository
+     * @param ?Page $page The page to process.
      * @param string $query Text to search for.
      * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
      */
     public function __construct(
-        BlameRepository $repository,
-        Page $page,
-        string $query,
+        protected Repository|BlameRepository $repository,
+        protected ?Page $page,
+        /** @var string Text to search for. */
+        protected string $query,
         ?string $target = null
     ) {
         parent::__construct($repository, $page, $target);
-        $this->query = $query;
     }
 
     /**
@@ -155,18 +153,18 @@ class Blame extends Authorship
 
             // We first check if the first token of the query matches, because we want to allow for partial matches
             // (e.g. for query "barbaz", the tokens ["foobar","baz"] should match).
-            if (false !== strpos($newMatchSoFar, $firstQueryToken)) {
+            if (str_contains($newMatchSoFar, $firstQueryToken)) {
                 // If the full query is in the new match, use it, otherwise use just the first token. This is because
                 // the full match may exist across multiple tokens, but the first match is only a partial match.
-                $newMatchSoFar = false !== strpos($newMatchSoFar, $tokenizedQuery)
+                $newMatchSoFar = str_contains($newMatchSoFar, $tokenizedQuery)
                     ? $newMatchSoFar
                     : $firstQueryToken;
             }
 
             // Keep track of tokens that match. To allow partial matches,
             // we check the query against $newMatchSoFar and vice versa.
-            if (false !== strpos($tokenizedQuery, $newMatchSoFar) ||
-                false !== strpos($newMatchSoFar, $tokenizedQuery)
+            if (str_contains($tokenizedQuery, $newMatchSoFar) ||
+                str_contains($newMatchSoFar, $tokenizedQuery)
             ) {
                 $matchSoFar = $newMatchSoFar;
                 $matchDataSoFar[] = [
@@ -182,7 +180,7 @@ class Blame extends Authorship
 
             // A full match was found, so merge $matchDataSoFar into $matchData,
             // and start over to see if there are more matches in the article.
-            if (false !== strpos($matchSoFar, $tokenizedQuery)) {
+            if (str_contains($matchSoFar, $tokenizedQuery)) {
                 $matchData = array_merge($matchData, $matchDataSoFar);
                 $matchDataSoFar = [];
                 $matchSoFar = '';

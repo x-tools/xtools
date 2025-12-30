@@ -5,21 +5,16 @@ declare(strict_types = 1);
 namespace App\Model;
 
 use App\Repository\LargestPagesRepository;
+use App\Repository\Repository;
 
 /**
  * A LargestPages provides a list of the largest pages on a project.
  */
 class LargestPages extends Model
 {
-    /** @var string */
-    protected string $includePattern;
-
-    /** @var string */
-    protected string $excludePattern;
-
     /**
      * LargestPages constructor.
-     * @param LargestPagesRepository $repository
+     * @param Repository|LargestPagesRepository $repository
      * @param Project $project
      * @param string|int|null $namespace Namespace ID or 'all'.
      * @param string $includePattern Either regular expression (starts/ends with forward slash),
@@ -28,17 +23,13 @@ class LargestPages extends Model
      *   or a wildcard pattern with % as the wildcard symbol.
      */
     public function __construct(
-        LargestPagesRepository $repository,
-        Project $project,
-        $namespace = 'all',
-        string $includePattern = '',
-        string $excludePattern = ''
+        protected Repository|LargestPagesRepository $repository,
+        protected Project $project,
+        string|int|null $namespace = 'all',
+        protected string $includePattern = '',
+        protected string $excludePattern = ''
     ) {
-        $this->repository = $repository;
-        $this->project = $project;
         $this->namespace = '' == $namespace ? 0 : $namespace;
-        $this->includePattern = $includePattern;
-        $this->excludePattern = $excludePattern;
     }
 
     /**

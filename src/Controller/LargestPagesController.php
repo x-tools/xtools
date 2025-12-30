@@ -9,7 +9,7 @@ use App\Repository\LargestPagesRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the search form and results for the Largest Pages tool.
@@ -27,9 +27,8 @@ class LargestPagesController extends XtoolsController
 
     /**
      * The search form.
-     * @Route("/largestpages", name="LargestPages")
-     * @return Response
      */
+    #[Route(path: '/largestpages', name: 'LargestPages')]
     public function indexAction(): Response
     {
         // Redirect if required params are given.
@@ -73,17 +72,13 @@ class LargestPagesController extends XtoolsController
 
     /**
      * Display the largest pages on the requested project.
-     * @Route(
-     *     "/largestpages/{project}/{namespace}",
-     *     name="LargestPagesResult",
-     *     defaults={
-     *         "namespace"="all"
-     *     }
-     * )
-     * @param LargestPagesRepository $largestPagesRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        path: '/largestpages/{project}/{namespace}',
+        name: 'LargestPagesResult',
+        defaults: ['namespace' => 'all']
+    )]
     public function resultsAction(LargestPagesRepository $largestPagesRepo): Response
     {
         $ret = [
@@ -99,14 +94,6 @@ class LargestPagesController extends XtoolsController
 
     /**
      * Get the largest pages on a project.
-     * @Route(
-     *     "/api/project/largest_pages/{project}/{namespace}",
-     *     name="ProjectApiLargestPages",
-     *     defaults={
-     *         "namespace"="all"
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="Project API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/Namespace")
@@ -141,10 +128,14 @@ class LargestPagesController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param LargestPagesRepository $largestPagesRepo
-     * @return JsonResponse
      * @codeCoverageIgnore
      */
+    #[Route(
+        path: "/api/project/largest_pages/{project}/{namespace}",
+        name: "ProjectApiLargestPages",
+        defaults: ["namespace" => "all"],
+        methods: ["GET"]
+    )]
     public function resultsApiAction(LargestPagesRepository $largestPagesRepo): JsonResponse
     {
         $this->recordApiUsage('project/largest_pages');

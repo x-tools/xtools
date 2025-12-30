@@ -223,7 +223,6 @@
 	"last-year": "Label for number of edits a user made in the past year. This message should be brief.",
 	"latest-action": "The latest action a user made as shown in the public logs at Special:Log.",
 	"latest-edit": "Latest edit of a user",
-	"latest-global-edits": "Title for the list of recent edits a user made across all projects.",
 	"latest-revision": "Label for option to use the latest revision of an article in the Authorship tool.",
 	"limit": "Option to specify a limit of results\n{{Identical|Limit}}",
 	"links": "General term for one or more links.\n{{Identical|Links}}",

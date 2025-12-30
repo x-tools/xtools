@@ -30,11 +30,11 @@ class PagesRepository extends UserRepository
     public function countPagesCreated(
         Project $project,
         User $user,
-        $namespace,
+        string|int $namespace,
         string $redirects,
         string $deleted,
-        $start = false,
-        $end = false
+        int|false $start = false,
+        int|false $end = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'num_user_pages_created');
         if ($this->cache->hasItem($cacheKey)) {
@@ -89,13 +89,13 @@ class PagesRepository extends UserRepository
     public function getPagesCreated(
         Project $project,
         User $user,
-        $namespace,
+        string|int $namespace,
         string $redirects,
         string $deleted,
-        $start = false,
-        $end = false,
+        int|false $start = false,
+        int|false $end = false,
         ?int $limit = 1000,
-        $offset = false
+        int|false $offset = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created');
         if ($this->cache->hasItem($cacheKey)) {
@@ -171,7 +171,7 @@ class PagesRepository extends UserRepository
      * @param string $redirects One of the Pages::REDIR_ constants.
      * @return string[] With keys 'namespaceRev', 'namespaceArc' and 'redirects'
      */
-    private function getNamespaceRedirectAndDeletedPagesConditions($namespace, string $redirects): array
+    private function getNamespaceRedirectAndDeletedPagesConditions(string|int $namespace, string $redirects): array
     {
         $conditions = [
             'namespaceArc' => '',
@@ -210,9 +210,9 @@ class PagesRepository extends UserRepository
         Project $project,
         array $conditions,
         string $deleted,
-        $start,
-        $end,
-        $offset = false,
+        int|false $start,
+        int|false $end,
+        int|false $offset = false,
         bool $count = false
     ): string {
         $pageTable = $project->getTableName('page');
@@ -304,10 +304,10 @@ class PagesRepository extends UserRepository
     public function getAssessmentCounts(
         Project $project,
         User $user,
-        $namespace,
+        int|string $namespace,
         string $redirects,
-        $start = false,
-        $end = false
+        int|false $start = false,
+        int|false $end = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created_assessments');
         if ($this->cache->hasItem($cacheKey)) {
@@ -373,10 +373,10 @@ class PagesRepository extends UserRepository
     public function getWikiprojectCounts(
         Project $project,
         User $user,
-        $namespace,
+        int|string $namespace,
         string $redirects,
-        $start = false,
-        $end = false
+        int|false $start = false,
+        int|false $end = false
     ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_pages_created_wikiprojects');
         if ($this->cache->hasItem($cacheKey)) {

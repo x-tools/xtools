@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Model\AdminScore;
 use App\Repository\AdminScoreRepository;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * The AdminScoreController serves the search form and results page of the AdminScore tool.
@@ -25,12 +25,11 @@ class AdminScoreController extends XtoolsController
 
     /**
      * Display the AdminScore search form.
-     * @Route("/adminscore", name="AdminScore")
-     * @Route("/adminscore/index.php", name="AdminScoreIndexPhp")
-     * @Route("/scottywong tools/adminscore.php", name="AdminScoreLegacy")
-     * @Route("/adminscore/{project}", name="AdminScoreProject")
-     * @return Response
      */
+    #[Route('/adminscore', name: 'AdminScore')]
+    #[Route('/adminscore/index.php', name: 'AdminScoreIndexPhp')]
+    #[Route('/scottywong tools/adminscore.php', name: 'AdminScoreLegacy')]
+    #[Route('/adminscore/{project}', name: 'AdminScoreProject')]
     public function indexAction(): Response
     {
         // Redirect if we have a project and user.
@@ -48,11 +47,9 @@ class AdminScoreController extends XtoolsController
 
     /**
      * Display the AdminScore results.
-     * @Route("/adminscore/{project}/{username}", name="AdminScoreResult")
-     * @param AdminScoreRepository $adminScoreRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route('/adminscore/{project}/{username}', name: 'AdminScoreResult')]
     public function resultAction(AdminScoreRepository $adminScoreRepo): Response
     {
         $adminScore = new AdminScore($adminScoreRepo, $this->project, $this->user);

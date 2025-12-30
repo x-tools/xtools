@@ -24,8 +24,13 @@ class SimpleEditCounterRepository extends Repository
      * @param int|false $end Unix timestamp.
      * @return string[] Counts, each row with keys 'source' and 'value'.
      */
-    public function fetchData(Project $project, User $user, $namespace = 'all', $start = false, $end = false): array
-    {
+    public function fetchData(
+        Project $project,
+        User $user,
+        int|string $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false
+    ): array {
         $cacheKey = $this->getCacheKey(func_get_args(), 'simple_editcount');
         if ($this->cache->hasItem($cacheKey)) {
             return $this->cache->getItem($cacheKey)->get();
@@ -52,9 +57,9 @@ class SimpleEditCounterRepository extends Repository
     private function fetchDataNormal(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false
+        int|string $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false,
     ): array {
         $userTable = $project->getTableName('user');
         $pageTable = $project->getTableName('page');
@@ -117,9 +122,9 @@ class SimpleEditCounterRepository extends Repository
     private function fetchDataIpRange(
         Project $project,
         User $user,
-        $namespace = 'all',
-        $start = false,
-        $end = false
+        int|string $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false
     ): array {
         $ipcTable = $project->getTableName('ip_changes');
         $revTable = $project->getTableName('revision', '');

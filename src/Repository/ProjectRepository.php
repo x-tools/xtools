@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Model\PageAssessments;
 use App\Model\Project;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
@@ -20,25 +20,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class ProjectRepository extends Repository
 {
-    protected PageAssessmentsRepository $assessmentsRepo;
-
     /** @var string[] Basic metadata if XTools is in single-wiki mode. */
     protected array $singleBasicInfo;
 
     /** @var string The cache key for the 'all project' metadata. */
     protected string $cacheKeyAllProjects = 'allprojects';
-
-    /** @var string The configured default project. */
-    protected string $defaultProject;
-
-    /** @var bool Whether XTools is configured to run on a single wiki or not. */
-    protected bool $singleWiki;
-
-    /** @var array Projects that have opted into showing restricted stats to everyone. */
-    protected array $optedIn;
-
-    /** @var string The project's API path. */
-    protected string $apiPath;
 
     /**
      * @param ManagerRegistry $managerRegistry
@@ -55,24 +41,23 @@ class ProjectRepository extends Repository
      * @param string $apiPath
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        PageAssessmentsRepository $assessmentsRepo,
-        string $defaultProject,
-        bool $singleWiki,
-        array $optedIn,
-        string $apiPath
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected PageAssessmentsRepository $assessmentsRepo,
+        /** @var string The configured default project. */
+        protected string $defaultProject,
+        /** @var bool Whether XTools is configured to run on a single wiki or not. */
+        protected bool $singleWiki,
+        /** @var array Projects that have opted into showing restricted stats to everyone. */
+        protected array $optedIn,
+        /** @var string The project's API path. */
+        protected string $apiPath,
     ) {
-        $this->assessmentsRepo = $assessmentsRepo;
-        $this->defaultProject = $defaultProject;
-        $this->singleWiki = $singleWiki;
-        $this->optedIn = $optedIn;
-        $this->apiPath = $apiPath;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
@@ -268,7 +253,7 @@ class ProjectRepository extends Repository
                     'formatversion' => '2',
                 ],
             ])->getBody()->getContents(), true);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return null;
         }
 
@@ -414,7 +399,7 @@ class ProjectRepository extends Repository
                 WHERE ug_group IN (?)
                 GROUP BY user_name, ug_group";
         $users = $this->getProjectsConnection($project)
-            ->executeQuery($sql, [$groups], [Connection::PARAM_STR_ARRAY])
+            ->executeQuery($sql, [$groups], [ArrayParameterType::STRING])
             ->fetchAllAssociative();
 
         if (count($globalGroups) > 0 && $this->isWMF) {
@@ -424,7 +409,7 @@ class ProjectRepository extends Repository
                     WHERE gug_group IN (?)
                     GROUP BY user_name, user_group";
             $globalUsers = $this->getProjectsConnection('centralauth')
-                ->executeQuery($sql, [$globalGroups], [Connection::PARAM_STR_ARRAY])
+                ->executeQuery($sql, [$globalGroups], [ArrayParameterType::STRING])
                 ->fetchAllAssociative();
 
             $users = array_merge($users, $globalUsers);

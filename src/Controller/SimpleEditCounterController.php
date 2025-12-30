@@ -7,8 +7,9 @@ namespace App\Controller;
 use App\Model\SimpleEditCounter;
 use App\Repository\SimpleEditCounterRepository;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -27,11 +28,10 @@ class SimpleEditCounterController extends XtoolsController
 
     /**
      * The Simple Edit Counter search form.
-     * @Route("/sc", name="SimpleEditCounter")
-     * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
-     * @Route("/sc/{project}", name="SimpleEditCounterProject")
-     * @return Response
      */
+    #[Route(path: '/sc', name: 'SimpleEditCounter')]
+    #[Route(path: '/sc/index.php', name: 'SimpleEditCounterIndexPhp')]
+    #[Route(path: '/sc/{project}', name: 'SimpleEditCounterProject')]
     public function indexAction(): Response
     {
         // Redirect if project and username are given.
@@ -73,25 +73,23 @@ class SimpleEditCounterController extends XtoolsController
 
     /**
      * Display the results.
-     * @Route(
-     *     "/sc/{project}/{username}/{namespace}/{start}/{end}",
-     *     name="SimpleEditCounterResult",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "namespace" = "|all|\d+",
-     *         "start" = "|\d{4}-\d{2}-\d{2}",
-     *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *         "namespace"="all",
-     *     }
-     * )
-     * @param SimpleEditCounterRepository $simpleEditCounterRepo
-     * @return Response
      * @codeCoverageIgnore
      */
+    #[Route(
+        '/sc/{project}/{username}/{namespace}/{start}/{end}',
+        name: 'SimpleEditCounterResult',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+            'namespace' => 'all',
+        ]
+    )]
     public function resultAction(SimpleEditCounterRepository $simpleEditCounterRepo): Response
     {
         $sec = $this->prepareSimpleEditCounter($simpleEditCounterRepo);
@@ -107,22 +105,6 @@ class SimpleEditCounterController extends XtoolsController
 
     /**
      * API endpoint for the Simple Edit Counter.
-     * @Route(
-     *     "/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}",
-     *     name="SimpleEditCounterApi",
-     *     requirements={
-     *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-     *         "start" = "|\d{4}-\d{2}-\d{2}",
-     *         "end" = "|\d{4}-\d{2}-\d{2}",
-     *         "namespace" = "|all|\d+"
-     *     },
-     *     defaults={
-     *         "start"=false,
-     *         "end"=false,
-     *         "namespace"="all",
-     *     },
-     *     methods={"GET"}
-     * )
      * @OA\Tag(name="User API")
      * @OA\Parameter(ref="#/components/parameters/Project")
      * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
@@ -149,11 +131,25 @@ class SimpleEditCounterController extends XtoolsController
      * @OA\Response(response=404, ref="#/components/responses/404")
      * @OA\Response(response=503, ref="#/components/responses/503")
      * @OA\Response(response=504, ref="#/components/responses/504")
-     * @param SimpleEditCounterRepository $simpleEditCounterRepository
-     * @return Response
      * @codeCoverageIgnore
      */
-    public function simpleEditCounterApiAction(SimpleEditCounterRepository $simpleEditCounterRepository): Response
+    #[Route(
+        '/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}',
+        name: 'SimpleEditCounterApi',
+        requirements: [
+            'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+            'namespace' => '|all|\d+',
+            'start' => '|\d{4}-\d{2}-\d{2}',
+            'end' => '|\d{4}-\d{2}-\d{2}',
+        ],
+        defaults: [
+            'start' => false,
+            'end' => false,
+            'namespace' => 'all',
+        ],
+        methods: ['GET']
+    )]
+    public function simpleEditCounterApiAction(SimpleEditCounterRepository $simpleEditCounterRepository): JsonResponse
     {
         $this->recordApiUsage('user/simple_editcount');
         $sec = $this->prepareSimpleEditCounter($simpleEditCounterRepository);

@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Result;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
@@ -21,31 +21,17 @@ use Wikimedia\IPUtils;
  */
 class UserRepository extends Repository
 {
-    protected ProjectRepository $projectRepo;
-
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param LoggerInterface $logger
-     * @param ParameterBagInterface $parameterBag
-     * @param bool $isWMF
-     * @param int $queryTimeout
-     * @param ProjectRepository $projectRepo
-     * @param RequestStack $requestStack
-     */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ProjectRepository $projectRepo,
-        RequestStack $requestStack
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected ProjectRepository $projectRepo,
+        protected ?RequestStack $requestStack
     ) {
-        $this->projectRepo = $projectRepo;
         parent::__construct(
             $managerRegistry,
             $cache,
@@ -86,7 +72,7 @@ class UserRepository extends Repository
      * Get the user's actor ID.
      * @param string $databaseName
      * @param string $username
-     * @return int|null
+     * @return ?int
      */
     public function getActorId(string $databaseName, string $username): ?int
     {
@@ -128,7 +114,7 @@ class UserRepository extends Repository
         $sql = "SELECT user_editcount FROM $userTable WHERE user_name = :username LIMIT 1";
         $resultQuery = $this->executeProjectsQuery($databaseName, $sql, ['username' => $username]);
 
-        return (int)$this->setCache($cacheKey, $resultQuery->fetchColumn());
+        return (int)$this->setCache($cacheKey, $resultQuery->fetchOne());
     }
 
     /**
@@ -172,8 +158,13 @@ class UserRepository extends Repository
      * @param int|false $end End date as Unix timestamp.
      * @return int
      */
-    public function countEdits(Project $project, User $user, $namespace = 'all', $start = false, $end = false): int
-    {
+    public function countEdits(
+        Project $project,
+        User $user,
+        int|string $namespace = 'all',
+        int|false $start = false,
+        int|false $end = false
+    ): int {
         $cacheKey = $this->getCacheKey(func_get_args(), 'user_editcount');
         if ($this->cache->hasItem($cacheKey)) {
             return (int)$this->cache->getItem($cacheKey)->get();
@@ -214,7 +205,7 @@ class UserRepository extends Repository
      * Get information about the currently-logged in user.
      * @return array|object|null null if not logged in.
      */
-    public function getXtoolsUserInfo()
+    public function getXtoolsUserInfo(): object|array|null
     {
         return $this->requestStack->getSession()->get('logged_in_user');
     }
@@ -243,7 +234,7 @@ class UserRepository extends Repository
      * @param int|string $namespace Namespace ID or 'all' for all namespaces.
      * @return array [page join clause, page namespace clause]
      */
-    protected function getPageAndNamespaceSql(Project $project, $namespace): array
+    protected function getPageAndNamespaceSql(Project $project, int|string $namespace): array
     {
         if ('all' === $namespace) {
             return [null, null];
@@ -278,15 +269,15 @@ class UserRepository extends Repository
      * @param User $user
      * @param int|string|null $namespace Namespace ID, or 'all'/null for all namespaces.
      * @param array $extraParams Will get merged in the params array used for binding values.
-     * @return ResultStatement
+     * @return Result
      */
     protected function executeQuery(
         string $sql,
         Project $project,
         User $user,
-        $namespace = 'all',
+        int|string|null $namespace = 'all',
         array $extraParams = []
-    ): ResultStatement {
+    ): Result {
         $params = ['actorId' => $user->getActorId($project)];
 
         if ('all' !== $namespace) {

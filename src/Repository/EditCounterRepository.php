@@ -20,31 +20,24 @@ use Wikimedia\IPUtils;
  */
 class EditCounterRepository extends Repository
 {
-    protected AutoEditsRepository $autoEditsRepo;
-    protected ProjectRepository $projectRepo;
-
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ProjectRepository $projectRepo,
-        AutoEditsRepository $autoEditsRepo
+        protected ManagerRegistry $managerRegistry,
+        protected CacheItemPoolInterface $cache,
+        protected Client $guzzle,
+        protected LoggerInterface $logger,
+        protected ParameterBagInterface $parameterBag,
+        protected bool $isWMF,
+        protected int $queryTimeout,
+        protected ProjectRepository $projectRepo,
+        protected AutoEditsRepository $autoEditsRepo
     ) {
-        $this->projectRepo = $projectRepo;
-        $this->autoEditsRepo = $autoEditsRepo;
         parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
     }
 
     /**
      * Get data about revisions, pages, etc.
-     * @param Project $project The project.
-     * @param User $user The user.
      * @return string[] With keys: 'deleted', 'live', 'total', '24h', '7d', '30d',
-     * '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
+     *   '365d', 'small', 'large', 'with_comments', and 'minor_edits', ...
      */
     public function getPairData(Project $project, User $user): array
     {
@@ -147,8 +140,6 @@ class EditCounterRepository extends Repository
 
     /**
      * Get log totals for a user.
-     * @param Project $project The project.
-     * @param User $user The user.
      * @return int[] Keys are "<log>-<action>" strings, values are counts.
      */
     public function getLogCounts(Project $project, User $user): array
@@ -228,9 +219,6 @@ class EditCounterRepository extends Repository
     /**
      * Get counts of files moved, and files moved/uploaded on Commons.
      * Local file uploads are counted in getLogCounts() since we're querying the same rows anyway.
-     * @param Project $project
-     * @param User $user
-     * @return array
      */
     public function getFileCounts(Project $project, User $user): array
     {
@@ -276,8 +264,6 @@ class EditCounterRepository extends Repository
 
     /**
      * Get count of files moved and uploaded on Commons.
-     * @param User $user
-     * @return array
      */
     protected function getFileCountsCommons(User $user): array
     {
@@ -364,9 +350,6 @@ class EditCounterRepository extends Repository
 
     /**
      * Get data for all blocks set on the given user.
-     * @param Project $project
-     * @param User $user
-     * @return array
      */
     public function getBlocksReceived(Project $project, User $user): array
     {
@@ -387,9 +370,6 @@ class EditCounterRepository extends Repository
 
     /**
      * Get the number of times the user was thanked.
-     * @param Project $project
-     * @param User $user
-     * @return int
      */
     public function getThanksReceived(Project $project, User $user): int
     {
@@ -408,7 +388,7 @@ class EditCounterRepository extends Repository
 
         return $this->setCache($cacheKey, (int)$this->executeProjectsQuery($project, $sql, [
             'username' => $username,
-        ])->fetchColumn());
+        ])->fetchOne());
     }
 
     /**
@@ -439,22 +419,16 @@ class EditCounterRepository extends Repository
             $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
         }
 
-        $sql = "SELECT page_namespace AS `namespace`, COUNT(rev_id) AS `total`
+        $sql = "SELECT page_namespace, COUNT(rev_id)
             FROM $pageTable p JOIN $revisionTable r ON (r.rev_page = p.page_id)
             $ipcJoin
             WHERE $whereClause
-            GROUP BY `namespace`";
+            GROUP BY page_namespace";
 
-        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
-
-        $namespaceTotals = array_combine(array_map(function ($e) {
-            return $e['namespace'];
-        }, $results), array_map(function ($e) {
-            return (int)$e['total'];
-        }, $results));
+        $results = $this->executeProjectsQuery($project, $sql, $params)->fetchAllKeyValue();
 
         // Cache and return.
-        return $this->setCache($cacheKey, $namespaceTotals);
+        return $this->setCache($cacheKey, $results);
     }
 
     /**
@@ -501,7 +475,7 @@ class EditCounterRepository extends Repository
             WHERE $whereClause
             GROUP BY YEAR(rev_timestamp), MONTH(rev_timestamp), `namespace`";
 
-        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
+        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $totals);
@@ -509,9 +483,6 @@ class EditCounterRepository extends Repository
 
     /**
      * Get data for the timecard chart, with totals grouped by day and to the nearest two-hours.
-     * @param Project $project
-     * @param User $user
-     * @return string[][]
      */
     public function getTimeCard(Project $project, User $user): array
     {
@@ -551,7 +522,7 @@ class EditCounterRepository extends Repository
             WHERE $whereClause
             GROUP BY DAYOFWEEK($column), $xCalc";
 
-        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAll();
+        $totals = $this->executeProjectsQuery($project, $sql, $params)->fetchAllAssociative();
 
         // Cache and return.
         return $this->setCache($cacheKey, $totals);

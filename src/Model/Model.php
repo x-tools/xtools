@@ -30,16 +30,16 @@ abstract class Model
     protected ?Page $page = null;
 
     /** @var int|string Which namespace we are querying for. 'all' for all namespaces. */
-    protected $namespace;
+    protected int|string $namespace;
 
     /** @var false|int Start of time period as Unix timestamp. */
-    protected $start;
+    protected false|int $start;
 
     /** @var false|int End of time period as Unix timestamp. */
-    protected $end;
+    protected false|int $end;
 
     /** @var false|int Unix timestamp to offset results which acts as a substitute for $end */
-    protected $offset;
+    protected false|int $offset = false;
 
     /** @var int|null Number of rows to fetch. */
     protected ?int $limit = null;
@@ -163,7 +163,7 @@ abstract class Model
      * Get the offset timestamp as Unix timestamp. Used for pagination.
      * @return false|int
      */
-    public function getOffset()
+    public function getOffset(): false|int
     {
         return $this->offset;
     }

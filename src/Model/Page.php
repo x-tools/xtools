@@ -6,8 +6,9 @@ namespace App\Model;
 
 use App\Exception\BadGatewayException;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use DateTime;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Result;
 use GuzzleHttp\Exception\ClientException;
 
 /**
@@ -15,9 +16,6 @@ use GuzzleHttp\Exception\ClientException;
  */
 class Page extends Model
 {
-    /** @var string The page name as provided at instantiation. */
-    protected string $unnormalizedPageName;
-
     /** @var string[]|null Metadata about this page. */
     protected ?array $pageInfo;
 
@@ -38,15 +36,16 @@ class Page extends Model
 
     /**
      * Page constructor.
-     * @param PageRepository $repository
+     * @param Repository|PageRepository $repository
      * @param Project $project
-     * @param string $pageName
+     * @param string $unnormalizedPageName
      */
-    public function __construct(PageRepository $repository, Project $project, string $pageName)
-    {
-        $this->repository = $repository;
-        $this->project = $project;
-        $this->unnormalizedPageName = $pageName;
+    public function __construct(
+        protected Repository|PageRepository $repository,
+        protected Project $project,
+        /** @var string The page name as provided at instantiation. */
+        protected string $unnormalizedPageName
+    ) {
     }
 
     /**
@@ -214,12 +213,12 @@ class Page extends Model
 
     /**
      * Get the HTML content of the body of the page.
-     * @param DateTime|int $target If a DateTime object, the
+     * @param DateTime|int|null $target If a DateTime object, the
      *   revision at that time will be returned. If an integer, it is
      *   assumed to be the actual revision ID.
      * @return string
      */
-    public function getHTMLContent($target = null): string
+    public function getHTMLContent(DateTime|int|null $target = null): string
     {
         if (is_a($target, 'DateTime')) {
             $target = $this->repository->getRevisionIdAtDate($this, $target);
@@ -274,7 +273,7 @@ class Page extends Model
      * @param false|int $end
      * @return int
      */
-    public function getNumRevisions(?User $user = null, $start = false, $end = false): int
+    public function getNumRevisions(?User $user = null, false|int $start = false, false|int $end = false): int
     {
         // If a user is given, we will not cache the result via instance variable.
         if (null !== $user) {
@@ -308,8 +307,8 @@ class Page extends Model
      */
     public function getRevisions(
         ?User $user = null,
-        $start = false,
-        $end = false,
+        false|int $start = false,
+        false|int $end = false,
         ?int $limit = null,
         ?int $numRevisions = null
     ): array {
@@ -346,15 +345,15 @@ class Page extends Model
      *   separate query is ran to get the nuber of revisions.
      * @param false|int $start
      * @param false|int $end
-     * @return ResultStatement
+     * @return Result
      */
     public function getRevisionsStmt(
         ?User $user = null,
         ?int $limit = null,
         ?int $numRevisions = null,
-        $start = false,
-        $end = false
-    ): ResultStatement {
+        false|int $start = false,
+        false|int $end = false
+    ): Result {
         // If we have a limit, we need to know the total number of revisions so that PageRepo
         // will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
         if (isset($limit) && null === $numRevisions) {
@@ -440,14 +439,14 @@ class Page extends Model
      * @param string|DateTime $end In the format YYYYMMDD
      * @return int|null Total pageviews or null if data is unavailable.
      */
-    public function getPageviews($start, $end): ?int
+    public function getPageviews(string|DateTime $start, string|DateTime $end): ?int
     {
         try {
             $pageviews = $this->repository->getPageviews($this, $start, $end);
-        } catch (ClientException $e) {
+        } catch (ClientException) {
             // 404 means zero pageviews
             return 0;
-        } catch (BadGatewayException $e) {
+        } catch (BadGatewayException) {
             // Upstream error, so return null so the view can customize messaging.
             return null;
         }
