@@ -95,24 +95,24 @@ class DefaultController extends XtoolsController {
 			return $this->redirectToRoute( 'homepage' );
 		}
 
-    try {
-      $verifier = $request->get( 'oauth_verifier' );
-      $accessToken = $client->complete( $token, $verifier );
+		try {
+			$verifier = $request->get( 'oauth_verifier' );
+			$accessToken = $client->complete( $token, $verifier );
 
-      // Store access token, and remove request token.
-      $session->set( 'oauth_access_token', $accessToken );
-      $session->remove( 'oauth_request_token' );
+			// Store access token, and remove request token.
+			$session->set( 'oauth_access_token', $accessToken );
+			$session->remove( 'oauth_request_token' );
 
-      // Store user identity.
-      $ident = $client->identify( $accessToken );
-      $session->set( 'logged_in_user', $ident );
+			// Store user identity.
+			$ident = $client->identify( $accessToken );
+			$session->set( 'logged_in_user', $ident );
 
-      // Store reference to the client.
-      $session->set( 'oauth_client', $this->oauthClient );
-    } catch ( OAuthException $e ) {
-      $this->addFlashMessage( 'notice', 'error-login' );
-      // Redirect below
-    }
+			// Store reference to the client.
+			$session->set( 'oauth_client', $this->oauthClient );
+		} catch ( OAuthException $e ) {
+			$this->addFlashMessage( 'notice', 'error-login' );
+			// Redirect below
+		}
 
 		// Redirect to callback, if given.
 		if ( $request->query->get( 'redirect' ) ) {
