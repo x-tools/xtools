@@ -82,11 +82,11 @@ class PagesController extends XtoolsController {
 	 * @codeCoverageIgnore
 	 */
 	protected function setUpPages(
-    PagesRepository $pagesRepo,
-    string $redirects,
-    string $deleted,
-    bool $countsOnly = false
-  ): Pages {
+		PagesRepository $pagesRepo,
+		string $redirects,
+		string $deleted,
+		bool $countsOnly = false
+	): Pages {
 		if ( $this->user->isIpRange() ) {
 			$this->params['username'] = $this->user->getUsername();
 			$this->throwXtoolsException( $this->getIndexRoute(), 'error-ip-range-unsupported' );
@@ -102,7 +102,7 @@ class PagesController extends XtoolsController {
 			$this->start,
 			$this->end,
 			$this->offset,
-      $countsOnly
+			$countsOnly
 		);
 	}
 
@@ -134,11 +134,11 @@ class PagesController extends XtoolsController {
 		string $redirects = Pages::REDIR_NONE,
 		string $deleted = Pages::DEL_ALL
 	): RedirectResponse|Response {
-    $countsOnly = filter_var(
-			$this->request->query->get('countsOnly', 'false'),
+		$countsOnly = filter_var(
+			$this->request->query->get( 'countsOnly', 'false' ),
 			FILTER_VALIDATE_BOOLEAN,
 		) && (
-			$this->request->query->get('format', 'html') === 'html'
+			$this->request->query->get( 'format', 'html' ) === 'html'
 		);
 		// Check for legacy values for 'redirects', and redirect
 		// back with correct values if need be. This could be refactored
@@ -150,7 +150,7 @@ class PagesController extends XtoolsController {
 				'redirects' => Pages::REDIR_NONE,
 				'deleted' => $deleted,
 				'offset' => $this->offset,
-        'countsOnly' => $countsOnly,
+				'countsOnly' => $countsOnly,
 			] ) );
 		}
 
