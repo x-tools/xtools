@@ -189,11 +189,11 @@ class I18nHelper {
 
 	/**
 	 * Format a number based on language settings.
-	 * @param int|float $number
+	 * @param int|float|null $number
 	 * @param int $decimals Number of decimals to format to.
 	 * @return string
 	 */
-	public function numberFormat( int|float $number, int $decimals = 0 ): string {
+	public function numberFormat( int|float|null $number, int $decimals = 0 ): string {
 		$lang = $this->getLangForTranslatingNumerals();
 		if ( !isset( $this->numFormatter ) ) {
 			$this->numFormatter = new NumberFormatter( $lang, NumberFormatter::DECIMAL );

@@ -446,11 +446,11 @@ class AppExtension extends AbstractExtension {
 
 	/**
 	 * Format a number based on language settings.
-	 * @param int|float $number
+	 * @param int|float|null $number
 	 * @param int $decimals Number of decimals to format to.
 	 * @return string
 	 */
-	public function numberFormat( int|float $number, int $decimals = 0 ): string {
+	public function numberFormat( int|float|null $number, int $decimals = 0 ): string {
 		return $this->i18n->numberFormat( $number, $decimals );
 	}
 
