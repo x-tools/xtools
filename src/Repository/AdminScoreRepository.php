@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Repository;
 
@@ -12,24 +12,22 @@ use App\Model\User;
  * databases for the AdminScore tool. It does not do any post-processing of that data.
  * @codeCoverageIgnore
  */
-class AdminScoreRepository extends Repository
-{
-    /**
-     * Fetches basic information and the counts used in calculating scores.
-     * @param Project $project
-     * @param User $user
-     * @return array with keys 'account-age', 'edit-count', 'user-page', 'patrols', 'blocks', 'afd', 'recent-activity',
-     *    aiv', 'edit-summaries', 'namespaces', 'pages-created-live', 'pages-created-deleted', and 'rpp'.
-     */
-    public function fetchData(Project $project, User $user): array
-    {
-        $userTable = $project->getTableName('user');
-        $pageTable = $project->getTableName('page');
-        $loggingTable = $project->getTableName('logging', 'userindex');
-        $revisionTable = $project->getTableName('revision');
-        $archiveTable = $project->getTableName('archive');
+class AdminScoreRepository extends Repository {
+	/**
+	 * Fetches basic information and the counts used in calculating scores.
+	 * @param Project $project
+	 * @param User $user
+	 * @return array with keys 'account-age', 'edit-count', 'user-page', 'patrols', 'blocks', 'afd', 'recent-activity',
+	 *    aiv', 'edit-summaries', 'namespaces', 'pages-created-live', 'pages-created-deleted', and 'rpp'.
+	 */
+	public function fetchData( Project $project, User $user ): array {
+		$userTable = $project->getTableName( 'user' );
+		$pageTable = $project->getTableName( 'page' );
+		$loggingTable = $project->getTableName( 'logging', 'userindex' );
+		$revisionTable = $project->getTableName( 'revision' );
+		$archiveTable = $project->getTableName( 'archive' );
 
-        $sql = "SELECT 'account-age' AS source, user_registration AS value FROM $userTable
+		$sql = "SELECT 'account-age' AS source, user_registration AS value FROM $userTable
                     WHERE user_name = :username
                 UNION
                 SELECT 'edit-count' AS source, user_editcount AS value FROM $userTable
@@ -82,9 +80,9 @@ class AdminScoreRepository extends Repository
                     WHERE p.page_title LIKE 'Requests_for_page_protection%'
                         AND r.rev_actor = :actorId;";
 
-        return $this->executeProjectsQuery($project, $sql, [
-            'username' => $user->getUsername(),
-            'actorId' => $user->getActorId($project),
-        ])->fetchAllAssociative();
-    }
+		return $this->executeProjectsQuery( $project, $sql, [
+			'username' => $user->getUsername(),
+			'actorId' => $user->getActorId( $project ),
+		] )->fetchAllAssociative();
+	}
 }

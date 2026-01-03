@@ -40,6 +40,6 @@ $(() => {
         '&uselang=' + mw.config.get('wgUserLanguage')
     ).done(function (result) {
         $result.html(result);
-        clearInterval(loadinganimation);
+        clearInterval(loadingAnimation);
     });
 });

@@ -4,7 +4,6 @@
 			"Papuass"
 		]
 	},
-	"accounts": "Konti",
 	"actions": "Darbības",
 	"admins": "Administratori",
 	"all": "Visas",
@@ -31,7 +30,6 @@
 	"editors": "Redaktori",
 	"edits": "Labojumi",
 	"feedback": "Atsauksmes",
-	"file": "Fails",
 	"files": "Faili",
 	"help-translate": "Palīdzi iztulkot",
 	"history": "Vēsture",
@@ -58,10 +56,10 @@
 	"summary": "Kopsavilkums",
 	"sunday": "Svētdiena",
 	"templates": "Veidnes",
-	"tool-about": "Par",
 	"tool-adminstats": "Administratoru statistika",
 	"tool-error": "Kļūda",
 	"tool-globalcontribs": "Globālais devums",
+	"tool-quote": "Nejaušs citāts",
 	"tuesday": "Otrdiena",
 	"unique-references": "Unikālas atsauces",
 	"unknown": "Nav zināms",

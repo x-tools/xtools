@@ -1,5 +1,37 @@
 # Release Notes #
 
+## 3.23.1 ##
+- PageInfo (T413692): Fix a typo in the gadget source.
+- Accept null in numberFormat.
+
+## 3.23.0 ##
+- (T400929) Upgrade to Symfony 6.4 and PHP 8.2, update dependencies.
+- CategoryEdits: update queries following schema changes, improve performance.
+- (T413013) Disable CheckWiki errors.
+- Localization updates.
+
+## 3.22.4 ##
+- AdminScore (T410809): Fix null argument to str_replace.
+- EditCounter (T411310): Fix last interval in edit size histogram.
+- Localization updates.
+
+## 3.22.3 ##
+- (T410391) Fix username duplication in linking macros.
+
+## 3.22.2 ##
+- PageInfo (T407814): Fix the "Top 10 by added text" chart following the removal of
+  the rev_sha1 column.
+- TopEdits (T407814): Temporarily disable sha1-based revert detection following the
+  removal of the rev_sha1 column.
+- PageInfo (T330941): Fix interwiki links of imported revisions.
+- (T226307): Fix error messages and codes for DB timeouts.
+- EditCounter (T284876): Integrate FlaggedRevs in protection counts.
+- EditCounter (T342402): Add approximate (semi-)automated edit count using tags.
+- EditCounter: Fix interaction between external legend and log checkbox with flexbox.
+- Edit (T408332): Fix link regex, titles cannot have []
+- (T393120) Remove obsolete i18n messages.
+- Localization updates.
+
 ## 3.22.1 ##
 - PageInfo (T402709): fix encoding errors in subpage count.
 - PageInfoApi: ensure rev_timestamp is a number

@@ -1,277 +1,258 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Model;
 
 use App\Repository\AdminStatsRepository;
+use App\Repository\Repository;
 
 /**
  * AdminStats returns information about users with rights defined in admin_stats.yaml.
  */
-class AdminStats extends Model
-{
+class AdminStats extends Model {
 
-    /** @var string[][] Keyed by user name, values are arrays containing actions and counts. */
-    protected array $adminStats;
+	/** @var string[][] Keyed by user name, values are arrays containing actions and counts. */
+	protected array $adminStats;
 
-    /** @var string[] Keys are user names, values are their user groups. */
-    protected array $usersAndGroups;
+	/** @var string[] Keys are user names, values are their user groups. */
+	protected array $usersAndGroups;
 
-    /** @var int Number of users in the relevant group who made any actions within the time period. */
-    protected int $numWithActions = 0;
+	/** @var int Number of users in the relevant group who made any actions within the time period. */
+	protected int $numWithActions = 0;
 
-    /** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
-    private array $usersInGroup = [];
+	/** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
+	private array $usersInGroup = [];
 
-    /** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
-    private string $type;
+	/**
+	 * AdminStats constructor.
+	 * @param Repository|AdminStatsRepository $repository
+	 * @param Project $project
+	 * @param false|int $start as UTC timestamp.
+	 * @param false|int $end as UTC timestamp.
+	 * @param string $type Which user group to get stats for. Refer to admin_stats.yaml for possible values.
+	 * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
+	 */
+	public function __construct(
+		protected Repository|AdminStatsRepository $repository,
+		protected Project $project,
+		protected false|int $start,
+		protected false|int $end,
+		/** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
+		private string $type,
+		/** @var string[] Which actions to show ('block', 'protect', etc.) */
+		private array $actions
+	) {
+	}
 
-    /** @var string[] Which actions to show ('block', 'protect', etc.) */
-    private array $actions;
+	/**
+	 * Get the group for this AdminStats.
+	 * @return string
+	 */
+	public function getType(): string {
+		return $this->type;
+	}
 
-    /**
-     * AdminStats constructor.
-     * @param AdminStatsRepository $repository
-     * @param Project $project
-     * @param int $start as UTC timestamp.
-     * @param int $end as UTC timestamp.
-     * @param string $group Which user group to get stats for. Refer to admin_stats.yaml for possible values.
-     * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
-     */
-    public function __construct(
-        AdminStatsRepository $repository,
-        Project $project,
-        int $start,
-        int $end,
-        string $group,
-        array $actions
-    ) {
-        $this->repository = $repository;
-        $this->project = $project;
-        $this->start = $start;
-        $this->end = $end;
-        $this->type = $group;
-        $this->actions = $actions;
-    }
+	/**
+	 * Get the user_group from the config given the 'group'.
+	 * @return string
+	 */
+	public function getRelevantUserGroup(): string {
+		// Quick cache, valid only for the same request.
+		static $relevantUserGroup = '';
+		if ( $relevantUserGroup !== '' ) {
+			return $relevantUserGroup;
+		}
 
-    /**
-     * Get the group for this AdminStats.
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
+		$relevantUserGroup = $this->getRepository()->getRelevantUserGroup( $this->type );
+		return $relevantUserGroup;
+	}
 
-    /**
-     * Get the user_group from the config given the 'group'.
-     * @return string
-     */
-    public function getRelevantUserGroup(): string
-    {
-        // Quick cache, valid only for the same request.
-        static $relevantUserGroup = '';
-        if ('' !== $relevantUserGroup) {
-            return $relevantUserGroup;
-        }
+	/**
+	 * Get the array of statistics for each qualifying user. This may be called ahead of self::getStats() so certain
+	 * class-level properties will be supplied (such as self::numUsers(), which is called in the view before iterating
+	 * over the master array of statistics).
+	 * @return string[]
+	 */
+	public function prepareStats(): array {
+		if ( isset( $this->adminStats ) ) {
+			return $this->adminStats;
+		}
 
-        return $relevantUserGroup = $this->getRepository()->getRelevantUserGroup($this->type);
-    }
+		$stats = $this->getRepository()
+			->getStats( $this->project, $this->start, $this->end, $this->type, $this->actions );
 
-    /**
-     * Get the array of statistics for each qualifying user. This may be called ahead of self::getStats() so certain
-     * class-level properties will be supplied (such as self::numUsers(), which is called in the view before iterating
-     * over the master array of statistics).
-     * @return string[]
-     */
-    public function prepareStats(): array
-    {
-        if (isset($this->adminStats)) {
-            return $this->adminStats;
-        }
+		// Group by username.
+		$stats = $this->groupStatsByUsername( $stats );
 
-        $stats = $this->getRepository()
-            ->getStats($this->project, $this->start, $this->end, $this->type, $this->actions);
+		// Resort, as for some reason the SQL doesn't do this properly.
+		uasort( $stats, static function ( $a, $b ) {
+			if ( $a['total'] === $b['total'] ) {
+				return 0;
+			}
+			return $a['total'] < $b['total'] ? 1 : -1;
+		} );
 
-        // Group by username.
-        $stats = $this->groupStatsByUsername($stats);
+		$this->adminStats = $stats;
+		return $this->adminStats;
+	}
 
-        // Resort, as for some reason the SQL doesn't do this properly.
-        uasort($stats, function ($a, $b) {
-            if ($a['total'] === $b['total']) {
-                return 0;
-            }
-            return $a['total'] < $b['total'] ? 1 : -1;
-        });
+	/**
+	 * Get users of the project that are capable of making the relevant actions,
+	 * keyed by user name, with the user groups as the values.
+	 * @return string[][]
+	 */
+	public function getUsersAndGroups(): array {
+		if ( isset( $this->usersAndGroups ) ) {
+			return $this->usersAndGroups;
+		}
 
-        $this->adminStats = $stats;
-        return $this->adminStats;
-    }
+		// All the user groups that are considered capable of making the relevant actions for $this->group.
+		$groupUserGroups = $this->getRepository()->getUserGroups( $this->project, $this->type );
 
-    /**
-     * Get users of the project that are capable of making the relevant actions,
-     * keyed by user name, with the user groups as the values.
-     * @return string[][]
-     */
-    public function getUsersAndGroups(): array
-    {
-        if (isset($this->usersAndGroups)) {
-            return $this->usersAndGroups;
-        }
+		$this->usersAndGroups = $this->project->getUsersInGroups(
+			$groupUserGroups['local'],
+			$groupUserGroups['global']
+		);
 
-        // All the user groups that are considered capable of making the relevant actions for $this->group.
-        $groupUserGroups = $this->getRepository()->getUserGroups($this->project, $this->type);
+		// Populate $this->usersInGroup with users who are in the relevant user group for $this->group.
+		$this->usersInGroup = array_keys( array_filter( $this->usersAndGroups, function ( array $groups ) {
+			return in_array( $this->getRelevantUserGroup(), $groups );
+		} ) );
 
-        $this->usersAndGroups = $this->project->getUsersInGroups($groupUserGroups['local'], $groupUserGroups['global']);
+		return $this->usersAndGroups;
+	}
 
-        // Populate $this->usersInGroup with users who are in the relevant user group for $this->group.
-        $this->usersInGroup = array_keys(array_filter($this->usersAndGroups, function ($groups) {
-            return in_array($this->getRelevantUserGroup(), $groups);
-        }));
+	/**
+	 * Get all user groups with permissions applicable to the $this->group.
+	 * @param bool $wikiPath Whether to return the title for the on-wiki image, instead of full URL.
+	 * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
+	 */
+	public function getUserGroupIcons( bool $wikiPath = false ): array {
+		// Quick cache, valid only for the same request.
+		static $userGroupIcons = null;
+		if ( $userGroupIcons !== null ) {
+			$out = $userGroupIcons;
+		} else {
+			$out = $userGroupIcons = $this->getRepository()->getUserGroupIcons();
+		}
 
-        return $this->usersAndGroups;
-    }
+		if ( $wikiPath ) {
+			$out = array_map( static function ( $url ) {
+				return str_replace( '.svg.png', '.svg', preg_replace( '/.*\/18px-/', '', $url ) );
+			}, $out );
+		}
 
-    /**
-     * Get all user groups with permissions applicable to the $this->group.
-     * @param bool $wikiPath Whether to return the title for the on-wiki image, instead of full URL.
-     * @return array Each entry contains 'name' (user group) and 'rights' (the permissions).
-     */
-    public function getUserGroupIcons(bool $wikiPath = false): array
-    {
-        // Quick cache, valid only for the same request.
-        static $userGroupIcons = null;
-        if (null !== $userGroupIcons) {
-            $out = $userGroupIcons;
-        } else {
-            $out = $userGroupIcons = $this->getRepository()->getUserGroupIcons();
-        }
+		return $out;
+	}
 
-        if ($wikiPath) {
-            $out = array_map(function ($url) {
-                return str_replace('.svg.png', '.svg', preg_replace('/.*\/18px-/', '', $url));
-            }, $out);
-        }
+	/**
+	 * The number of days we're spanning between the start and end date.
+	 * @return int
+	 */
+	public function numDays(): int {
+		return (int)( ( $this->end - $this->start ) / 60 / 60 / 24 ) + 1;
+	}
 
-        return $out;
-    }
+	/**
+	 * Get the master array of statistics for each qualifying user.
+	 * @return string[]
+	 */
+	public function getStats(): array {
+		if ( isset( $this->adminStats ) ) {
+			$this->adminStats = $this->prepareStats();
+		}
+		return $this->adminStats;
+	}
 
-    /**
-     * The number of days we're spanning between the start and end date.
-     * @return int
-     */
-    public function numDays(): int
-    {
-        return (int)(($this->end - $this->start) / 60 / 60 / 24) + 1;
-    }
+	/**
+	 * Get the actions that are shown as columns in the view.
+	 * @return string[] Each the i18n key of the action.
+	 */
+	public function getActions(): array {
+		return count( $this->getStats() ) > 0
+			? array_diff( array_keys( array_values( $this->getStats() )[0] ), [ 'username', 'user-groups', 'total' ] )
+			: [];
+	}
 
-    /**
-     * Get the master array of statistics for each qualifying user.
-     * @return string[]
-     */
-    public function getStats(): array
-    {
-        if (isset($this->adminStats)) {
-            $this->adminStats = $this->prepareStats();
-        }
-        return $this->adminStats;
-    }
+	/**
+	 * Given the data returned by AdminStatsRepository::getStats, return the stats keyed by user name,
+	 * adding in a key/value for user groups.
+	 * @param string[][] $data As retrieved by AdminStatsRepository::getStats
+	 * @return string[] Stats keyed by user name.
+	 * Functionality covered in test for self::getStats().
+	 * @codeCoverageIgnore
+	 */
+	private function groupStatsByUsername( array $data ): array {
+		$usersAndGroups = $this->getUsersAndGroups();
+		$users = [];
 
-    /**
-     * Get the actions that are shown as columns in the view.
-     * @return string[] Each the i18n key of the action.
-     */
-    public function getActions(): array
-    {
-        return count($this->getStats()) > 0
-            ? array_diff(array_keys(array_values($this->getStats())[0]), ['username', 'user-groups', 'total'])
-            : [];
-    }
+		foreach ( $data as $datum ) {
+			$username = $datum['username'];
 
-    /**
-     * Given the data returned by AdminStatsRepository::getStats, return the stats keyed by user name,
-     * adding in a key/value for user groups.
-     * @param string[][] $data As retrieved by AdminStatsRepository::getStats
-     * @return string[] Stats keyed by user name.
-     * Functionality covered in test for self::getStats().
-     * @codeCoverageIgnore
-     */
-    private function groupStatsByUsername(array $data): array
-    {
-        $usersAndGroups = $this->getUsersAndGroups();
-        $users = [];
+			// Push to array containing all users with admin actions.
+			// We also want numerical values to be integers.
+			$users[$username] = array_map( 'intval', $datum );
 
-        foreach ($data as $datum) {
-            $username = $datum['username'];
+			// Push back username which was casted to an integer.
+			$users[$username]['username'] = $username;
 
-            // Push to array containing all users with admin actions.
-            // We also want numerical values to be integers.
-            $users[$username] = array_map('intval', $datum);
+			// Set the 'user-groups' property with the user groups they belong to (if any),
+			// going off of self::getUsersAndGroups().
+			if ( isset( $usersAndGroups[$username] ) ) {
+				$users[$username]['user-groups'] = $usersAndGroups[$username];
+			} else {
+				$users[$username]['user-groups'] = [];
+			}
 
-            // Push back username which was casted to an integer.
-            $users[$username]['username'] = $username;
+			// Keep track of users who are not in the relevant user group but made applicable actions.
+			if ( in_array( $username, $this->usersInGroup ) ) {
+				$this->numWithActions++;
+			}
+		}
 
-            // Set the 'user-groups' property with the user groups they belong to (if any),
-            // going off of self::getUsersAndGroups().
-            if (isset($usersAndGroups[$username])) {
-                $users[$username]['user-groups'] = $usersAndGroups[$username];
-            } else {
-                $users[$username]['user-groups'] = [];
-            }
+		return $users;
+	}
 
-            // Keep track of users who are not in the relevant user group but made applicable actions.
-            if (in_array($username, $this->usersInGroup)) {
-                $this->numWithActions++;
-            }
-        }
+	/**
+	 * Get the "totals" row.
+	 * @return array containing as keys the counts.
+	 */
+	public function getTotalsRow(): array {
+		$totalsRow = [];
+		foreach ( $this->adminStats as $data ) {
+			foreach ( $data as $action => $count ) {
+				if ( $action === 'username' || $action === 'user-groups' ) {
+					continue;
+				}
+				$totalsRow[$action] ??= 0;
+				$totalsRow[$action] += $count;
+			}
+		}
+		return $totalsRow;
+	}
 
-        return $users;
-    }
+	/**
+	 * Get the total number of users in the relevant user group.
+	 * @return int
+	 */
+	public function getNumInRelevantUserGroup(): int {
+		return count( $this->usersInGroup );
+	}
 
-    /**
-     * Get the "totals" row.
-     * @return array containing as keys the counts.
-     */
-    public function getTotalsRow(): array
-    {
-        $totalsRow = [];
-        foreach ($this->adminStats as $data) {
-            foreach ($data as $action => $count) {
-                if ('username' === $action || 'user-groups' === $action) {
-                    continue;
-                }
-                $totalsRow[$action] ??= 0;
-                $totalsRow[$action] += $count;
-            }
-        }
-        return $totalsRow;
-    }
+	/**
+	 * Number of users who made any relevant actions within the time period.
+	 * @return int
+	 */
+	public function getNumWithActions(): int {
+		return $this->numWithActions;
+	}
 
-    /**
-     * Get the total number of users in the relevant user group.
-     * @return int
-     */
-    public function getNumInRelevantUserGroup(): int
-    {
-        return count($this->usersInGroup);
-    }
-
-    /**
-     * Number of users who made any relevant actions within the time period.
-     * @return int
-     */
-    public function getNumWithActions(): int
-    {
-        return $this->numWithActions;
-    }
-
-    /**
-     * Number of currently users who made any actions within the time period who are not in the relevant user group.
-     * @return int
-     */
-    public function getNumWithActionsNotInGroup(): int
-    {
-        return count($this->adminStats) - $this->numWithActions;
-    }
+	/**
+	 * Number of currently users who made any actions within the time period who are not in the relevant user group.
+	 * @return int
+	 */
+	public function getNumWithActionsNotInGroup(): int {
+		return count( $this->adminStats ) - $this->numWithActions;
+	}
 }
