@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Repository;
 
@@ -18,63 +18,56 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * An EditRepository fetches data about a single revision.
  * @codeCoverageIgnore
  */
-class EditRepository extends Repository
-{
-    protected AutomatedEditsHelper $autoEditsHelper;
-    protected PageRepository $pageRepo;
+class EditRepository extends Repository {
+	public function __construct(
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected PageRepository $pageRepo
+	) {
+		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
+	}
 
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        AutomatedEditsHelper $autoEditsHelper,
-        PageRepository $pageRepo
-    ) {
-        $this->autoEditsHelper = $autoEditsHelper;
-        $this->pageRepo = $pageRepo;
-        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
-    }
+	/**
+	 * @return AutomatedEditsHelper
+	 */
+	public function getAutoEditsHelper(): AutomatedEditsHelper {
+		return $this->autoEditsHelper;
+	}
 
-    /**
-     * @return AutomatedEditsHelper
-     */
-    public function getAutoEditsHelper(): AutomatedEditsHelper
-    {
-        return $this->autoEditsHelper;
-    }
+	/**
+	 * Get an Edit instance given the revision ID. This does NOT set the associated User or Page.
+	 * @param UserRepository $userRepo
+	 * @param Project $project
+	 * @param int $revId
+	 * @param Page|null $page Provide if you already know the Page, so as to point to the same instance.
+	 *   This should already have the PageRepository set.
+	 * @return Edit|null Null if not found.
+	 */
+	public function getEditFromRevIdForPage(
+		UserRepository $userRepo,
+		Project $project,
+		int $revId,
+		?Page $page = null
+	): ?Edit {
+		$revisionTable = $project->getTableName( 'revision', '' );
+		$commentTable = $project->getTableName( 'comment', 'revision' );
+		$actorTable = $project->getTableName( 'actor', 'revision' );
+		$pageSelect = '';
+		$pageJoin = '';
 
-    /**
-     * Get an Edit instance given the revision ID. This does NOT set the associated User or Page.
-     * @param UserRepository $userRepo
-     * @param Project $project
-     * @param int $revId
-     * @param Page|null $page Provide if you already know the Page, so as to point to the same instance.
-     *   This should already have the PageRepository set.
-     * @return Edit|null Null if not found.
-     */
-    public function getEditFromRevIdForPage(
-        UserRepository $userRepo,
-        Project $project,
-        int $revId,
-        ?Page $page = null
-    ): ?Edit {
-        $revisionTable = $project->getTableName('revision', '');
-        $commentTable = $project->getTableName('comment', 'revision');
-        $actorTable = $project->getTableName('actor', 'revision');
-        $pageSelect = '';
-        $pageJoin = '';
+		if ( $page === null ) {
+			$pageTable = $project->getTableName( 'page' );
+			$pageSelect = "page_title,";
+			$pageJoin = "JOIN $pageTable ON revs.rev_page = page_id";
+		}
 
-        if (null === $page) {
-            $pageTable = $project->getTableName('page');
-            $pageSelect = "page_title,";
-            $pageJoin = "JOIN $pageTable ON revs.rev_page = page_id";
-        }
-
-        $sql = "SELECT $pageSelect
+		$sql = "SELECT $pageSelect
                     revs.rev_id AS id,
                     actor_name AS username,
                     revs.rev_timestamp AS timestamp,
@@ -89,35 +82,34 @@ class EditRepository extends Repository
                 LEFT OUTER JOIN $commentTable ON (revs.rev_comment_id = comment_id)
                 WHERE revs.rev_id = :revId";
 
-        $result = $this->executeProjectsQuery($project, $sql, ['revId' => $revId])
-            ->fetchAssociative();
+		$result = $this->executeProjectsQuery( $project, $sql, [ 'revId' => $revId ] )
+			->fetchAssociative();
 
-        if (!$result) {
-            return null;
-        }
+		if ( !$result ) {
+			return null;
+		}
 
-        // Create the Page instance.
-        if (null === $page) {
-            $page = new Page($this->pageRepo, $project, $result['page_title']);
-        }
+		// Create the Page instance.
+		if ( $page === null ) {
+			$page = new Page( $this->pageRepo, $project, $result['page_title'] );
+		}
 
-        return new Edit($this, $userRepo, $page, $result);
-    }
+		return new Edit( $this, $userRepo, $page, $result );
+	}
 
-    /**
-     * Use the Compare API to get HTML for the diff.
-     * @param Edit $edit
-     * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison found.
-     */
-    public function getDiffHtml(Edit $edit): ?string
-    {
-        $params = [
-            'action' => 'compare',
-            'fromrev' => $edit->getId(),
-            'torelative' => 'prev',
-        ];
+	/**
+	 * Use the Compare API to get HTML for the diff.
+	 * @param Edit $edit
+	 * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison found.
+	 */
+	public function getDiffHtml( Edit $edit ): ?string {
+		$params = [
+			'action' => 'compare',
+			'fromrev' => $edit->getId(),
+			'torelative' => 'prev',
+		];
 
-        $res = $this->executeApiRequest($edit->getProject(), $params);
-        return $res['compare']['*'] ?? null;
-    }
+		$res = $this->executeApiRequest( $edit->getProject(), $params );
+		return $res['compare']['*'] ?? null;
+	}
 }

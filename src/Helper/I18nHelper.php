@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Helper;
 
 use DateTime;
 use IntlDateFormatter;
-use Intuition;
+use Krinkle\Intuition\Intuition;
 use NumberFormatter;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -17,306 +17,282 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * The I18nHelper centralizes all methods for i18n and l10n,
  * and interactions with the Intuition library.
  */
-class I18nHelper
-{
-    private string $projectDir;
-    protected ContainerInterface $container;
-    protected Intuition $intuition;
-    protected IntlDateFormatter $dateFormatter;
-    protected NumberFormatter $numFormatter;
-    protected NumberFormatter $percentFormatter;
-    protected RequestStack $requestStack;
+class I18nHelper {
+	protected ContainerInterface $container;
+	protected Intuition $intuition;
+	protected IntlDateFormatter $dateFormatter;
+	protected NumberFormatter $numFormatter;
+	protected NumberFormatter $percentFormatter;
 
-    /**
-     * Constructor for the I18nHelper.
-     * @param RequestStack $requestStack
-     * @param string $projectDir
-     */
-    public function __construct(
-        RequestStack $requestStack,
-        string $projectDir
-    ) {
-        $this->requestStack = $requestStack;
-        $this->projectDir = $projectDir;
-    }
+	/**
+	 * Constructor for the I18nHelper.
+	 * @param RequestStack $requestStack
+	 * @param string $projectDir
+	 */
+	public function __construct(
+		protected RequestStack $requestStack,
+		private readonly string $projectDir
+	) {
+	}
 
-    /**
-     * Get an Intuition object, set to the current language based on the query string or session
-     * of the current request.
-     * @return Intuition
-     * @throws Exception If the 'i18n/en.json' file doesn't exist (as it's the default).
-     */
-    public function getIntuition(): Intuition
-    {
-        // Don't recreate the object.
-        if (isset($this->intuition)) {
-            return $this->intuition;
-        }
+	/**
+	 * Get an Intuition object, set to the current language based on the query string or session
+	 * of the current request.
+	 * @return Intuition
+	 * @throws Exception If the 'i18n/en.json' file doesn't exist (as it's the default).
+	 */
+	public function getIntuition(): Intuition {
+		// Don't recreate the object.
+		if ( isset( $this->intuition ) ) {
+			return $this->intuition;
+		}
 
-        // Find the path, and complain if English doesn't exist.
-        $path = $this->projectDir . '/i18n';
-        if (!file_exists("$path/en.json")) {
-            throw new Exception("Language directory doesn't exist: $path");
-        }
+		// Find the path, and complain if English doesn't exist.
+		$path = $this->projectDir . '/i18n';
+		if ( !file_exists( "$path/en.json" ) ) {
+			throw new Exception( "Language directory doesn't exist: $path" );
+		}
 
-        $useLang = $this->getIntuitionLang();
+		$this->intuition = new Intuition( 'xtools' );
+		$this->intuition->registerDomain( 'xtools', $path );
 
-        // Save the language to the session.
-        $session = $this->requestStack->getSession();
-        if ($session->get('lang') !== $useLang) {
-            $session->set('lang', $useLang);
-        }
+		$useLang = $this->getIntuitionLang();
+		// Validate the language.
+		if ( !$this->intuition->getLangName( $useLang ) ) {
+			$useLang = 'en';
+		}
 
-        // Set up Intuition, using the selected language.
-        $intuition = new Intuition('xtools');
-        $intuition->registerDomain('xtools', $path);
-        $intuition->setLang(strtolower($useLang));
+		// Save the language to the session.
+		$session = $this->requestStack->getSession();
+		if ( $session->get( 'lang' ) !== $useLang ) {
+			$session->set( 'lang', $useLang );
+		}
 
-        $this->intuition = $intuition;
-        return $intuition;
-    }
+		$this->intuition->setLang( strtolower( $useLang ) );
 
-    /**
-     * Get the current language code.
-     * @return string
-     */
-    public function getLang(): string
-    {
-        return $this->getIntuition()->getLang();
-    }
+		return $this->intuition;
+	}
 
-    /**
-     * Get the current language name (defaults to 'English').
-     * @return string
-     */
-    public function getLangName(): string
-    {
-        return in_array(ucfirst($this->getIntuition()->getLangName()), $this->getAllLangs())
-            ? $this->getIntuition()->getLangName()
-            : 'English';
-    }
+	/**
+	 * Get the current language code.
+	 * @return string
+	 */
+	public function getLang(): string {
+		return $this->getIntuition()->getLang();
+	}
 
-    /**
-     * Get all available languages in the i18n directory
-     * @return string[] Associative array of langKey => langName
-     */
-    public function getAllLangs(): array
-    {
-        $messageFiles = glob($this->projectDir.'/i18n/*.json');
+	/**
+	 * Get the current language name (defaults to 'English').
+	 * @return string
+	 */
+	public function getLangName(): string {
+		return in_array( ucfirst( $this->getIntuition()->getLangName() ), $this->getAllLangs() )
+			? $this->getIntuition()->getLangName()
+			: 'English';
+	}
 
-        $languages = array_values(array_unique(array_map(
-            function ($filename) {
-                return basename($filename, '.json');
-            },
-            $messageFiles
-        )));
+	/**
+	 * Get all available languages in the i18n directory
+	 * @return string[] Associative array of langKey => langName
+	 */
+	public function getAllLangs(): array {
+		$messageFiles = glob( $this->projectDir . '/i18n/*.json' );
 
-        $availableLanguages = [];
+		$languages = array_values( array_unique( array_map(
+			static function ( $filename ) {
+				return basename( $filename, '.json' );
+			},
+			$messageFiles
+		) ) );
 
-        foreach ($languages as $lang) {
-            $availableLanguages[$lang] = ucfirst($this->getIntuition()->getLangName($lang));
-        }
-        asort($availableLanguages);
+		$availableLanguages = [];
 
-        return $availableLanguages;
-    }
+		foreach ( $languages as $lang ) {
+			$availableLanguages[$lang] = ucfirst( $this->getIntuition()->getLangName( $lang ) );
+		}
+		asort( $availableLanguages );
 
-    /**
-     * Whether the current language is right-to-left.
-     * @param string|null $lang Optionally provide a specific language code.
-     * @return bool
-     */
-    public function isRTL(?string $lang = null): bool
-    {
-        return $this->getIntuition()->isRTL(
-            $lang ?? $this->getLang()
-        );
-    }
+		return $availableLanguages;
+	}
 
-    /**
-     * Get the fallback languages for the current or given language, so we know what to
-     * load with jQuery.i18n. Languages for which no file exists are not returned.
-     * @param string|null $useLang
-     * @return string[]
-     */
-    public function getFallbacks(?string $useLang = null): array
-    {
-        $i18nPath = $this->projectDir.'/i18n/';
-        $useLang = $useLang ?? $this->getLang();
+	/**
+	 * Whether the current language is right-to-left.
+	 * @param string|null $lang Optionally provide a specific language code.
+	 * @return bool
+	 */
+	public function isRTL( ?string $lang = null ): bool {
+		return $this->getIntuition()->isRTL(
+			$lang ?? $this->getLang()
+		);
+	}
 
-        $fallbacks = array_merge(
-            [$useLang],
-            $this->getIntuition()->getLangFallbacks($useLang)
-        );
+	/**
+	 * Get the fallback languages for the current or given language, so we know what to
+	 * load with jQuery.i18n. Languages for which no file exists are not returned.
+	 * @param string|null $useLang
+	 * @return string[]
+	 */
+	public function getFallbacks( ?string $useLang = null ): array {
+		$i18nPath = $this->projectDir . '/i18n/';
+		$useLang = $useLang ?? $this->getLang();
 
-        return array_filter($fallbacks, function ($lang) use ($i18nPath) {
-            return is_file($i18nPath.$lang.'.json');
-        });
-    }
+		$fallbacks = array_merge(
+			[ $useLang ],
+			$this->getIntuition()->getLangFallbacks( $useLang )
+		);
 
-    /******************** MESSAGE HELPERS ********************/
+		return array_filter( $fallbacks, static function ( $lang ) use ( $i18nPath ) {
+			return is_file( $i18nPath . $lang . '.json' );
+		} );
+	}
 
-    /**
-     * Get an i18n message.
-     * @param string|null $message
-     * @param string[] $vars
-     * @return string|null
-     */
-    public function msg(?string $message, array $vars = []): ?string
-    {
-        return $this->getIntuition()->msg($message, ['domain' => 'xtools', 'variables' => $vars]);
-    }
+	/******************** MESSAGE HELPERS */
 
-    /**
-     * See if a given i18n message exists.
-     * @param string|null $message The message.
-     * @param string[] $vars
-     * @return bool
-     */
-    public function msgExists(?string $message, array $vars = []): bool
-    {
-        return $this->getIntuition()->msgExists($message, array_merge(
-            ['domain' => 'xtools'],
-            ['variables' => $vars]
-        ));
-    }
+	/**
+	 * Get an i18n message.
+	 * @param string|null $message
+	 * @param string[] $vars
+	 * @return string|null
+	 */
+	public function msg( ?string $message, array $vars = [] ): ?string {
+		return $this->getIntuition()->msg( $message, [ 'domain' => 'xtools', 'variables' => $vars ] );
+	}
 
-    /**
-     * Get an i18n message if it exists, otherwise just get the message key.
-     * @param string|null $message
-     * @param string[] $vars
-     * @return string
-     */
-    public function msgIfExists(?string $message, array $vars = []): string
-    {
-        if ($this->msgExists($message, $vars)) {
-            return $this->msg($message, $vars);
-        } else {
-            return $message ?? '';
-        }
-    }
+	/**
+	 * See if a given i18n message exists.
+	 * @param string|null $message The message.
+	 * @param string[] $vars
+	 * @return bool
+	 */
+	public function msgExists( ?string $message, array $vars = [] ): bool {
+		return $message && $this->getIntuition()->msgExists( $message, array_merge(
+			[ 'domain' => 'xtools' ],
+			[ 'variables' => $vars ]
+		) );
+	}
 
-    /************************ NUMBERS ************************/
+	/**
+	 * Get an i18n message if it exists, otherwise just get the message key.
+	 * @param string|null $message
+	 * @param string[] $vars
+	 * @return string
+	 */
+	public function msgIfExists( ?string $message, array $vars = [] ): string {
+		if ( $this->msgExists( $message, $vars ) ) {
+			return $this->msg( $message, $vars );
+		} else {
+			return $message ?? '';
+		}
+	}
 
-    /**
-     * Format a number based on language settings.
-     * @param int|float $number
-     * @param int $decimals Number of decimals to format to.
-     * @return string
-     */
-    public function numberFormat($number, int $decimals = 0): string
-    {
-        $lang = $this->getLangForTranslatingNumerals();
-        if (!isset($this->numFormatter)) {
-            $this->numFormatter = new NumberFormatter($lang, NumberFormatter::DECIMAL);
-        }
+	/************************ NUMBERS */
 
-        $this->numFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $decimals);
+	/**
+	 * Format a number based on language settings.
+	 * @param int|float|null $number
+	 * @param int $decimals Number of decimals to format to.
+	 * @return string
+	 */
+	public function numberFormat( int|float|null $number, int $decimals = 0 ): string {
+		$lang = $this->getLangForTranslatingNumerals();
+		if ( !isset( $this->numFormatter ) ) {
+			$this->numFormatter = new NumberFormatter( $lang, NumberFormatter::DECIMAL );
+		}
 
-        return $this->numFormatter->format((float)$number ?? 0);
-    }
+		$this->numFormatter->setAttribute( NumberFormatter::MAX_FRACTION_DIGITS, $decimals );
 
-    /**
-     * Format a given number or fraction as a percentage.
-     * @param int|float $numerator Numerator or single fraction if denominator is omitted.
-     * @param int|null $denominator Denominator.
-     * @param integer $precision Number of decimal places to show.
-     * @return string Formatted percentage.
-     */
-    public function percentFormat($numerator, ?int $denominator = null, int $precision = 1): string
-    {
-        $lang = $this->getLangForTranslatingNumerals();
-        if (!isset($this->percentFormatter)) {
-            $this->percentFormatter = new NumberFormatter($lang, NumberFormatter::PERCENT);
-        }
+		return $this->numFormatter->format( (float)$number ?? 0 );
+	}
 
-        $this->percentFormatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $precision);
+	/**
+	 * Format a given number or fraction as a percentage.
+	 * @param int|float $numerator Numerator or single fraction if denominator is omitted.
+	 * @param int|null $denominator Denominator.
+	 * @param int $precision Number of decimal places to show.
+	 * @return string Formatted percentage.
+	 */
+	public function percentFormat( int|float $numerator, ?int $denominator = null, int $precision = 1 ): string {
+		$lang = $this->getLangForTranslatingNumerals();
+		if ( !isset( $this->percentFormatter ) ) {
+			$this->percentFormatter = new NumberFormatter( $lang, NumberFormatter::PERCENT );
+		}
 
-        if (null === $denominator) {
-            $quotient = $numerator / 100;
-        } elseif (0 === $denominator) {
-            $quotient = 0;
-        } else {
-            $quotient = $numerator / $denominator;
-        }
+		$this->percentFormatter->setAttribute( NumberFormatter::MAX_FRACTION_DIGITS, $precision );
 
-        return $this->percentFormatter->format($quotient);
-    }
+		if ( $denominator === null ) {
+			$quotient = $numerator / 100;
+		} elseif ( $denominator === 0 ) {
+			$quotient = 0;
+		} else {
+			$quotient = $numerator / $denominator;
+		}
 
-    /************************ DATES ************************/
+		return $this->percentFormatter->format( $quotient );
+	}
 
-    /**
-     * Localize the given date based on language settings.
-     * @param string|int|DateTime $datetime
-     * @param string $pattern Format according to this ICU date format.
-     * @see http://userguide.icu-project.org/formatparse/datetime
-     * @return string
-     */
-    public function dateFormat($datetime, string $pattern = 'yyyy-MM-dd HH:mm'): string
-    {
-        $lang = $this->getLangForTranslatingNumerals();
-        if (!isset($this->dateFormatter)) {
-            $this->dateFormatter = new IntlDateFormatter(
-                $lang,
-                IntlDateFormatter::SHORT,
-                IntlDateFormatter::SHORT
-            );
-        }
+	/************************ DATES */
 
-        if (is_string($datetime)) {
-            $datetime = new DateTime($datetime);
-        } elseif (is_int($datetime)) {
-            $datetime = DateTime::createFromFormat('U', (string)$datetime);
-        } elseif (!is_a($datetime, 'DateTime')) {
-            return ''; // Unknown format.
-        }
+	/**
+	 * Localize the given date based on language settings.
+	 * @param string|int|DateTime $datetime
+	 * @param string $pattern Format according to this ICU date format.
+	 * @see http://userguide.icu-project.org/formatparse/datetime
+	 * @return string
+	 */
+	public function dateFormat( string|int|DateTime $datetime, string $pattern = 'yyyy-MM-dd HH:mm' ): string {
+		$lang = $this->getLangForTranslatingNumerals();
+		if ( !isset( $this->dateFormatter ) ) {
+			$this->dateFormatter = new IntlDateFormatter(
+				$lang,
+				IntlDateFormatter::SHORT,
+				IntlDateFormatter::SHORT
+			);
+		}
 
-        $this->dateFormatter->setPattern($pattern);
+		if ( is_string( $datetime ) ) {
+			$datetime = new DateTime( $datetime );
+		} elseif ( is_int( $datetime ) ) {
+			$datetime = DateTime::createFromFormat( 'U', (string)$datetime );
+		} elseif ( !is_a( $datetime, 'DateTime' ) ) {
+			// Unknown format.
+			return '';
+		}
 
-        return $this->dateFormatter->format($datetime);
-    }
+		$this->dateFormatter->setPattern( $pattern );
 
-    /********************* PRIVATE METHODS *********************/
+		return $this->dateFormatter->format( $datetime );
+	}
 
-    /**
-     * Return the language to be used when translating numberals.
-     * Currently this just disables numeral translation for Arabic.
-     * @see https://mediawiki.org/wiki/Topic:Y4ufad47v5o4ebpe
-     * @todo This should go by $wgTranslateNumerals.
-     * @return string
-     */
-    private function getLangForTranslatingNumerals(): string
-    {
-        return 'ar' === $this->getIntuition()->getLang() ? 'en': $this->getIntuition()->getLang();
-    }
+	/********************* PRIVATE METHODS */
 
-    /**
-     * Determine the interface language, either from the current request or session.
-     * @return string
-     */
-    private function getIntuitionLang(): string
-    {
-        $queryLang = $this->getRequest()->query->get('uselang');
-        $sessionLang = $this->requestStack->getSession()->get('lang');
+	/**
+	 * Return the language to be used when translating numberals.
+	 * Currently this just disables numeral translation for Arabic.
+	 * @see https://mediawiki.org/wiki/Topic:Y4ufad47v5o4ebpe
+	 * @todo This should go by $wgTranslateNumerals.
+	 * @return string
+	 */
+	private function getLangForTranslatingNumerals(): string {
+		return $this->getIntuition()->getLang() === 'ar' ? 'en' : $this->getIntuition()->getLang();
+	}
 
-        if ('' !== $queryLang && null !== $queryLang) {
-            return $queryLang;
-        } elseif ('' !== $sessionLang && null !== $sessionLang) {
-            return $sessionLang;
-        }
+	/**
+	 * Determine the interface language, either from the current request or session.
+	 * @return string
+	 */
+	private function getIntuitionLang(): string {
+		$queryLang = $this->getRequest()->query->get( 'uselang' );
+		$sessionLang = $this->requestStack->getSession()->get( 'lang' );
+		return $queryLang ?? $sessionLang ?? 'en';
+	}
 
-        // English as default.
-        return 'en';
-    }
-
-    /**
-     * Shorthand to get the current request from the request stack.
-     * @return Request|null Null in test suite.
-     * There is no request stack in the tests.
-     * @codeCoverageIgnore
-     */
-    private function getRequest(): ?Request
-    {
-        return $this->requestStack->getCurrentRequest();
-    }
+	/**
+	 * Shorthand to get the current request from the request stack.
+	 * @return Request|null Null in test suite.
+	 * There is no request stack in the tests.
+	 * @codeCoverageIgnore
+	 */
+	private function getRequest(): ?Request {
+		return $this->requestStack->getCurrentRequest();
+	}
 }

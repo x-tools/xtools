@@ -128,7 +128,7 @@
         {% if not(user.isIpRange) %}
             <tr>
                 <td><strong>{{ msg('total-edits') }}</strong></td>
-                <td class="xt-test--total-edits"><strong>{{ ec.countAllRevisions|num_format }}</strong></td>
+                <td><strong>{{ ec.countAllRevisions|num_format }}</strong></td>
             </tr>
         {% endif %}
     </tbody></table>
@@ -170,6 +170,15 @@
                 {% endif %}
             </td>
         </tr>
+        <tr>
+            <td>{{ msg('auto-edits-tagged') }}*</td>
+            <td>
+                {{ ec.countAutoEdits|num_format }}
+                {% if ec.countLast5000 %}
+                    &middot;
+                    ({{ ((ec.countAutoEdits / ec.countLast5000) * 100)|percent_format }} )
+                {% endif %}
+            </td>
         <tr>
             <td>{{ msg('small-edits') }}*</td>
             <td>
@@ -522,7 +531,7 @@
         <script type="text/javascript">
             $(function() {
                 xtools.editcounter.setupSizeHistogram(
-                    {{ ec.editSizeData|json_encode()|raw }},
+                    {{ ec.editSizeData.sizes|json_encode()|raw }},
                     ["{{ color(1) }}", "{{ color(0) }}", "{{ color(4) }}"],
                     ["{{ msg('additions') }}", "{{ msg('removals') }}", "{{ msg('size-zero') }}"],
                 );

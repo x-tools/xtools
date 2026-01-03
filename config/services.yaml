@@ -12,7 +12,7 @@ imports:
     - { resource: user_group_icons.yaml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.version: '%env(APP_VERSION)%'
     locale: 'en'
@@ -42,6 +42,7 @@ parameters:
     enable.TopEdits: '%env(bool:APP_ENABLE_TOPEDITS)%'
     oauth_key: '%env(OAUTH_KEY)%'
     oauth_secret: '%env(OAUTH_SECRET)%'
+    mailer.to_email: '%env(MAILER_TO_EMAIL)%'
 
 services:
     _defaults:
@@ -107,7 +108,7 @@ services:
     # These need to not be public, but they are, for now...
     app.automated_edits_helper:
         class: App\Helper\AutomatedEditsHelper
-        arguments: ['@request_stack', '@cache.app']
+        arguments: ['@request_stack', '@cache.app', 'eight_points_guzzle.client.xtools']
         public: true
     app.i18n_helper:
         class: App\Helper\I18nHelper

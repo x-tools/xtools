@@ -730,3 +730,18 @@ a.help-icon {
 .reverted-edit {
     background: #fcf8e3 !important;
 }
+
+.side-to-side > div {
+    display: inline-block;
+    margin: 0 10px 15px 0;
+    vertical-align: top;
+}
+
+.side-to-side {
+    clear: both;
+}
+
+.link-loading {
+    pointer-events: none;
+    font-style: italic;
+}

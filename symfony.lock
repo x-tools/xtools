@@ -1,11 +1,11 @@
 {
-    "doctrine/annotations": {
-        "version": "1.14",
+    "doctrine/deprecations": {
+        "version": "1.0",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "1.10",
-            "ref": "64d8583af5ea57b7afa4aba4b159907f3a148b05"
+            "version": "1.0",
+            "ref": "87424683adc81d7dc305eefec1fced883084aab9"
         }
     },
     "doctrine/doctrine-bundle": {
@@ -138,20 +138,18 @@
         ]
     },
     "symfony/framework-bundle": {
-        "version": "4.4",
+        "version": "6.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "main",
-            "version": "4.4",
-            "ref": "24eb45d1355810154890460e6a05c0ca27318fe7"
+            "version": "6.4",
+            "ref": "32126346f25e1cee607cc4aa6783d46034920554"
         },
         "files": [
-            "config/bootstrap.php",
             "config/packages/cache.yaml",
             "config/packages/framework.yaml",
-            "config/packages/test/framework.yaml",
             "config/preload.php",
-            "config/routes/dev/framework.yaml",
+            "config/routes/framework.yaml",
             "config/services.yaml",
             "public/index.php",
             "src/Controller/.gitignore",

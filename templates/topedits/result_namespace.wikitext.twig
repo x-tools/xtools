@@ -15,6 +15,7 @@
 ==== {{ nsName(ns, project.namespaces) }} ====
 
 {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+{{ te.numPagesNamespace(ns) }} {{ msg('pages')|lower }}.
 {| class="wikitable sortable"
 ! {{ msg('edits')|ucfirst }}
 ! {{ msg('page-title') }}
@@ -38,6 +39,18 @@
 ! colspan={{ showPageAssessment ? 4 : 3 }} | [{{ url('TopEditsResultNamespace', {project:project.domain, username:user.usernameIdent, namespace:ns}) }} {{ msg('more') }}&hellip;]
 {% endif %}
 |}
-
+{% if showPageAssessment %}
+{% set totals = te.projectTotals(ns) %}
+{% if totals|length > 0 %}
+{| class="wikitable sortable"
+|+ {{ msg('top-wikiprojects') }}
+! {{ msg('wikiproject') }} !! {{ msg('count') }}
+{% for row in totals %}
+|-
+| {{ row.pap_project_title }} || {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ row.count }}}}
+{% endfor %}
+|}
+{% endif %}
+{% endif %}
 {% endfor %}
 {% endif %}
