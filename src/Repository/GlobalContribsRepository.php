@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Repository;
 
@@ -17,268 +17,262 @@ use Wikimedia\IPUtils;
  * A GlobalContribsRepository is responsible for retrieving information from the database for the GlobalContribs tool.
  * @codeCoverageIgnore
  */
-class GlobalContribsRepository extends Repository
-{
+class GlobalContribsRepository extends Repository {
 
-    /** @var Project CentralAuth project (meta.wikimedia for WMF installation). */
-    protected Project $caProject;
+	/** @var Project CentralAuth project (meta.wikimedia for WMF installation). */
+	protected Project $caProject;
 
-    public function __construct(
-        protected ManagerRegistry $managerRegistry,
-        protected CacheItemPoolInterface $cache,
-        protected Client $guzzle,
-        protected LoggerInterface $logger,
-        protected ParameterBagInterface $parameterBag,
-        protected bool $isWMF,
-        protected int $queryTimeout,
-        protected ProjectRepository $projectRepo,
-        string $centralAuthProject
-    ) {
-        $this->caProject = new Project($centralAuthProject);
-        $this->caProject->setRepository($this->projectRepo);
-        parent::__construct($managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout);
-    }
+	public function __construct(
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected ProjectRepository $projectRepo,
+		string $centralAuthProject
+	) {
+		$this->caProject = new Project( $centralAuthProject );
+		$this->caProject->setRepository( $this->projectRepo );
+		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
+	}
 
-    /**
-     * Get a user's edit count for each project.
-     * @see GlobalContribsRepository::globalEditCountsFromCentralAuth()
-     * @see GlobalContribsRepository::globalEditCountsFromDatabases()
-     * @param User $user The user.
-     * @return ?array Elements are arrays with 'project' (Project), and 'total' (int). Null if anon (too slow).
-     */
-    public function globalEditCounts(User $user): ?array
-    {
-        if ($user->isIP()) {
-            return null;
-        }
+	/**
+	 * Get a user's edit count for each project.
+	 * @see GlobalContribsRepository::globalEditCountsFromCentralAuth()
+	 * @see GlobalContribsRepository::globalEditCountsFromDatabases()
+	 * @param User $user The user.
+	 * @return ?array Elements are arrays with 'project' (Project), and 'total' (int). Null if anon (too slow).
+	 */
+	public function globalEditCounts( User $user ): ?array {
+		if ( $user->isIP() ) {
+			return null;
+		}
 
-        // Get the edit counts from CentralAuth or database.
-        $editCounts = $this->globalEditCountsFromCentralAuth($user);
+		// Get the edit counts from CentralAuth or database.
+		$editCounts = $this->globalEditCountsFromCentralAuth( $user );
 
-        // Pre-populate all projects' metadata, to prevent each project call from fetching it.
-        $this->caProject->getRepository()->getAll();
+		// Pre-populate all projects' metadata, to prevent each project call from fetching it.
+		$this->caProject->getRepository()->getAll();
 
-        // Compile the output.
-        $out = [];
-        foreach ($editCounts as $editCount) {
-            $project = new Project($editCount['dbName']);
-            $project->setRepository($this->projectRepo);
-            // Make sure the project exists (new projects may not yet be on db replicas).
-            if ($project->exists()) {
-                $out[] = [
-                    'dbName' => $editCount['dbName'],
-                    'total' => $editCount['total'],
-                    'project' => $project,
-                ];
-            }
-        }
-        return $out;
-    }
+		// Compile the output.
+		$out = [];
+		foreach ( $editCounts as $editCount ) {
+			$project = new Project( $editCount['dbName'] );
+			$project->setRepository( $this->projectRepo );
+			// Make sure the project exists (new projects may not yet be on db replicas).
+			if ( $project->exists() ) {
+				$out[] = [
+					'dbName' => $editCount['dbName'],
+					'total' => $editCount['total'],
+					'project' => $project,
+				];
+			}
+		}
+		return $out;
+	}
 
-    /**
-     * Get a user's total edit count on one or more project.
-     * Requires the CentralAuth extension to be installed on the project.
-     * @param User $user The user.
-     * @return array|null Elements are arrays with 'dbName' (string), and 'total' (int). Null for logged out users.
-     */
-    protected function globalEditCountsFromCentralAuth(User $user): ?array
-    {
-        if (true === $user->isIP()) {
-            return null;
-        }
+	/**
+	 * Get a user's total edit count on one or more project.
+	 * Requires the CentralAuth extension to be installed on the project.
+	 * @param User $user The user.
+	 * @return array|null Elements are arrays with 'dbName' (string), and 'total' (int). Null for logged out users.
+	 */
+	protected function globalEditCountsFromCentralAuth( User $user ): ?array {
+		if ( $user->isIP() ) {
+			return null;
+		}
 
-        // Set up cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'gc_globaleditcounts');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+		// Set up cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'gc_globaleditcounts' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $params = [
-            'meta' => 'globaluserinfo',
-            'guiprop' => 'editcount|merged',
-            'guiuser' => $user->getUsername(),
-        ];
-        $result = $this->executeApiRequest($this->caProject, $params);
-        if (!isset($result['query']['globaluserinfo']['merged'])) {
-            return [];
-        }
-        $out = [];
-        foreach ($result['query']['globaluserinfo']['merged'] as $result) {
-            $out[] = [
-                'dbName' => $result['wiki'],
-                'total' => $result['editcount'],
-            ];
-        }
+		$params = [
+			'meta' => 'globaluserinfo',
+			'guiprop' => 'editcount|merged',
+			'guiuser' => $user->getUsername(),
+		];
+		$result = $this->executeApiRequest( $this->caProject, $params );
+		if ( !isset( $result['query']['globaluserinfo']['merged'] ) ) {
+			return [];
+		}
+		$out = [];
+		foreach ( $result['query']['globaluserinfo']['merged'] as $result ) {
+			$out[] = [
+				'dbName' => $result['wiki'],
+				'total' => $result['editcount'],
+			];
+		}
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $out);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $out );
+	}
 
-    /**
-     * Loop through the given dbNames and create Project objects for each.
-     * @param array $dbNames
-     * @return Project[] Keyed by database name.
-     */
-    private function formatProjects(array $dbNames): array
-    {
-        $projects = [];
+	/**
+	 * Loop through the given dbNames and create Project objects for each.
+	 * @param array $dbNames
+	 * @return Project[] Keyed by database name.
+	 */
+	private function formatProjects( array $dbNames ): array {
+		$projects = [];
 
-        foreach ($dbNames as $dbName) {
-            $projects[$dbName] = $this->projectRepo->getProject($dbName);
-        }
+		foreach ( $dbNames as $dbName ) {
+			$projects[$dbName] = $this->projectRepo->getProject( $dbName );
+		}
 
-        return $projects;
-    }
+		return $projects;
+	}
 
-    /**
-     * Get all Projects on which the user has made at least one edit.
-     * @param User $user
-     * @return Project[]
-     */
-    public function getProjectsWithEdits(User $user): array
-    {
-        if ($user->isIP()) {
-            $dbNames = array_keys($this->getDbNamesAndActorIds($user));
-        } else {
-            $dbNames = [];
+	/**
+	 * Get all Projects on which the user has made at least one edit.
+	 * @param User $user
+	 * @return Project[]
+	 */
+	public function getProjectsWithEdits( User $user ): array {
+		if ( $user->isIP() ) {
+			$dbNames = array_keys( $this->getDbNamesAndActorIds( $user ) );
+		} else {
+			$dbNames = [];
 
-            foreach ($this->globalEditCountsFromCentralAuth($user) as $projectMeta) {
-                if ($projectMeta['total'] > 0) {
-                    $dbNames[] = $projectMeta['dbName'];
-                }
-            }
-        }
+			foreach ( $this->globalEditCountsFromCentralAuth( $user ) as $projectMeta ) {
+				if ( $projectMeta['total'] > 0 ) {
+					$dbNames[] = $projectMeta['dbName'];
+				}
+			}
+		}
 
-        return $this->formatProjects($dbNames);
-    }
+		return $this->formatProjects( $dbNames );
+	}
 
-    /**
-     * Get projects that the user has made at least one edit on, and the associated actor ID.
-     * @param User $user
-     * @param string[] $dbNames Loop over these projects instead of all of them.
-     * @return array Keys are database names, values are actor IDs.
-     */
-    public function getDbNamesAndActorIds(User $user, ?array $dbNames = null): array
-    {
-        // Check cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'gc_db_names_actor_ids');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get projects that the user has made at least one edit on, and the associated actor ID.
+	 * @param User $user
+	 * @param string[]|null $dbNames Loop over these projects instead of all of them.
+	 * @return array Keys are database names, values are actor IDs.
+	 */
+	public function getDbNamesAndActorIds( User $user, ?array $dbNames = null ): array {
+		// Check cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'gc_db_names_actor_ids' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        if (!$dbNames) {
-            $dbNames = array_column($this->caProject->getRepository()->getAll(), 'dbName');
-        }
+		if ( !$dbNames ) {
+			$dbNames = array_column( $this->caProject->getRepository()->getAll(), 'dbName' );
+		}
 
-        if ($user->isIpRange()) {
-            $username = $user->getIpSubstringFromCidr().'%';
-            $whereClause = "actor_name LIKE :actor";
-        } else {
-            $username = $user->getUsername();
-            $whereClause = "actor_name = :actor";
-        }
+		if ( $user->isIpRange() ) {
+			$username = $user->getIpSubstringFromCidr() . '%';
+			$whereClause = "actor_name LIKE :actor";
+		} else {
+			$username = $user->getUsername();
+			$whereClause = "actor_name = :actor";
+		}
 
-        $queriesBySlice = [];
+		$queriesBySlice = [];
 
-        foreach ($dbNames as $dbName) {
-            $slice = $this->getDbList()[$dbName];
-            // actor_revision table only includes users who have made at least one edit.
-            $actorTable = $this->getTableName($dbName, 'actor', 'revision');
-            $queriesBySlice[$slice][] = "SELECT '$dbName' AS `dbName`, actor_id " .
-                "FROM $actorTable WHERE $whereClause";
-        }
+		foreach ( $dbNames as $dbName ) {
+			$slice = $this->getDbList()[$dbName];
+			// actor_revision table only includes users who have made at least one edit.
+			$actorTable = $this->getTableName( $dbName, 'actor', 'revision' );
+			$queriesBySlice[$slice][] = "SELECT '$dbName' AS `dbName`, actor_id " .
+				"FROM $actorTable WHERE $whereClause";
+		}
 
-        $actorIds = [];
+		$actorIds = [];
 
-        foreach ($queriesBySlice as $slice => $queries) {
-            $sql = implode(' UNION ', $queries);
-            $resultQuery = $this->executeProjectsQuery($slice, $sql, [
-                'actor' => $username,
-            ]);
+		foreach ( $queriesBySlice as $slice => $queries ) {
+			$sql = implode( ' UNION ', $queries );
+			$resultQuery = $this->executeProjectsQuery( $slice, $sql, [
+				'actor' => $username,
+			] );
 
-            while ($row = $resultQuery->fetchAssociative()) {
-                $actorIds[$row['dbName']] = (int)$row['actor_id'];
-            }
-        }
+			// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+			while ( $row = $resultQuery->fetchAssociative() ) {
+				$actorIds[$row['dbName']] = (int)$row['actor_id'];
+			}
+		}
 
-        return $this->setCache($cacheKey, $actorIds);
-    }
+		return $this->setCache( $cacheKey, $actorIds );
+	}
 
-    /**
-     * Get revisions by this user across the given Projects.
-     * @param string[] $dbNames Database names of projects to iterate over.
-     * @param User $user The user.
-     * @param int|string $namespace Namespace ID or 'all' for all namespaces.
-     * @param int|false $start Unix timestamp or false.
-     * @param int|false $end Unix timestamp or false.
-     * @param int $limit The maximum number of revisions to fetch from each project.
-     * @param int|false $offset Unix timestamp. Used for pagination.
-     * @return array
-     */
-    public function getRevisions(
-        array $dbNames,
-        User $user,
-        int|string $namespace = 'all',
-        int|false $start = false,
-        int|false $end = false,
-        int $limit = 31, // One extra to know whether there should be another page.
-        int|false $offset = false
-    ): array {
-        // Check cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'gc_revisions');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get revisions by this user across the given Projects.
+	 * @param string[] $dbNames Database names of projects to iterate over.
+	 * @param User $user The user.
+	 * @param int|string $namespace Namespace ID or 'all' for all namespaces.
+	 * @param int|false $start Unix timestamp or false.
+	 * @param int|false $end Unix timestamp or false.
+	 * @param int $limit The maximum number of revisions to fetch from each project.
+	 * @param int|false $offset Unix timestamp. Used for pagination.
+	 * @return array
+	 */
+	public function getRevisions(
+		array $dbNames,
+		User $user,
+		int|string $namespace = 'all',
+		int|false $start = false,
+		int|false $end = false,
+		// One extra to know whether there should be another page.
+		int $limit = 31,
+		int|false $offset = false
+	): array {
+		// Check cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'gc_revisions' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        // Just need any Connection to use the ->quote() method.
-        $quoteConn = $this->getProjectsConnection('s1');
-        $username = $quoteConn->getDatabasePlatform()->quoteStringLiteral($user->getUsername());
+		// Just need any Connection to use the ->quote() method.
+		$quoteConn = $this->getProjectsConnection( 's1' );
+		$username = $quoteConn->getDatabasePlatform()->quoteStringLiteral( $user->getUsername() );
 
-        // IP range handling.
-        $startIp = '';
-        $endIp = '';
-        if ($user->isIpRange()) {
-            [$startIp, $endIp] = IPUtils::parseRange($user->getUsername());
-            $startIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral($startIp);
-            $endIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral($endIp);
-        }
+		// IP range handling.
+		$startIp = '';
+		$endIp = '';
+		if ( $user->isIpRange() ) {
+			[ $startIp, $endIp ] = IPUtils::parseRange( $user->getUsername() );
+			$startIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral( $startIp );
+			$endIp = $quoteConn->getDatabasePlatform()->quoteStringLiteral( $endIp );
+		}
 
-        // Fetch actor IDs (for IP ranges, it strips trailing zeros and uses a LIKE query).
-        $actorIds = $this->getDbNamesAndActorIds($user, $dbNames);
+		// Fetch actor IDs (for IP ranges, it strips trailing zeros and uses a LIKE query).
+		$actorIds = $this->getDbNamesAndActorIds( $user, $dbNames );
 
-        if (!$actorIds) {
-            return [];
-        }
+		if ( !$actorIds ) {
+			return [];
+		}
 
-        $namespaceCond = 'all' === $namespace
-            ? ''
-            : 'AND page_namespace = '.(int)$namespace;
-        $revDateConditions = $this->getDateConditions($start, $end, $offset, 'revs.', 'rev_timestamp');
+		$namespaceCond = $namespace === 'all' ? '' : 'AND page_namespace = ' . (int)$namespace;
+		$revDateConditions = $this->getDateConditions( $start, $end, $offset, 'revs.', 'rev_timestamp' );
 
-        // Assemble queries.
-        $queriesBySlice = [];
-        $projectRepo = $this->caProject->getRepository();
-        foreach ($dbNames as $dbName) {
-            if (isset($actorIds[$dbName])) {
-                $revisionTable = $projectRepo->getTableName($dbName, 'revision');
-                $pageTable = $projectRepo->getTableName($dbName, 'page');
-                $commentTable = $projectRepo->getTableName($dbName, 'comment', 'revision');
-                $actorTable = $projectRepo->getTableName($dbName, 'actor', 'revision');
-                $tagTable = $projectRepo->getTableName($dbName, 'change_tag');
-                $tagDefTable = $projectRepo->getTableName($dbName, 'change_tag_def');
+		// Assemble queries.
+		$queriesBySlice = [];
+		$projectRepo = $this->caProject->getRepository();
+		foreach ( $dbNames as $dbName ) {
+			if ( isset( $actorIds[$dbName] ) ) {
+				$revisionTable = $projectRepo->getTableName( $dbName, 'revision' );
+				$pageTable = $projectRepo->getTableName( $dbName, 'page' );
+				$commentTable = $projectRepo->getTableName( $dbName, 'comment', 'revision' );
+				$actorTable = $projectRepo->getTableName( $dbName, 'actor', 'revision' );
+				$tagTable = $projectRepo->getTableName( $dbName, 'change_tag' );
+				$tagDefTable = $projectRepo->getTableName( $dbName, 'change_tag_def' );
 
-                if ($user->isIpRange()) {
-                    $ipcTable = $projectRepo->getTableName($dbName, 'ip_changes');
-                    $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
-                    $whereClause = "ipc_hex BETWEEN $startIp AND $endIp";
-                    $username = 'actor_name';
-                } else {
-                    $ipcJoin = '';
-                    $whereClause = 'revs.rev_actor = '.$actorIds[$dbName];
-                }
+				if ( $user->isIpRange() ) {
+					$ipcTable = $projectRepo->getTableName( $dbName, 'ip_changes' );
+					$ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
+					$whereClause = "ipc_hex BETWEEN $startIp AND $endIp";
+					$username = 'actor_name';
+				} else {
+					$ipcJoin = '';
+					$whereClause = 'revs.rev_actor = ' . $actorIds[$dbName];
+				}
 
-                $slice = $this->getDbList()[$dbName];
-                $queriesBySlice[$slice][] = "
+				$slice = $this->getDbList()[$dbName];
+				$queriesBySlice[$slice][] = "
                     SELECT
                         '$dbName' AS dbName,
                         revs.rev_id AS id,
@@ -313,30 +307,31 @@ class GlobalContribsRepository extends Repository
                     WHERE $whereClause
                         $namespaceCond
                         $revDateConditions";
-            }
-        }
+			}
+		}
 
-        // Re-assemble into UNIONed queries, executing as many per slice as possible.
-        $revisions = [];
-        foreach ($queriesBySlice as $slice => $queries) {
-            $sql = "SELECT * FROM ((\n" . join("\n) UNION (\n", $queries) . ")) a ORDER BY timestamp DESC LIMIT $limit";
-            $revisions = array_merge($revisions, $this->executeProjectsQuery($slice, $sql)->fetchAllAssociative());
-        }
+		// Re-assemble into UNIONed queries, executing as many per slice as possible.
+		$revisions = [];
+		foreach ( $queriesBySlice as $slice => $queries ) {
+			$sql = "SELECT * FROM ((\n" . implode( "\n) UNION (\n", $queries ) . ")) a " .
+					"ORDER BY timestamp DESC LIMIT $limit";
+			$revisions = array_merge( $revisions, $this->executeProjectsQuery( $slice, $sql )->fetchAllAssociative() );
+		}
 
-        // If there are more than $limit results, re-sort by timestamp.
-        if (count($revisions) > $limit) {
-            usort($revisions, function ($a, $b) {
-                if ($a['unix_timestamp'] === $b['unix_timestamp']) {
-                    return 0;
-                }
-                return $a['unix_timestamp'] > $b['unix_timestamp'] ? -1 : 1;
-            });
+		// If there are more than $limit results, re-sort by timestamp.
+		if ( count( $revisions ) > $limit ) {
+			usort( $revisions, static function ( $a, $b ) {
+				if ( $a['unix_timestamp'] === $b['unix_timestamp'] ) {
+					return 0;
+				}
+				return $a['unix_timestamp'] > $b['unix_timestamp'] ? -1 : 1;
+			} );
 
-            // Truncate size to $limit.
-            $revisions = array_slice($revisions, 0, $limit);
-        }
+			// Truncate size to $limit.
+			$revisions = array_slice( $revisions, 0, $limit );
+		}
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $revisions);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $revisions );
+	}
 }

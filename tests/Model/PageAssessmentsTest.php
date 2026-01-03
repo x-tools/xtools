@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Tests\Model;
 
@@ -16,110 +16,105 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Tests for the PageAssessments class.
  * @covers \App\Model\PageAssessments
  */
-class PageAssessmentsTest extends TestAdapter
-{
-    /** @var ContainerInterface The Symfony localContainer ($localContainer to not override self::$container). */
-    protected ContainerInterface $localContainer;
+class PageAssessmentsTest extends TestAdapter {
+	/** @var ContainerInterface The Symfony localContainer ($localContainer to not override self::$container). */
+	protected ContainerInterface $localContainer;
 
-    /** @var PageAssessments */
-    protected $pa;
+	/** @var PageAssessments */
+	protected $pa;
 
-    /** @var PageAssessmentsRepository The repository for page assessments. */
-    protected $paRepo;
+	/** @var PageAssessmentsRepository The repository for page assessments. */
+	protected $paRepo;
 
-    /** @var Project The project we're working with. */
-    protected $project;
+	/** @var Project The project we're working with. */
+	protected $project;
 
-    /**
-     * Set up client and set container, and PageAssessmentsRepository mock.
-     */
-    public function setUp(): void
-    {
-        $client = static::createClient();
-        $this->localContainer = $client->getContainer();
+	/**
+	 * Set up client and set container, and PageAssessmentsRepository mock.
+	 */
+	public function setUp(): void {
+		$client = static::createClient();
+		$this->localContainer = $client->getContainer();
 
-        $this->paRepo = $this->createMock(PageAssessmentsRepository::class);
-        $this->paRepo->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($this->localContainer->getParameter('assessments')['en.wikipedia.org']);
+		$this->paRepo = $this->createMock( PageAssessmentsRepository::class );
+		$this->paRepo->expects( $this->once() )
+			->method( 'getConfig' )
+			->willReturn( $this->localContainer->getParameter( 'assessments' )['en.wikipedia.org'] );
 
-        $this->project = $this->createMock(Project::class);
-    }
+		$this->project = $this->createMock( Project::class );
+	}
 
-    /**
-     * Some of the basics.
-     */
-    public function testBasics(): void
-    {
-        $pa = new PageAssessments($this->paRepo, $this->project);
+	/**
+	 * Some of the basics.
+	 */
+	public function testBasics(): void {
+		$pa = new PageAssessments( $this->paRepo, $this->project );
 
-        static::assertEquals(
-            $this->localContainer->getParameter('assessments')['en.wikipedia.org'],
-            $pa->getConfig()
-        );
-        static::assertTrue($pa->isEnabled());
-        static::assertTrue($pa->hasImportanceRatings());
-        static::assertTrue($pa->isSupportedNamespace(6));
-    }
+		static::assertEquals(
+			$this->localContainer->getParameter( 'assessments' )['en.wikipedia.org'],
+			$pa->getConfig()
+		);
+		static::assertTrue( $pa->isEnabled() );
+		static::assertTrue( $pa->hasImportanceRatings() );
+		static::assertTrue( $pa->isSupportedNamespace( 6 ) );
+	}
 
-    /**
-     * Badges
-     */
-    public function testBadges(): void
-    {
-        $pa = new PageAssessments($this->paRepo, $this->project);
+	/**
+	 * Badges
+	 */
+	public function testBadges(): void {
+		$pa = new PageAssessments( $this->paRepo, $this->project );
 
-        static::assertEquals(
-            'https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg',
-            $pa->getBadgeURL('FA')
-        );
+		static::assertEquals(
+			'https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg',
+			$pa->getBadgeURL( 'FA' )
+		);
 
-        static::assertEquals(
-            'Featured_article_star.svg',
-            $pa->getBadgeURL('FA', true)
-        );
-    }
+		static::assertEquals(
+			'Featured_article_star.svg',
+			$pa->getBadgeURL( 'FA', true )
+		);
+	}
 
-    /**
-     * Page assements.
-     */
-    public function testGetAssessments(): void
-    {
-        $pageRepo = $this->createMock(PageRepository::class);
-        $pageRepo->method('getPageInfo')->willReturn([
-            'title' => 'Test Page',
-            'ns' => 0,
-        ]);
-        $page = new Page($pageRepo, $this->project, 'Test_page');
+	/**
+	 * Page assements.
+	 */
+	public function testGetAssessments(): void {
+		$pageRepo = $this->createMock( PageRepository::class );
+		$pageRepo->method( 'getPageInfo' )->willReturn( [
+			'title' => 'Test Page',
+			'ns' => 0,
+		] );
+		$page = new Page( $pageRepo, $this->project, 'Test_page' );
 
-        $this->paRepo->expects($this->once())
-            ->method('getAssessments')
-            ->with($page)
-            ->willReturn([
-                [
-                    'wikiproject' => 'Military history',
-                    'class' => 'Start',
-                    'importance' => 'Low',
-                ],
-                [
-                    'wikiproject' => 'Firearms',
-                    'class' => 'C',
-                    'importance' => 'High',
-                ],
-            ]);
+		$this->paRepo->expects( $this->once() )
+			->method( 'getAssessments' )
+			->with( $page )
+			->willReturn( [
+				[
+					'wikiproject' => 'Military history',
+					'class' => 'Start',
+					'importance' => 'Low',
+				],
+				[
+					'wikiproject' => 'Firearms',
+					'class' => 'C',
+					'importance' => 'High',
+				],
+			] );
 
-        $pa = new PageAssessments($this->paRepo, $this->project);
+		$pa = new PageAssessments( $this->paRepo, $this->project );
 
-        $assessments = $pa->getAssessments($page);
+		$assessments = $pa->getAssessments( $page );
 
-        // Picks the first assessment.
-        static::assertEquals([
-            'class' => 'Start',
-            'color' => '#FFAA66',
-            'category' => 'Category:Start-Class articles',
-            'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
-        ], $assessments['assessment']);
+		// Picks the first assessment.
+		static::assertEquals( [
+			'class' => 'Start',
+			'color' => '#FFAA66',
+			'category' => 'Category:Start-Class articles',
+			'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
+		], $assessments['assessment'] );
 
-        static::assertEquals(2, count($assessments['wikiprojects']));
-    }
+		static::assertCount( 2, $assessments['wikiprojects'] );
+	}
 }
