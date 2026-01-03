@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.23.1 ##
+- PageInfo (T413692): Fix a typo in the gadget source.
+- Accept null in numberFormat.
+
 ## 3.23.0 ##
 - (T400929) Upgrade to Symfony 6.4 and PHP 8.2, update dependencies.
 - CategoryEdits: update queries following schema changes, improve performance.
