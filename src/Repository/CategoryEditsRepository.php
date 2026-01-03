@@ -91,7 +91,7 @@ class CategoryEditsRepository extends Repository {
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions";
 		$result = (int)$this->executeStmt( $sql, $project, $user, $categories )->fetchOne();
 
@@ -132,21 +132,21 @@ class CategoryEditsRepository extends Repository {
 			$whereClause = 'ipc_hex BETWEEN ? AND ?';
 		}
 
-		$sql = "SELECT cl_to AS cat, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
+		$sql = "SELECT cl_target_id, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
                 FROM $revisionTable revs
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions
-                GROUP BY cl_to
+                GROUP BY cl_target_id
                 ORDER BY edit_count DESC";
 
 		$counts = [];
 		$stmt = $this->executeStmt( $sql, $project, $user, $categories );
 		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $result = $stmt->fetchAssociative() ) {
-			$counts[$result['cat']] = [
+			$counts[$this->getCategoryTargetIds( $project, $categories )[$result['cl_target_id']]] = [
 				'editCount' => (int)$result['edit_count'],
 				'pageCount' => (int)$result['page_count'],
 			];
@@ -182,7 +182,7 @@ class CategoryEditsRepository extends Repository {
 
 		$pageTable = $project->getTableName( 'page' );
 		$revisionTable = $project->getTableName( 'revision' );
-		$commentTable = $project->getTableName( 'comment' );
+		$commentTable = $project->getTableName( 'comment', 'revision' );
 		$categorylinksTable = $project->getTableName( 'categorylinks' );
 		$revDateConditions = $this->getDateConditions( $start, $end, $offset, 'revs.' );
 		$whereClause = 'revs.rev_actor = ?';
@@ -205,7 +205,7 @@ class CategoryEditsRepository extends Repository {
                 LEFT JOIN $commentTable comment ON revs.rev_comment_id = comment_id
                 LEFT JOIN $revisionTable parentrevs ON revs.rev_parent_id = parentrevs.rev_id
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
@@ -215,6 +215,22 @@ class CategoryEditsRepository extends Repository {
 
 		// Cache and return.
 		return $this->setCache( $cacheKey, $result );
+	}
+
+	private function getCategoryTargetIds( Project $project, array $categories ): array {
+		static $result = null;
+		if ( $result ) {
+			return $result;
+		}
+		$linktargetTable = $project->getTableName( 'linktarget' );
+		$sql = "SELECT lt_id, lt_title FROM $linktargetTable WHERE lt_title IN (?) AND lt_namespace = 14";
+		$result = $this->getProjectsConnection( $project )
+			->executeQuery(
+				$sql,
+				[ $categories ],
+				[ ArrayParameterType::STRING ]
+			)->fetchAllKeyValue();
+		return $result;
 	}
 
 	/**
@@ -231,12 +247,13 @@ class CategoryEditsRepository extends Repository {
 		User $user,
 		array $categories
 	): Result {
+		$catLinkIds = array_keys( $this->getCategoryTargetIds( $project, $categories ) );
 		if ( $user->isIpRange() ) {
 			[ $hexStart, $hexEnd ] = IPUtils::parseRange( $user->getUsername() );
 			$params = [
 				$hexStart,
 				$hexEnd,
-				$categories,
+				$catLinkIds,
 			];
 			$types = [
 				ParameterType::STRING,
@@ -246,7 +263,7 @@ class CategoryEditsRepository extends Repository {
 		} else {
 			$params = [
 				$user->getActorId( $project ),
-				$categories,
+				$catLinkIds,
 			];
 			$types = [
 				ParameterType::STRING,
