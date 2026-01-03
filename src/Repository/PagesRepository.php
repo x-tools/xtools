@@ -347,7 +347,8 @@ class PagesRepository extends UserRepository {
 		$resultQuery = $this->executeQuery( $sql, $project, $user, $namespace );
 
 		$assessments = [];
-		foreach ( $resultQuery->fetchAssociative() as $result ) {
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
+		while ( $result = $resultQuery->fetchAssociative() ) {
 			$class = $result['class'] == '' ? '' : $result['class'];
 			$assessments[$class] = $result['count'];
 		}

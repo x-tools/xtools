@@ -7,6 +7,6 @@ $(function () {
 	}
 
 	xtools.application.setupContributionsNavListeners(function (params) {
-		return `globalcontribs / ${params.username} / ${params.namespace} / ${params.start} / ${params.end}`;
+		return `globalcontribs/${params.username}/${params.namespace}/${params.start}/${params.end}`;
 	}, 'globalcontribs');
 });
