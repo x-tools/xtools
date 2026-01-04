@@ -94,7 +94,7 @@ class TopEditsController extends XtoolsController {
 			$this->project,
 			$this->user,
 			$this->page,
-			$this->namespace,
+			$this->namespace ?? 'all',
 			$this->start,
 			$this->end,
 			$this->limit,
