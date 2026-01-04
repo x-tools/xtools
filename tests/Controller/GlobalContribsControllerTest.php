@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace App\Tests\Controller;
 
@@ -9,21 +9,19 @@ namespace App\Tests\Controller;
  * @group integration
  * @covers \App\Controller\GlobalContribsController
  */
-class GlobalContribsControllerTest extends ControllerTestAdapter
-{
-    /**
-     * Test that each route returns a successful response.
-     */
-    public function testRoutes(): void
-    {
-        if (!static::getContainer()->getParameter('app.is_wmf')) {
-            return;
-        }
+class GlobalContribsControllerTest extends ControllerTestAdapter {
+	/**
+	 * Test that each route returns a successful response.
+	 */
+	public function testRoutes(): void {
+		if ( !static::getContainer()->getParameter( 'app.is_wmf' ) ) {
+			return;
+		}
 
-        $this->assertSuccessfulRoutes([
-            '/globalcontribs',
-            '/globalcontribs/Example',
-            '/api/user/globalcontribs/Example',
-        ]);
-    }
+		$this->assertSuccessfulRoutes( [
+			'/globalcontribs',
+			'/globalcontribs/Example',
+			'/api/user/globalcontribs/Example',
+		] );
+	}
 }

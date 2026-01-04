@@ -40,7 +40,6 @@
         "nelmio/cors-bundle": "^2.3",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.16",
-        "slevomat/coding-standard": "^8.0",
         "symfony/asset": "~5.4",
         "symfony/cache": "~5.4",
         "symfony/config": "~5.4",
@@ -64,11 +63,11 @@
         "wikimedia/ip-utils": "^5.0"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "~5.4",
-        "squizlabs/php_codesniffer": "^3.3.0",
-        "mediawiki/minus-x": "^1.0.0",
         "dms/phpunit-arraysubset-asserts": "^0.4.0",
-        "symfony/browser-kit": "~5.4"
+        "mediawiki/mediawiki-codesniffer": "^48.0.0",
+        "mediawiki/minus-x": "^1.0.0",
+        "symfony/browser-kit": "~6.4",
+        "symfony/phpunit-bridge": "~6.4"
     },
     "scripts": {
         "test": [

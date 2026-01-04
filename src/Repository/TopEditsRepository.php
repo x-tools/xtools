@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Repository;
 
@@ -24,170 +24,168 @@ use Wikimedia\IPUtils;
  * of that information.
  * @codeCoverageIgnore
  */
-class TopEditsRepository extends UserRepository
-{
-    protected EditRepository $editRepo;
-    protected UserRepository $userRepo;
+class TopEditsRepository extends UserRepository {
+	protected EditRepository $editRepo;
+	protected UserRepository $userRepo;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param CacheItemPoolInterface $cache
-     * @param Client $guzzle
-     * @param LoggerInterface $logger
-     * @param ParameterBagInterface $parameterBag
-     * @param bool $isWMF
-     * @param int $queryTimeout
-     * @param ProjectRepository $projectRepo
-     * @param EditRepository $editRepo
-     * @param UserRepository $userRepo
-     * @param SessionInterface $session
-     */
-    public function __construct(
-        ManagerRegistry $managerRegistry,
-        CacheItemPoolInterface $cache,
-        Client $guzzle,
-        LoggerInterface $logger,
-        ParameterBagInterface $parameterBag,
-        bool $isWMF,
-        int $queryTimeout,
-        ProjectRepository $projectRepo,
-        EditRepository $editRepo,
-        UserRepository $userRepo,
-        RequestStack $requestStack
-    ) {
-        $this->editRepo = $editRepo;
-        $this->userRepo = $userRepo;
-        parent::__construct(
-            $managerRegistry,
-            $cache,
-            $guzzle,
-            $logger,
-            $parameterBag,
-            $isWMF,
-            $queryTimeout,
-            $projectRepo,
-            $requestStack
-        );
-    }
+	/**
+	 * @param ManagerRegistry $managerRegistry
+	 * @param CacheItemPoolInterface $cache
+	 * @param Client $guzzle
+	 * @param LoggerInterface $logger
+	 * @param ParameterBagInterface $parameterBag
+	 * @param bool $isWMF
+	 * @param int $queryTimeout
+	 * @param ProjectRepository $projectRepo
+	 * @param EditRepository $editRepo
+	 * @param UserRepository $userRepo
+	 * @param SessionInterface $session
+	 */
+	public function __construct(
+		ManagerRegistry $managerRegistry,
+		CacheItemPoolInterface $cache,
+		Client $guzzle,
+		LoggerInterface $logger,
+		ParameterBagInterface $parameterBag,
+		bool $isWMF,
+		int $queryTimeout,
+		ProjectRepository $projectRepo,
+		EditRepository $editRepo,
+		UserRepository $userRepo,
+		RequestStack $requestStack
+	) {
+		$this->editRepo = $editRepo;
+		$this->userRepo = $userRepo;
+		parent::__construct(
+			$managerRegistry,
+			$cache,
+			$guzzle,
+			$logger,
+			$parameterBag,
+			$isWMF,
+			$queryTimeout,
+			$projectRepo,
+			$requestStack
+		);
+	}
 
-    /**
-     * Factory to instantiate a new Edit for the given revision.
-     * @param Page $page
-     * @param array $revision
-     * @return Edit
-     */
-    public function getEdit(Page $page, array $revision): Edit
-    {
-        return new Edit($this->editRepo, $this->userRepo, $page, $revision);
-    }
+	/**
+	 * Factory to instantiate a new Edit for the given revision.
+	 * @param Page $page
+	 * @param array $revision
+	 * @return Edit
+	 */
+	public function getEdit( Page $page, array $revision ): Edit {
+		return new Edit( $this->editRepo, $this->userRepo, $page, $revision );
+	}
 
-    /**
-     * Get the selects for PageAssessments class and projects.
-     * @param Project $project
-     * @param int|string $namespace
-     * @return string
-     */
-    private function getPaSelects(
-        Project $project,
-        $namespace
-    ): string {
-        $hasPageAssessments = $this->isWMF && $project->hasPageAssessments($namespace);
-        $paTable = $project->getTableName('page_assessments');
-        $paSelect = $hasPageAssessments
-            ?  ", (
+	/**
+	 * Get the selects for PageAssessments class and projects.
+	 * @param Project $project
+	 * @param int|string $namespace
+	 * @return string
+	 */
+	private function getPaSelects(
+		Project $project,
+		$namespace
+	): string {
+		$hasPageAssessments = $this->isWMF && $project->hasPageAssessments( $namespace );
+		$paTable = $project->getTableName( 'page_assessments' );
+		$paSelect = $hasPageAssessments
+			? ", (
                     SELECT pa_class
                     FROM $paTable
                     WHERE pa_page_id = page_id
                     AND pa_class != ''
                     LIMIT 1
                 ) AS pa_class"
-            : '';
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
-        $paProjectsSelect = $hasPageAssessments
-            ? ", (
+			: '';
+		$paProjectsTable = $project->getTableName( 'page_assessments_projects' );
+		$paProjectsSelect = $hasPageAssessments
+			? ", (
                     SELECT JSON_ARRAYAGG(pap_project_title)
                     FROM $paTable
                     JOIN $paProjectsTable
                     ON pa_project_id = pap_project_id
                     WHERE pa_page_id = page_id
                 ) AS pap_project_title"
-            : '';
-        return $paSelect . $paProjectsSelect;
-    }
+			: '';
+		return $paSelect . $paProjectsSelect;
+	}
 
-    /**
-     * Get the select and join for ProofreadPage quality level.
-     * @param Project $project
-     * @param int|string $namespace Namespade ID or 'all'
-     * @return array With keys 'prpSelect' and 'prpJoin'
-     */
-    private function getPrpConditions(
-        Project $project,
-        $namespace
-    ): array {
-        if ($project->isPrpPage($namespace)) {
-            $pagePropsTable = $project->getTableName('page_props', '');
-            return [
-                'prpSelect' => ", pp_value as `prp_quality`",
-                'prpJoin' => "LEFT OUTER JOIN $pagePropsTable
+	/**
+	 * Get the select and join for ProofreadPage quality level.
+	 * @param Project $project
+	 * @param int|string $namespace Namespade ID or 'all'
+	 * @return array With keys 'prpSelect' and 'prpJoin'
+	 */
+	private function getPrpConditions(
+		Project $project,
+		$namespace
+	): array {
+		if ( $project->isPrpPage( $namespace ) ) {
+			$pagePropsTable = $project->getTableName( 'page_props', '' );
+			return [
+				'prpSelect' => ", pp_value as `prp_quality`",
+				'prpJoin' => "LEFT OUTER JOIN $pagePropsTable
                 ON (pp_page, pp_propname) = (page_id, 'proofread_page_quality_level')",
-            ];
-        }
-        return ['prpSelect' => '', 'prpJoin' => ''];
-    }
+			];
+		}
+		return [ 'prpSelect' => '', 'prpJoin' => '' ];
+	}
 
-    /**
-     * Get the top edits by a user in a single namespace.
-     * @param Project $project
-     * @param User $user
-     * @param int $namespace Namespace ID.
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @param int $limit Number of edits to fetch.
-     * @param int $pagination Which page of results to return.
-     * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
-     */
-    public function getTopEditsNamespace(
-        Project $project,
-        User $user,
-        int $namespace = 0,
-        $start = false,
-        $end = false,
-        int $limit = 1000,
-        int $pagination = 0
-    ): array {
-        // Set up cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_ns');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get the top edits by a user in a single namespace.
+	 * @param Project $project
+	 * @param User $user
+	 * @param int $namespace Namespace ID.
+	 * @param int|false $start Start date as Unix timestamp.
+	 * @param int|false $end End date as Unix timestamp.
+	 * @param int $limit Number of edits to fetch.
+	 * @param int $pagination Which page of results to return.
+	 * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
+	 */
+	public function getTopEditsNamespace(
+		Project $project,
+		User $user,
+		int $namespace = 0,
+		$start = false,
+		$end = false,
+		int $limit = 1000,
+		int $pagination = 0
+	): array {
+		// Set up cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_ns' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $project->getTableName('page');
-        $revisionTable = $project->getTableName('revision');
+		$revDateConditions = $this->getDateConditions( $start, $end );
+		$pageTable = $project->getTableName( 'page' );
+		$revisionTable = $project->getTableName( 'revision' );
 
-        $ipcJoin = '';
-        $whereClause = 'rev_actor = :actorId';
-        $params = [];
-        if ($user->isIpRange()) {
-            $ipcTable = $project->getTableName('ip_changes');
-            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
-            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
-            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
-        }
+		$ipcJoin = '';
+		$whereClause = 'rev_actor = :actorId';
+		$params = [];
+		if ( $user->isIpRange() ) {
+			$ipcTable = $project->getTableName( 'ip_changes' );
+			$ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+			$whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
+		}
 
-        $paSelects = $this->getPaSelects($project, $namespace);
+		$paSelects = $this->getPaSelects( $project, $namespace );
 
-        $prpConditions = $this->getPrpConditions($project, $namespace);
+		$prpConditions = $this->getPrpConditions( $project, $namespace );
 
-        $offset = $pagination * $limit;
-        $sql = "SELECT page_namespace AS `namespace`, page_title,
+		$offset = $pagination * $limit;
+		$sql = "SELECT page_namespace AS `namespace`, page_title,
                     page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
                     $paSelects
-                    ".$prpConditions['prpSelect']."
+                    " . $prpConditions['prpSelect'] . "
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
-                ".$prpConditions['prpJoin']."
+                " . $prpConditions['prpJoin'] . "
                 $ipcJoin
                 WHERE $whereClause
                 AND page_namespace = :namespace
@@ -197,46 +195,45 @@ class TopEditsRepository extends UserRepository
                 LIMIT $limit
                 OFFSET $offset";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
-        $result = $resultQuery->fetchAllAssociative();
+		$resultQuery = $this->executeQuery( $sql, $project, $user, $namespace, $params );
+		$result = $resultQuery->fetchAllAssociative();
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $result);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $result );
+	}
 
-    /**
-     * Count the number of pages edited in the given namespace.
-     * @param Project $project
-     * @param User $user
-     * @param int|string $namespace
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @return mixed
-     */
-    public function countPagesNamespace(Project $project, User $user, $namespace, $start = false, $end = false)
-    {
-        // Set up cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_count_ns');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Count the number of pages edited in the given namespace.
+	 * @param Project $project
+	 * @param User $user
+	 * @param int|string $namespace
+	 * @param int|false $start Start date as Unix timestamp.
+	 * @param int|false $end End date as Unix timestamp.
+	 * @return mixed
+	 */
+	public function countPagesNamespace( Project $project, User $user, $namespace, $start = false, $end = false ) {
+		// Set up cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_count_ns' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $project->getTableName('page');
-        $revisionTable = $project->getTableName('revision');
-        $nsCondition = is_numeric($namespace) ? 'AND page_namespace = :namespace' : '';
+		$revDateConditions = $this->getDateConditions( $start, $end );
+		$pageTable = $project->getTableName( 'page' );
+		$revisionTable = $project->getTableName( 'revision' );
+		$nsCondition = is_numeric( $namespace ) ? 'AND page_namespace = :namespace' : '';
 
-        $ipcJoin = '';
-        $whereClause = 'rev_actor = :actorId';
-        $params = [];
-        if ($user->isIpRange()) {
-            $ipcTable = $project->getTableName('ip_changes');
-            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
-            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
-            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
-        }
+		$ipcJoin = '';
+		$whereClause = 'rev_actor = :actorId';
+		$params = [];
+		if ( $user->isIpRange() ) {
+			$ipcTable = $project->getTableName( 'ip_changes' );
+			$ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+			$whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
+		}
 
-        $sql = "SELECT COUNT(DISTINCT page_id)
+		$sql = "SELECT COUNT(DISTINCT page_id)
                 FROM $pageTable
                 JOIN $revisionTable ON page_id = rev_page
                 $ipcJoin
@@ -244,49 +241,49 @@ class TopEditsRepository extends UserRepository
                 $nsCondition
                 $revDateConditions";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, $namespace, $params);
+		$resultQuery = $this->executeQuery( $sql, $project, $user, $namespace, $params );
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $resultQuery->fetchOne());
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $resultQuery->fetchOne() );
+	}
 
-    /**
-     * Get the 10 Wikiprojects within which the user has the most edits.
-     * @param Project $project
-     * @param User $user
-     * @param int $ns
-     * @param int|false $start
-     * @param int|false $end
-     */
-    public function getProjectTotals(
-        Project $project,
-        User $user,
-        int $ns,
-        $start = false,
-        $end = false
-    ): array {
-        $cacheKey = $this->getCacheKey(func_get_args(), 'top_edits_wikiprojects');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get the 10 Wikiprojects within which the user has the most edits.
+	 * @param Project $project
+	 * @param User $user
+	 * @param int $ns
+	 * @param int|false $start
+	 * @param int|false $end
+	 */
+	public function getProjectTotals(
+		Project $project,
+		User $user,
+		int $ns,
+		$start = false,
+		$end = false
+	): array {
+		$cacheKey = $this->getCacheKey( func_get_args(), 'top_edits_wikiprojects' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $project->getTableName('page');
-        $revisionTable = $project->getTableName('revision');
-        $pageAssessmentsTable = $project->getTableName('page_assessments');
-        $paProjectsTable = $project->getTableName('page_assessments_projects');
+		$revDateConditions = $this->getDateConditions( $start, $end );
+		$pageTable = $project->getTableName( 'page' );
+		$revisionTable = $project->getTableName( 'revision' );
+		$pageAssessmentsTable = $project->getTableName( 'page_assessments' );
+		$paProjectsTable = $project->getTableName( 'page_assessments_projects' );
 
-        $ipcJoin = '';
-        $whereClause = 'rev_actor = :actorId';
-        $params = [];
-        if ($user->isIpRange()) {
-            $ipcTable = $project->getTableName('ip_changes');
-            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
-            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
-            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
-        }
+		$ipcJoin = '';
+		$whereClause = 'rev_actor = :actorId';
+		$params = [];
+		if ( $user->isIpRange() ) {
+			$ipcTable = $project->getTableName( 'ip_changes' );
+			$ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+			$whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
+		}
 
-        $sql = "SELECT pap_project_title, SUM(`edit_count`) AS `count`
+		$sql = "SELECT pap_project_title, SUM(`edit_count`) AS `count`
                 FROM (
                     SELECT page_id, COUNT(page_id) AS `edit_count`
                     FROM $revisionTable
@@ -303,53 +300,53 @@ class TopEditsRepository extends UserRepository
                 ORDER BY `count` DESC
                 LIMIT 10";
 
-        $totals = $this->executeQuery($sql, $project, $user, $ns)
-            ->fetchAllAssociative();
+		$totals = $this->executeQuery( $sql, $project, $user, $ns )
+			->fetchAllAssociative();
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $totals);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $totals );
+	}
 
-    /**
-     * Get the top edits by a user across all namespaces.
-     * @param Project $project
-     * @param User $user
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @param int $limit Number of edits to fetch.
-     * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
-     */
-    public function getTopEditsAllNamespaces(
-        Project $project,
-        User $user,
-        $start = false,
-        $end = false,
-        int $limit = 10
-    ): array {
-        // Set up cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_all');
-        if ($this->cache->hasItem($cacheKey) && false) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get the top edits by a user across all namespaces.
+	 * @param Project $project
+	 * @param User $user
+	 * @param int|false $start Start date as Unix timestamp.
+	 * @param int|false $end End date as Unix timestamp.
+	 * @param int $limit Number of edits to fetch.
+	 * @return string[] namespace, page_title, redirect, count (number of edits), assessment (page assessment).
+	 */
+	public function getTopEditsAllNamespaces(
+		Project $project,
+		User $user,
+		$start = false,
+		$end = false,
+		int $limit = 10
+	): array {
+		// Set up cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_all' );
+		if ( $this->cache->hasItem( $cacheKey ) && false ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $revDateConditions = $this->getDateConditions($start, $end);
-        $pageTable = $this->getTableName($project->getDatabaseName(), 'page');
-        $revisionTable = $this->getTableName($project->getDatabaseName(), 'revision');
+		$revDateConditions = $this->getDateConditions( $start, $end );
+		$pageTable = $this->getTableName( $project->getDatabaseName(), 'page' );
+		$revisionTable = $this->getTableName( $project->getDatabaseName(), 'revision' );
 
-        $ipcJoin = '';
-        $whereClause = 'rev_actor = :actorId';
-        $params = [];
-        if ($user->isIpRange()) {
-            $ipcTable = $project->getTableName('ip_changes');
-            $ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
-            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
-            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
-        }
+		$ipcJoin = '';
+		$whereClause = 'rev_actor = :actorId';
+		$params = [];
+		if ( $user->isIpRange() ) {
+			$ipcTable = $project->getTableName( 'ip_changes' );
+			$ipcJoin = "JOIN $ipcTable ON rev_id = ipc_rev_id";
+			$whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
+		}
 
-        $paSelects = $this->getPaSelects($project, 'all');
-        $prpConditions = $this->getPrpConditions($project, 'all');
+		$paSelects = $this->getPaSelects( $project, 'all' );
+		$prpConditions = $this->getPrpConditions( $project, 'all' );
 
-        $sql = "
+		$sql = "
             SELECT * FROM (
                 SELECT
                     page_namespace as `namespace`,
@@ -362,81 +359,80 @@ class TopEditsRepository extends UserRepository
                         ORDER BY page_namespace ASC, `count` DESC
                     ) `row_number`
                     $paSelects
-                    ".$prpConditions['prpSelect']."
+                    " . $prpConditions['prpSelect'] . "
                 FROM $revisionTable
                 $ipcJoin
                 JOIN $pageTable ON page_id = rev_page
-                ".$prpConditions['prpJoin']."
+                " . $prpConditions['prpJoin'] . "
                 WHERE $whereClause
                 $revDateConditions
                 GROUP BY page_namespace, rev_page
             ) a
             WHERE `row_number` <= $limit
             ORDER BY `namespace` ASC, `count` DESC";
-        $resultQuery = $this->executeQuery($sql, $project, $user, 'all', $params);
-        $result = $resultQuery->fetchAllAssociative();
+		$resultQuery = $this->executeQuery( $sql, $project, $user, 'all', $params );
+		$result = $resultQuery->fetchAllAssociative();
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $result);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $result );
+	}
 
-    /**
-     * Get the top edits by a user to a single page.
-     * @param Page $page
-     * @param User $user
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @return string[][] Each row with keys 'id', 'timestamp', 'minor', 'length',
-     *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
-     */
-    public function getTopEditsPage(Page $page, User $user, $start = false, $end = false): array
-    {
-        // Set up cache.
-        $cacheKey = $this->getCacheKey(func_get_args(), 'topedits_page');
-        if ($this->cache->hasItem($cacheKey)) {
-            return $this->cache->getItem($cacheKey)->get();
-        }
+	/**
+	 * Get the top edits by a user to a single page.
+	 * @param Page $page
+	 * @param User $user
+	 * @param int|false $start Start date as Unix timestamp.
+	 * @param int|false $end End date as Unix timestamp.
+	 * @return string[][] Each row with keys 'id', 'timestamp', 'minor', 'length',
+	 *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
+	 */
+	public function getTopEditsPage( Page $page, User $user, $start = false, $end = false ): array {
+		// Set up cache.
+		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_page' );
+		if ( $this->cache->hasItem( $cacheKey ) ) {
+			return $this->cache->getItem( $cacheKey )->get();
+		}
 
-        $results = $this->queryTopEditsPage($page, $user, $start, $end, true);
+		$results = $this->queryTopEditsPage( $page, $user, $start, $end, true );
 
-        // Now we need to get the most recent revision, since the childrevs stuff excludes it.
-        $lastRev = $this->queryTopEditsPage($page, $user, $start, $end, false);
-        if (empty($results) || $lastRev[0]['id'] !== $results[0]['id']) {
-            $results = array_merge($lastRev, $results);
-        }
+		// Now we need to get the most recent revision, since the childrevs stuff excludes it.
+		$lastRev = $this->queryTopEditsPage( $page, $user, $start, $end, false );
+		if ( empty( $results ) || $lastRev[0]['id'] !== $results[0]['id'] ) {
+			$results = array_merge( $lastRev, $results );
+		}
 
-        // Cache and return.
-        return $this->setCache($cacheKey, $results);
-    }
+		// Cache and return.
+		return $this->setCache( $cacheKey, $results );
+	}
 
-    /**
-     * The actual query to get the top edits by the user to the page.
-     * Because of the way the main query works, we aren't given the most recent revision,
-     * so we have to call this twice, once with $childRevs set to true and once with false.
-     * @param Page $page
-     * @param User $user
-     * @param int|false $start Start date as Unix timestamp.
-     * @param int|false $end End date as Unix timestamp.
-     * @param boolean $childRevs Whether to include child revisions.
-     * @return array Each row with keys 'id', 'timestamp', 'minor', 'length',
-     *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
-     */
-    private function queryTopEditsPage(
-        Page $page,
-        User $user,
-        $start = false,
-        $end = false,
-        bool $childRevs = false
-    ): array {
-        $project = $page->getProject();
-        $revDateConditions = $this->getDateConditions($start, $end, false, 'revs.');
-        $revTable = $project->getTableName('revision');
-        $commentTable = $project->getTableName('comment');
-        $tagTable = $project->getTableName('change_tag');
-        $tagDefTable = $project->getTableName('change_tag_def');
+	/**
+	 * The actual query to get the top edits by the user to the page.
+	 * Because of the way the main query works, we aren't given the most recent revision,
+	 * so we have to call this twice, once with $childRevs set to true and once with false.
+	 * @param Page $page
+	 * @param User $user
+	 * @param int|false $start Start date as Unix timestamp.
+	 * @param int|false $end End date as Unix timestamp.
+	 * @param bool $childRevs Whether to include child revisions.
+	 * @return array Each row with keys 'id', 'timestamp', 'minor', 'length',
+	 *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
+	 */
+	private function queryTopEditsPage(
+		Page $page,
+		User $user,
+		$start = false,
+		$end = false,
+		bool $childRevs = false
+	): array {
+		$project = $page->getProject();
+		$revDateConditions = $this->getDateConditions( $start, $end, false, 'revs.' );
+		$revTable = $project->getTableName( 'revision' );
+		$commentTable = $project->getTableName( 'comment' );
+		$tagTable = $project->getTableName( 'change_tag' );
+		$tagDefTable = $project->getTableName( 'change_tag_def' );
 
-        if ($childRevs) {
-            $childSelect = ", (
+		if ( $childRevs ) {
+			$childSelect = ", (
                     CASE WHEN
                         childrevs.rev_sha1 = parentrevs.rev_sha1
                         OR (
@@ -454,33 +450,33 @@ class TopEditsRepository extends UserRepository
                     END
                 ) AS `reverted`,
                 childcomments.comment_text AS `parent_comment`";
-            $childJoin = "LEFT JOIN $revTable AS childrevs ON (revs.rev_id = childrevs.rev_parent_id)
+			$childJoin = "LEFT JOIN $revTable AS childrevs ON (revs.rev_id = childrevs.rev_parent_id)
                 LEFT OUTER JOIN $commentTable AS childcomments
                 ON (childrevs.rev_comment_id = childcomments.comment_id)";
-            $childWhere = 'AND childrevs.rev_page = :pageid';
-            $childLimit = '';
-        } else {
-            $childSelect = ', "" AS parent_comment, 0 AS reverted';
-            $childJoin = '';
-            $childWhere = '';
-            $childLimit = 'LIMIT 1';
-        }
+			$childWhere = 'AND childrevs.rev_page = :pageid';
+			$childLimit = '';
+		} else {
+			$childSelect = ', "" AS parent_comment, 0 AS reverted';
+			$childJoin = '';
+			$childWhere = '';
+			$childLimit = 'LIMIT 1';
+		}
 
-        $userId = $this->getProjectsConnection($project)->quote($user->getId($page->getProject()), PDO::PARAM_STR);
-        $username = $this->getProjectsConnection($project)->quote($user->getUsername(), PDO::PARAM_STR);
+		$userId = $this->getProjectsConnection( $project )->quote( $user->getId( $page->getProject() ), PDO::PARAM_STR );
+		$username = $this->getProjectsConnection( $project )->quote( $user->getUsername(), PDO::PARAM_STR );
 
-        // IP range handling.
-        $ipcJoin = '';
-        $whereClause = 'revs.rev_actor = :actorId';
-        $params = ['pageid' => $page->getId()];
-        if ($user->isIpRange()) {
-            $ipcTable = $project->getTableName('ip_changes');
-            $ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
-            $whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
-            [$params['startIp'], $params['endIp']] = IPUtils::parseRange($user->getUsername());
-        }
+		// IP range handling.
+		$ipcJoin = '';
+		$whereClause = 'revs.rev_actor = :actorId';
+		$params = [ 'pageid' => $page->getId() ];
+		if ( $user->isIpRange() ) {
+			$ipcTable = $project->getTableName( 'ip_changes' );
+			$ipcJoin = "JOIN $ipcTable ON revs.rev_id = ipc_rev_id";
+			$whereClause = 'ipc_hex BETWEEN :startIp AND :endIp';
+			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
+		}
 
-        $sql = "SELECT * FROM (
+		$sql = "SELECT * FROM (
                     SELECT
                         revs.rev_id AS id,
                         revs.rev_timestamp AS timestamp,
@@ -504,7 +500,7 @@ class TopEditsRepository extends UserRepository
                 ORDER BY timestamp DESC
                 $childLimit";
 
-        $resultQuery = $this->executeQuery($sql, $project, $user, null, $params);
-        return $resultQuery->fetchAllAssociative();
-    }
+		$resultQuery = $this->executeQuery( $sql, $project, $user, null, $params );
+		return $resultQuery->fetchAllAssociative();
+	}
 }

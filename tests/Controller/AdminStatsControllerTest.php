@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare( strict_types = 1 );
 
 namespace App\Tests\Controller;
 
@@ -9,37 +9,34 @@ namespace App\Tests\Controller;
  * @group integration
  * @covers \App\Controller\AdminStatsController
  */
-class AdminStatsControllerTest extends ControllerTestAdapter
-{
-    /**
-     * Check response codes of index and result pages.
-     */
-    public function testHtmlRoutes(): void
-    {
-        if (!static::getContainer()->getParameter('app.is_wmf')) {
-            return;
-        }
+class AdminStatsControllerTest extends ControllerTestAdapter {
+	/**
+	 * Check response codes of index and result pages.
+	 */
+	public function testHtmlRoutes(): void {
+		if ( !static::getContainer()->getParameter( 'app.is_wmf' ) ) {
+			return;
+		}
 
-        $this->assertSuccessfulRoutes([
-            '/adminstats',
-            '/adminstats/fr.wikipedia.org',
-            '/adminstats/fr.wikipedia.org//2018-01-10',
-            '/stewardstats/meta.wikimedia.org/2018-01-01/2018-01-10?actions=global-rights',
-        ]);
-    }
+		$this->assertSuccessfulRoutes( [
+			'/adminstats',
+			'/adminstats/fr.wikipedia.org',
+			'/adminstats/fr.wikipedia.org//2018-01-10',
+			'/stewardstats/meta.wikimedia.org/2018-01-01/2018-01-10?actions=global-rights',
+		] );
+	}
 
-    /**
-     * Check response codes of API endpoints.
-     */
-    public function testApis(): void
-    {
-        if (!static::getContainer()->getParameter('app.is_wmf')) {
-            return;
-        }
+	/**
+	 * Check response codes of API endpoints.
+	 */
+	public function testApis(): void {
+		if ( !static::getContainer()->getParameter( 'app.is_wmf' ) ) {
+			return;
+		}
 
-        $this->assertSuccessfulRoutes([
-            '/api/project/admin_groups/fr.wikipedia',
-            '/api/project/admin_stats/frwiki/2019-01-01',
-        ]);
-    }
+		$this->assertSuccessfulRoutes( [
+			'/api/project/admin_groups/fr.wikipedia',
+			'/api/project/admin_stats/frwiki/2019-01-01',
+		] );
+	}
 }
