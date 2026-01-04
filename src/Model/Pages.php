@@ -34,6 +34,9 @@ class Pages extends Model {
 	/** @var array Number of redirects/pages that were created/deleted, broken down by namespace. */
 	protected array $countsByNamespace;
 
+	/** @var bool Whether to only get the counts */
+	protected bool $countsOnly;
+
 	/**
 	 * Pages constructor.
 	 * @param Repository|PagesRepository $repository
@@ -45,6 +48,7 @@ class Pages extends Model {
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @param int|false $offset Unix timestamp. Used for pagination.
+	 * @param bool $countsOnly Whether to only get the counts
 	 */
 	public function __construct(
 		protected Repository|PagesRepository $repository,
@@ -55,11 +59,13 @@ class Pages extends Model {
 		string $deleted = self::DEL_ALL,
 		protected int|false $start = false,
 		protected int|false $end = false,
-		protected int|false $offset = false
+		protected int|false $offset = false,
+		bool $countsOnly = false,
 	) {
 		$this->namespace = $namespace === 'all' ? 'all' : (int)$namespace;
 		$this->redirects = $redirects ?: self::REDIR_NONE;
 		$this->deleted = $deleted ?: self::DEL_ALL;
+		$this->countsOnly = $countsOnly;
 	}
 
 	/**
@@ -79,6 +85,14 @@ class Pages extends Model {
 	}
 
 	/**
+	 * Whether to only calculate counts.
+	 * @return bool
+	 */
+	public function isCountsOnly(): bool {
+		return $this->countsOnly;
+	}
+
+	/**
 	 * Fetch and prepare the pages created by the user.
 	 * @param bool $all Whether to get *all* results. This should only be used for
 	 *     export options. HTTP and JSON should paginate.
@@ -87,6 +101,10 @@ class Pages extends Model {
 	 */
 	public function prepareData( bool $all = false ): array {
 		$this->pages = [];
+
+		if ( $this->countsOnly ) {
+			return [];
+		}
 
 		foreach ( $this->getNamespaces() as $ns ) {
 			$data = $this->fetchPagesCreated( $ns, $all );
