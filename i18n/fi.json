@@ -51,6 +51,7 @@
 	"auto-contribs-use-tool": "Näytä vain muokkaukset käyttäen työkalua:",
 	"auto-edits": "(Puoli)automatisoidut muokkaukset",
 	"auto-edits-bot": "Tämä käyttäjä on botti. Kaikki muokkaukset voivat olla automatisoituja. Tässä näytetyt tilastot perustuvat tunnetuilla työkaluilla tehtyihin muokkauksiin.",
+	"auto-edits-tagged": "Merkityt (puoli)automatisoidut muokkaukset",
 	"auto-edits-counts-desc": "Joidenkin työkalujen käyttö menee päällekkäin (esimerkiksi kumoaminen versioon, joka on ohjaus lasketaan sekä kumoamisena että ohjauksena), joten eri työkalulla tehtyjen muokkausten summa voi erota $1:stä.",
 	"auto-edits-counts-desc-grand-total": "yhteensä",
 	"auto-edits-logged-out": "Sinun on kirjauduttava sisään, jotta voit käyttää hiekkalaatikon kokoonpanoa. Käytä sen sijaan tuotantokonfiguraatiota.",
