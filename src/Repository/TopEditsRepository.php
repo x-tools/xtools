@@ -408,7 +408,7 @@ class TopEditsRepository extends UserRepository {
 		}
 
 		$userId = $user->getId( $page->getProject() );
-		if ($userId === null) {
+		if ( $userId === null ) {
 			$userId = "";
 		} else {
 			$userId = "$userId AS user_id,";
