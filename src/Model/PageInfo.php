@@ -1007,7 +1007,10 @@ class PageInfo extends PageInfoApi {
 			return [
 				'label' => $editor,
 				'value' => $added,
-				'percentage' => $this->addedBytes === 0 ? 0 : 100 * ( $added / $topTenTotalAdded ),
+				'percentage' =>
+					$topTenTotalAdded === 0 ?
+					0 :
+					100 * ( $added / $topTenTotalAdded ),
 			];
 		}, $topTenEditorsByAdded );
 	}
