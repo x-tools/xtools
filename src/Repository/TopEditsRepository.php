@@ -408,6 +408,11 @@ class TopEditsRepository extends UserRepository {
 		}
 
 		$userId = $user->getId( $page->getProject() );
+		if ( $userId === null ) {
+			$userId = "";
+		} else {
+			$userId = "$userId AS user_id,";
+		}
 		$username = $this->getProjectsConnection( $project )->quote( $user->getUsername() );
 
 		// IP range handling.
@@ -428,7 +433,7 @@ class TopEditsRepository extends UserRepository {
                         revs.rev_minor_edit AS minor,
                         revs.rev_len AS length,
                         (CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0)) AS length_change,
-                        $userId AS user_id,
+                        $userId
                         $username AS username,
                         comments.comment_text AS `comment`
                         $childSelect
