@@ -72,7 +72,8 @@ class AuthorshipTest extends TestAdapter {
 		$page = new Page( $pageRepo, $project, 'Test page' );
 		$authorship = new Authorship( $authorshipRepo, $page, null, 2 );
 		$authorship->prepareData();
-		$authorship->prepareData(); // Ensure caching
+		// Ensure caching
+		$authorship->prepareData();
 
 		static::assertEquals(
 			[
@@ -141,7 +142,12 @@ class AuthorshipTest extends TestAdapter {
 				null,
 			],
 			'getData no key tokens' => [
-				$this->returnValue( [ 'revisions' => [ [ '123' => [ 'time' => '2018-04-16T13:51:11Z', 'tokens' => [] ] ] ] ] ),
+				$this->returnValue( [
+					'revisions' => [ [ '123' => [
+						'time' => '2018-04-16T13:51:11Z',
+						'tokens' => []
+					] ] ]
+				] ),
 				0,
 			],
 		];

@@ -59,7 +59,7 @@ class UserRightsRepository extends Repository {
 		$dbName = $project->getDatabaseName();
 
 		// Global rights and Meta-changed rights should use a Meta Project.
-		if ( 'local' !== $type ) {
+		if ( $type !== 'local' ) {
 			$dbName = 'metawiki';
 		}
 
@@ -68,7 +68,7 @@ class UserRightsRepository extends Repository {
 		$actorTable = $this->getTableName( $dbName, 'actor', 'logging' );
 		$username = str_replace( ' ', '_', $user->getUsername() );
 
-		if ( 'meta' === $type ) {
+		if ( $type === 'meta' ) {
 			// Reference the original Project.
 			$username .= '@' . $project->getDatabaseName();
 		}
@@ -77,7 +77,7 @@ class UserRightsRepository extends Repository {
 		// Some log entries aren't caught unless we look for both variations.
 		$usernameLower = lcfirst( $username );
 
-		$logType = 'global' == $type ? 'gblrights' : 'rights';
+		$logType = $type === 'global' ? 'gblrights' : 'rights';
 
 		$sql = "SELECT log_id, log_timestamp, log_params, log_action, actor_name AS `performer`,
                     comment_text AS `log_comment`, log_deleted, '$type' AS type
@@ -186,7 +186,7 @@ class UserRightsRepository extends Repository {
 			->getContents();
 
 		$dbname = $project->getDatabaseName();
-		if ( 'wikidatawiki' === $dbname ) {
+		if ( $dbname === 'wikidatawiki' ) {
 			// Edge-case: 'wikidata' is an alias.
 			$dbname = 'wikidatawiki|wikidata';
 		}
@@ -198,19 +198,21 @@ class UserRightsRepository extends Repository {
 			// Extract the text of the file that contains the rules we're looking for.
 			$typeRegex = "/\'$type.*?\]/s";
 			$matches = [];
-			if ( 1 === preg_match( $typeRegex, $contents, $matches ) ) {
+			if ( preg_match( $typeRegex, $contents, $matches ) === 1 ) {
 				$group = $matches[0];
 
 				// Find the autoconfirmed expression for the $type and $dbname.
 				$matches = [];
-				if ( 1 === preg_match( $dbNameRegex, $group, $matches ) ) {
+				if ( preg_match( $dbNameRegex, $group, $matches ) === 1 ) {
+					// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.eval
 					$out[$type] = (int)eval( 'return(' . $matches[1] . ');' );
 					continue;
 				}
 
 				// Find the autoconfirmed expression for the 'default' and $dbname.
 				$matches = [];
-				if ( 1 === preg_match( $defaultRegex, $group, $matches ) ) {
+				if ( preg_match( $defaultRegex, $group, $matches ) === 1 ) {
+					// phpcs:ignore MediaWiki.Usage.ForbiddenFunctions.eval
 					$out[$type] = (int)eval( 'return(' . $matches[1] . ');' );
 					continue;
 				}

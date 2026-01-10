@@ -13,7 +13,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -35,20 +34,7 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 		'showAction',
 	];
 
-	protected CacheItemPoolInterface $cache;
-	protected I18nHelper $i18n;
-	protected LoggerInterface $crawlerLogger;
-	protected LoggerInterface $denylistLogger;
-	protected LoggerInterface $rateLimitLogger;
-	protected ParameterBagInterface $parameterBag;
 	protected Request $request;
-	protected SessionInterface $session;
-
-	/** @var int Number of requests allowed in time period */
-	protected int $rateLimit;
-
-	/** @var int Number of minutes during which $rateLimit requests are permitted. */
-	protected int $rateDuration;
 
 	/** @var string User agent string. */
 	protected string $userAgent;
@@ -71,25 +57,18 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 	 * @param int $rateDuration
 	 */
 	public function __construct(
-		I18nHelper $i18n,
-		CacheItemPoolInterface $cache,
-		ParameterBagInterface $parameterBag,
-		RequestStack $requestStack,
-		LoggerInterface $crawlerLogger,
-		LoggerInterface $denylistLogger,
-		LoggerInterface $rateLimitLogger,
-		int $rateLimit,
-		int $rateDuration
+		protected I18nHelper $i18n,
+		protected CacheItemPoolInterface $cache,
+		protected ParameterBagInterface $parameterBag,
+		protected RequestStack $requestStack,
+		protected LoggerInterface $crawlerLogger,
+		protected LoggerInterface $denylistLogger,
+		protected LoggerInterface $rateLimitLogger,
+		/** @var int Number of requests allowed in time period */
+		protected int $rateLimit,
+		/** @var int Number of minutes during which $rateLimit requests are permitted. */
+		protected int $rateDuration
 	) {
-		$this->i18n = $i18n;
-		$this->cache = $cache;
-		$this->parameterBag = $parameterBag;
-		$this->session = $requestStack->getSession();
-		$this->crawlerLogger = $crawlerLogger;
-		$this->denylistLogger = $denylistLogger;
-		$this->rateLimitLogger = $rateLimitLogger;
-		$this->rateLimit = $rateLimit;
-		$this->rateDuration = $rateDuration;
 	}
 
 	/**
@@ -128,15 +107,19 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 		$this->checkDenylist();
 
 		// Zero values indicate the rate limiting feature should be disabled.
-		if ( 0 === $this->rateLimit || 0 === $this->rateDuration ) {
+		if ( $this->rateLimit === 0 || $this->rateDuration === 0 ) {
 			return;
 		}
 
-		$loggedIn = (bool)$this->session->get( 'logged_in_user' );
-		$isApi = 'ApiAction' === substr( $action, -9 );
+		$loggedIn = (bool)$this->request->getSession()->get( 'logged_in_user' );
+		$isApi = str_ends_with( $action, 'ApiAction' );
 
 		// No rate limits on lightweight pages, logged in users, subrequests or API requests.
-		if ( in_array( $action, self::ACTION_ALLOWLIST ) || $loggedIn || false === $event->isMainRequest() || $isApi ) {
+		if ( in_array( $action, self::ACTION_ALLOWLIST ) ||
+			$loggedIn ||
+			!$event->isMainRequest() ||
+			$isApi
+		) {
 			return;
 		}
 
@@ -150,7 +133,7 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 	private function xffRateLimit(): void {
 		$xff = $this->request->headers->get( 'x-forwarded-for', '' );
 
-		if ( '' === $xff ) {
+		if ( $xff === '' ) {
 			// Happens in local environments, or outside of Cloud Services.
 			return;
 		}
@@ -181,7 +164,7 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 		$useLangMatches = [];
 		$hasMatch = preg_match( '/\?uselang=(.*)/', $this->uri, $useLangMatches );
 
-		if ( 1 !== $hasMatch ) {
+		if ( $hasMatch !== 1 ) {
 			return;
 		}
 
@@ -189,7 +172,7 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 
 		// If requesting the same language as the target project, ignore.
 		// FIXME: This has side-effects (T384711#10759078)
-		if ( 1 === preg_match( "/[=\/]$useLang.?wik/", $this->uri ) ) {
+		if ( preg_match( "/[=\/]$useLang.?wik/", $this->uri ) === 1 ) {
 			return;
 		}
 
@@ -215,19 +198,19 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 				$matches[] = $item['user_agent'] === $this->userAgent;
 			}
 			if ( isset( $item['user_agent_pattern'] ) ) {
-				$matches[] = 1 === preg_match( '/' . $item['user_agent_pattern'] . '/', $this->userAgent );
+				$matches[] = preg_match( '/' . $item['user_agent_pattern'] . '/', $this->userAgent ) === 1;
 			}
 			if ( isset( $item['referer'] ) ) {
 				$matches[] = $item['referer'] === $this->referer;
 			}
 			if ( isset( $item['referer_pattern'] ) ) {
-				$matches[] = 1 === preg_match( '/' . $item['referer_pattern'] . '/', $this->referer );
+				$matches[] = preg_match( '/' . $item['referer_pattern'] . '/', $this->referer ) === 1;
 			}
 			if ( isset( $item['uri'] ) ) {
 				$matches[] = $item['uri'] === $this->uri;
 			}
 			if ( isset( $item['uri_pattern'] ) ) {
-				$matches[] = 1 === preg_match( '/' . $item['uri_pattern'] . '/', $this->uri );
+				$matches[] = preg_match( '/' . $item['uri_pattern'] . '/', $this->uri ) === 1;
 			}
 
 			if ( count( $matches ) > 0 && count( $matches ) === count( array_filter( $matches ) ) ) {

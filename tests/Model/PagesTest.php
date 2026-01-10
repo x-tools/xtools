@@ -52,7 +52,7 @@ class PagesTest extends TestAdapter {
 		static::assertEquals( $this->project, $pages->getProject() );
 		static::assertEquals( $this->user, $pages->getUser() );
 		static::assertEquals( Pages::REDIR_NONE, $pages->getRedirects() );
-		static::assertSame( 0, $pages->getOffset() );
+		static::assertFalse( $pages->getOffset() );
 	}
 
 	/**
@@ -86,8 +86,8 @@ class PagesTest extends TestAdapter {
 	public function testResults(): void {
 		$this->setPagesResults();
 		$pages = new Pages( $this->pagesRepo, $this->project, $this->user, 'all', 'all' );
-		$pages->setRepository( $this->pagesRepo );
-		$pages->getResults(); // Ensure it does prepare
+		// Ensure it does prepare
+		$pages->getResults();
 		static::assertEquals( 3, $pages->getNumResults() );
 		static::assertSame( 1, $pages->getNumDeleted() );
 		static::assertSame( 1, $pages->getNumRedirects() );
@@ -109,7 +109,8 @@ class PagesTest extends TestAdapter {
 			],
 		], $pages->getCounts() );
 
-		$results = $pages->getResults(); // Also ensures it does cache
+		// Also ensures it does cache
+		$results = $pages->getResults();
 
 		static::assertEquals( [ 0, 1 ], array_keys( $results ) );
 		static::assertEquals( [

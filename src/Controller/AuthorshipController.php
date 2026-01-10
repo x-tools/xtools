@@ -8,6 +8,7 @@ use App\Model\Authorship;
 use App\Repository\AuthorshipRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the search form and results for the Authorship tool
@@ -30,11 +31,10 @@ class AuthorshipController extends XtoolsController {
 		return Authorship::SUPPORTED_PROJECTS;
 	}
 
+	#[Route( '/authorship', name: 'Authorship' )]
+	#[Route( '/authorship/{project}', name: 'AuthorshipProject' )]
 	/**
 	 * The search form.
-	 * @Route("/authorship", name="Authorship")
-	 * @Route("/authorship/{project}", name="AuthorshipProject")
-	 * @return Response
 	 */
 	public function indexAction(): Response {
 		$this->params['target'] = $this->request->query->get( 'target', '' );
@@ -67,36 +67,33 @@ class AuthorshipController extends XtoolsController {
 		] ) );
 	}
 
+	#[Route(
+		'/authorship/{project}/{page}/{target}',
+		name: 'AuthorshipResult',
+		requirements: [
+			'page' => '(.+?)',
+			'target' => '|latest|\d+|\d{4}-\d{2}-\d{2}',
+		],
+		defaults: [ 'target' => 'latest' ]
+	)]
+	#[Route(
+		'/articleinfo-authorship/{project}/{page}',
+		name: 'AuthorshipResultLegacy',
+		requirements: [
+			'page' => '(.+?)',
+			'target' => '|latest|\d+|\d{4}-\d{2}-\d{2}',
+		],
+		defaults: [ 'target' => 'latest' ]
+	)]
 	/**
-	 * @Route(
-	 *     "/articleinfo-authorship/{project}/{page}",
-	 *     name="AuthorshipResultLegacy",
-	 *     requirements={
-	 *         "page"="(.+?)",
-	 *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-	 *     },
-	 *     defaults={"target"="latest"}
-	 * )
-	 * @Route(
-	 *     "/authorship/{project}/{page}/{target}",
-	 *     name="AuthorshipResult",
-	 *     requirements={
-	 *         "page"="(.+?)",
-	 *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-	 *     },
-	 *     defaults={"target"="latest"}
-	 * )
-	 * @param string $target
-	 * @param AuthorshipRepository $authorshipRepo
-	 * @param RequestStack $requestStack
-	 * @return Response
+	 * The result page.
 	 */
 	public function resultAction(
 		string $target,
 		AuthorshipRepository $authorshipRepo,
 		RequestStack $requestStack
 	): Response {
-		if ( 0 !== $this->page->getNamespace() ) {
+		if ( $this->page->getNamespace() !== 0 ) {
 			$this->addFlashMessage( 'danger', 'error-authorship-non-mainspace' );
 			return $this->redirectToRoute( 'AuthorshipProject', [
 				'project' => $this->project->getDomain(),
@@ -106,7 +103,7 @@ class AuthorshipController extends XtoolsController {
 		// This action sometimes requires more memory. 256M should be safe.
 		ini_set( 'memory_limit', '256M' );
 
-		$isSubRequest = $this->request->get( 'htmlonly' ) || null !== $requestStack->getParentRequest();
+		$isSubRequest = $this->request->get( 'htmlonly' ) || $requestStack->getParentRequest() !== null;
 		$limit = $isSubRequest ? 10 : ( $this->limit ?? 500 );
 
 		$authorship = new Authorship( $authorshipRepo, $this->page, $target, $limit );

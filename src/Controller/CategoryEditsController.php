@@ -7,8 +7,10 @@ namespace App\Controller;
 use App\Exception\XtoolsHttpException;
 use App\Model\CategoryEdits;
 use App\Repository\CategoryEditsRepository;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the Category Edits tool.
@@ -38,16 +40,18 @@ class CategoryEditsController extends XtoolsController {
 		return $this->getIndexRoute();
 	}
 
+	#[Route( path: '/categoryedits', name: 'CategoryEdits' )]
+	#[Route( path: '/categoryedits/{project}', name: 'CategoryEditsProject' )]
 	/**
 	 * Display the search form.
-	 * @Route("/categoryedits", name="CategoryEdits")
-	 * @Route("/categoryedits/{project}", name="CategoryEditsProject")
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
 	public function indexAction(): Response {
 		// Redirect if at minimum project, username and categories are provided.
-		if ( isset( $this->params['project'] ) && isset( $this->params['username'] ) && isset( $this->params['categories'] ) ) {
+		if ( isset( $this->params['project'] )
+			&& isset( $this->params['username'] )
+			&& isset( $this->params['categories'] )
+		) {
 			return $this->redirectToRoute( 'CategoryEditsResult', $this->params );
 		}
 
@@ -107,7 +111,7 @@ class CategoryEditsController extends XtoolsController {
 		$normalized = false;
 		$nsName = $this->project->getNamespaces()[14] . ':';
 		$this->categories = array_map( static function ( $category ) use ( $nsName, &$normalized ) {
-			if ( 0 === strpos( $category, $nsName ) || 0 === strpos( $category, 'Category:' ) ) {
+			if ( str_starts_with( $category, $nsName ) || str_starts_with( $category, 'Category:' ) ) {
 				$normalized = true;
 			}
 			return preg_replace( '/^' . $nsName . '/', '', $category );
@@ -125,22 +129,20 @@ class CategoryEditsController extends XtoolsController {
 		}
 	}
 
+	#[Route(
+		"/categoryedits/{project}/{username}/{categories}/{start}/{end}/{offset}",
+		name: "CategoryEditsResult",
+		requirements: [
+			"username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+			"categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+			"start" => "|\d{4}-\d{2}-\d{2}",
+			"end" => "|\d{4}-\d{2}-\d{2}",
+			"offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+		],
+		defaults: [ "start" => false, "end" => false, "offset" => false ]
+	)]
 	/**
 	 * Display the results.
-	 * @Route(
-	 *     "/categoryedits/{project}/{username}/{categories}/{start}/{end}/{offset}",
-	 *     name="CategoryEditsResult",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-	 *         "start"="|\d{4}-\d{2}-\d{2}",
-	 *         "end"="|\d{4}-\d{2}-\d{2}",
-	 *         "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
-	 *     },
-	 *     defaults={"start"=false, "end"=false, "offset"=false}
-	 * )
-	 * @param CategoryEditsRepository $categoryEditsRepo
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
 	public function resultAction( CategoryEditsRepository $categoryEditsRepo ): Response {
@@ -149,22 +151,20 @@ class CategoryEditsController extends XtoolsController {
 		return $this->getFormattedResponse( 'categoryEdits/result', $this->output );
 	}
 
+	#[Route(
+		"/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
+		name: "CategoryContributionsResult",
+		requirements: [
+			"username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+			"categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
+			"start" => "|\d{4}-\d{2}-\d{2}",
+			"end" => "|\d{4}-\d{2}-\d{2}",
+			"offset" => "|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
+		],
+		defaults: [ "start" => false, "end" => false, "offset" => false ]
+	)]
 	/**
 	 * Get edits by a user to pages in given categories.
-	 * @Route(
-	 *   "/categoryedits-contributions/{project}/{username}/{categories}/{start}/{end}/{offset}",
-	 *   name="CategoryContributionsResult",
-	 *   requirements={
-	 *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *       "categories"="(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2}))?",
-	 *       "start"="|\d{4}-\d{2}-\d{2}",
-	 *       "end"="|\d{4}-\d{2}-\d{2}",
-	 *       "offset"="|\d{4}-?\d{2}-?\d{2}T?\d{2}:?\d{2}:?\d{2}Z?",
-	 *   },
-	 *   defaults={"start"=false, "end"=false, "offset"=false}
-	 * )
-	 * @param CategoryEditsRepository $categoryEditsRepo
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
 	public function categoryContributionsAction( CategoryEditsRepository $categoryEditsRepo ): Response {
@@ -175,54 +175,60 @@ class CategoryEditsController extends XtoolsController {
 
 	/************************ API endpoints */
 
+	#[OA\Tag( name: "User API" )]
+	#[OA\Get( description:
+		"Count the number of edits a user has made to pages in any of the given [categories](https://w.wiki/6oKx)."
+	)]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Parameter( ref: "#/components/parameters/UsernameOrIp" )]
+	#[OA\Parameter(
+		name: "categories",
+		description: "Pipe-separated list of category names, without the namespace prefix.",
+		in: "path",
+		schema: new OA\Schema( type: "array", items: new OA\Items( type: "string" ), example: [ "Living people" ] ),
+		style: "pipeDelimited"
+	)]
+	#[OA\Parameter( ref: "#/components/parameters/Start" )]
+	#[OA\Parameter( ref: "#/components/parameters/End" )]
+	#[OA\Response(
+		response: 200,
+		description: "Count of edits made to any of the given categories.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "username", ref: "#/components/parameters/UsernameOrIp/schema" ),
+				new OA\Property(
+					property: "categories",
+					type: "array",
+					items: new OA\Items( type: "string" ),
+					example: [ "Living people" ]
+				),
+				new OA\Property( property: "start", ref: "#/components/parameters/Start/schema" ),
+				new OA\Property( property: "end", ref: "#/components/parameters/End/schema" ),
+				new OA\Property( property: "total_editcount", type: "integer" ),
+				new OA\Property( property: "category_editcount", type: "integer" ),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/501", response: 501 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route(
+		"/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
+		name: "UserApiCategoryEditCount",
+		requirements: [
+			"username" => "(ipr-.+\/\d+[^\/])|([^\/]+)",
+			"categories" => "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
+			"start" => "|\d{4}-\d{2}-\d{2}",
+			"end" => "|\d{4}-\d{2}-\d{2}",
+		],
+		defaults: [ "start" => false, "end" => false ],
+		methods: [ "GET" ]
+	)]
 	/**
 	 * Count the number of edits a user has made in a category.
-	 * @Route(
-	 *   "/api/user/category_editcount/{project}/{username}/{categories}/{start}/{end}",
-	 *   name="UserApiCategoryEditCount",
-	 *   requirements={
-	 *       "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *       "categories" = "(.+?)(?!\/(?:|\d{4}-\d{2}-\d{2})(?:\/(|\d{4}-\d{2}-\d{2}))?)?$",
-	 *       "start" = "|\d{4}-\d{2}-\d{2}",
-	 *       "end" = "|\d{4}-\d{2}-\d{2}"
-	 *   },
-	 *   defaults={"start" = false, "end" = false},
-	 *   methods={"GET"}
-	 * )
-	 * @OA\Tag(name="User API")
-	 * @OA\Get(description="Count the number of edits a user has made to pages in
-	 * any of the given [categories](https://w.wiki/6oKx).")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
-	 * @OA\Parameter(
-	 *     name="categories",
-	 *     in="path",
-	 *     description="Pipe-separated list of category names, without the namespace prefix.",
-	 *     style="pipeDelimited",
-	 * @OA\Schema(type="array", @OA\Items(type="string"), example={"Living people"})
-	 * )
-	 * @OA\Parameter(ref="#/components/parameters/Start")
-	 * @OA\Parameter(ref="#/components/parameters/End")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Count of edits made to any of the given categories.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
-	 * @OA\Property(property="categories", type="array", @OA\Items(type="string"), example={"Living people"}),
-	 * @OA\Property(property="start", ref="#/components/parameters/Start/schema"),
-	 * @OA\Property(property="end", ref="#/components/parameters/End/schema"),
-	 * @OA\Property(property="total_editcount", type="integer"),
-	 * @OA\Property(property="category_editcount", type="integer"),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=501, ref="#/components/responses/501")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @param CategoryEditsRepository $categoryEditsRepo
-	 * @return JsonResponse
 	 * @codeCoverageIgnore
 	 */
 	public function categoryEditCountApiAction( CategoryEditsRepository $categoryEditsRepo ): JsonResponse {

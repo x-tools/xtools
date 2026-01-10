@@ -5,6 +5,7 @@ declare( strict_types=1 );
 namespace App\Model;
 
 use App\Repository\AuthorshipRepository;
+use App\Repository\Repository;
 use DateTime;
 use GuzzleHttp\Exception\RequestException;
 
@@ -38,25 +39,22 @@ class Authorship extends Model {
 
 	/**
 	 * Authorship constructor.
-	 * @param AuthorshipRepository $repository
-	 * @param Page $page The page to process.
-	 * @param string|null $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
-	 * @param int|null $limit Max number of results.
+	 * @param Repository|AuthorshipRepository $repository
+	 * @param ?Page $page The page to process.
+	 * @param ?string $target Either a revision ID or date in YYYY-MM-DD format. Null to use latest revision.
+	 * @param ?int $limit Max number of results.
 	 */
 	public function __construct(
-		AuthorshipRepository $repository,
-		Page $page,
+		protected Repository|AuthorshipRepository $repository,
+		protected ?Page $page,
 		?string $target = null,
-		?int $limit = null
+		protected ?int $limit = null
 	) {
-		$this->repository = $repository;
-		$this->page = $page;
-		$this->limit = $limit;
 		$this->target = $this->getTargetRevId( $target );
 	}
 
 	private function getTargetRevId( ?string $target ): ?int {
-		if ( null === $target ) {
+		if ( $target === null ) {
 			return null;
 		}
 
@@ -106,7 +104,7 @@ class Authorship extends Model {
 	 * Get the total number of authors.
 	 * @return int|null
 	 */
-	public function getTotalAuthors(): ?int {
+	public function getTotalAuthors(): int|null {
 		return $this->data['totalAuthors'] ?? null;
 	}
 
@@ -114,7 +112,7 @@ class Authorship extends Model {
 	 * Get the total number of characters added.
 	 * @return int|null
 	 */
-	public function getTotalCount(): ?int {
+	public function getTotalCount(): int|null {
 		return $this->data['totalCount'] ?? null;
 	}
 
@@ -141,7 +139,7 @@ class Authorship extends Model {
 	 */
 	public static function isSupportedPage( Page $page ): bool {
 		return in_array( $page->getProject()->getDomain(), self::SUPPORTED_PROJECTS ) &&
-			0 === $page->getNamespace();
+			$page->getNamespace() === 0;
 	}
 
 	/**
@@ -153,7 +151,7 @@ class Authorship extends Model {
 	protected function getRevisionData( bool $returnRevId = false ): ?array {
 		try {
 			$ret = $this->repository->getData( $this->page, $this->target, $returnRevId );
-		} catch ( RequestException $e ) {
+		} catch ( RequestException ) {
 			$this->data = [
 				'error' => 'unknown',
 			];
@@ -190,14 +188,14 @@ class Authorship extends Model {
 
 		// Set revision data. self::setRevisionData() returns null if there are errors.
 		$revisionData = $this->getRevisionData();
-		if ( null === $revisionData ) {
+		if ( $revisionData === null ) {
 			return;
 		}
 
 		[ $counts, $totalCount, $userIds ] = $this->countTokens( $revisionData['tokens'] );
 		$usernameMap = $this->getUsernameMap( $userIds );
 
-		if ( null !== $this->limit ) {
+		if ( $this->limit !== null ) {
 			$countsToProcess = array_slice( $counts, 0, $this->limit, true );
 		} else {
 			$countsToProcess = $counts;
@@ -284,7 +282,7 @@ class Authorship extends Model {
 			$editor = $token['editor'];
 
 			// IPs are prefixed with '0|', otherwise it's the user ID.
-			if ( '0|' === substr( $editor, 0, 2 ) ) {
+			if ( str_starts_with( $editor, '0|' ) ) {
 				$editor = substr( $editor, 2 );
 			} else {
 				$userIds[] = $editor;

@@ -12,14 +12,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @codeCoverageIgnore
  */
 class WebProcessorMonolog {
-	protected RequestStack $requestStack;
-
 	/**
 	 * WebProcessorMonolog constructor.
 	 * @param RequestStack $requestStack
 	 */
-	public function __construct( RequestStack $requestStack ) {
-		$this->requestStack = $requestStack;
+	public function __construct( protected RequestStack $requestStack ) {
 	}
 
 	/**
@@ -30,7 +27,7 @@ class WebProcessorMonolog {
 	public function __invoke( array $record ): array {
 		try {
 			$session = $this->requestStack->getSession();
-		} catch ( SessionNotFoundException $e ) {
+		} catch ( SessionNotFoundException ) {
 			return $record;
 		}
 		if ( !$session->isStarted() ) {

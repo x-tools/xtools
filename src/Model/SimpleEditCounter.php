@@ -4,6 +4,7 @@ declare( strict_types = 1 );
 
 namespace App\Model;
 
+use App\Repository\Repository;
 use App\Repository\SimpleEditCounterRepository;
 
 /**
@@ -27,33 +28,28 @@ class SimpleEditCounter extends Model {
 
 	/**
 	 * Constructor for the SimpleEditCounter class.
+	 * @param Repository|SimpleEditCounterRepository $repository
 	 * @param Project $project
-	 * @param User $user
+	 * @param ?User $user
 	 * @param string|int|null $namespace Namespace ID or 'all'.
 	 * @param false|int $start As Unix timestamp.
 	 * @param false|int $end As Unix timestamp.
 	 */
 	public function __construct(
-		SimpleEditCounterRepository $repository,
-		Project $project,
-		User $user,
-		$namespace = 'all',
-		$start = false,
-		$end = false
+		protected Repository|SimpleEditCounterRepository $repository,
+		protected Project $project,
+		protected ?User $user,
+		string|int|null $namespace = 'all',
+		protected false|int $start = false,
+		protected false|int $end = false
 	) {
-		$this->setRepository( $repository );
-		$this->project = $project;
-		$this->user = $user;
-
 		if ( $this->user->getEditCount( $this->project ) > $this->user->maxEdits() ) {
 			$this->limited = true;
 			$this->namespace = 'all';
 			$this->start = false;
 			$this->end = false;
 		} else {
-			$this->namespace = '' == $namespace ? 0 : $namespace;
-			$this->start = $start;
-			$this->end = $end;
+			$this->namespace = $namespace == '' ? 0 : $namespace;
 		}
 	}
 

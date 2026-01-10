@@ -7,16 +7,13 @@ namespace App\Model;
 use App\Repository\EditRepository;
 use App\Repository\GlobalContribsRepository;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use App\Repository\UserRepository;
 
 /**
  * A GlobalContribs provides a list of a user's edits to all projects.
  */
 class GlobalContribs extends Model {
-	protected EditRepository $editRepo;
-	protected PageRepository $pageRepo;
-	protected UserRepository $userRepo;
-
 	/** @var int Number of results per page. */
 	public const PAGE_SIZE = 50;
 
@@ -28,11 +25,11 @@ class GlobalContribs extends Model {
 
 	/**
 	 * GlobalContribs constructor.
-	 * @param GlobalContribsRepository $repository
+	 * @param Repository|GlobalContribsRepository $repository
 	 * @param PageRepository $pageRepo
 	 * @param UserRepository $userRepo
 	 * @param EditRepository $editRepo
-	 * @param User $user
+	 * @param ?User $user
 	 * @param string|int|null $namespace Namespace ID or 'all'.
 	 * @param false|int $start As Unix timestamp.
 	 * @param false|int $end As Unix timestamp.
@@ -40,26 +37,18 @@ class GlobalContribs extends Model {
 	 * @param int|null $limit Number of results to return.
 	 */
 	public function __construct(
-		GlobalContribsRepository $repository,
-		PageRepository $pageRepo,
-		UserRepository $userRepo,
-		EditRepository $editRepo,
-		User $user,
-		$namespace = 'all',
-		$start = false,
-		$end = false,
-		$offset = false,
+		protected Repository|GlobalContribsRepository $repository,
+		protected PageRepository $pageRepo,
+		protected UserRepository $userRepo,
+		protected EditRepository $editRepo,
+		protected ?User $user,
+		string|int|null $namespace = 'all',
+		protected false|int $start = false,
+		protected false|int $end = false,
+		protected false|int $offset = false,
 		?int $limit = null
 	) {
-		$this->repository = $repository;
-		$this->pageRepo = $pageRepo;
-		$this->userRepo = $userRepo;
-		$this->editRepo = $editRepo;
-		$this->user = $user;
-		$this->namespace = '' == $namespace ? 0 : $namespace;
-		$this->start = $start;
-		$this->end = $end;
-		$this->offset = $offset;
+		$this->namespace = $namespace == '' ? 0 : $namespace;
 		$this->limit = $limit ?? self::PAGE_SIZE;
 	}
 
@@ -137,7 +126,7 @@ class GlobalContribs extends Model {
 
 		// Get projects with edits.
 		$projects = $this->repository->getProjectsWithEdits( $this->user );
-		if ( 0 === count( $projects ) ) {
+		if ( count( $projects ) === 0 ) {
 			return [];
 		}
 
@@ -158,7 +147,7 @@ class GlobalContribs extends Model {
 			$project = $projects[$revision['dbName']];
 
 			// Can happen if the project is given from CentralAuth API but the database is not being replicated.
-			if ( null === $project || !$project->exists() ) {
+			if ( $project === null || !$project->exists() ) {
 				continue;
 			}
 

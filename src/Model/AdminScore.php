@@ -1,10 +1,10 @@
 <?php
-
 declare( strict_types = 1 );
 
 namespace App\Model;
 
 use App\Repository\AdminScoreRepository;
+use App\Repository\Repository;
 use DateTime;
 
 /**
@@ -41,14 +41,15 @@ class AdminScore extends Model {
 
 	/**
 	 * AdminScore constructor.
-	 * @param AdminScoreRepository $repository
+	 * @param Repository|AdminScoreRepository $repository
 	 * @param Project $project
-	 * @param User $user
+	 * @param ?User $user
 	 */
-	public function __construct( AdminScoreRepository $repository, Project $project, User $user ) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->user = $user;
+	public function __construct(
+		protected Repository|AdminScoreRepository $repository,
+		protected Project $project,
+		protected ?User $user
+	) {
 	}
 
 	/**
@@ -90,10 +91,13 @@ class AdminScore extends Model {
 			// WMF Replica databases are returning binary control characters
 			// This is specifically shown with WikiData.
 			// More details: T197165
-			$value = str_replace( "\x00", "", $value );
+			$isnull = ( $value == null );
+			if ( !$isnull ) {
+				$value = str_replace( "\x00", "", $value );
+			}
 
-			if ( 'account-age' === $key ) {
-				if ( null == $value ) {
+			if ( $key === 'account-age' ) {
+				if ( $isnull ) {
 					$value = 0;
 				} else {
 					$now = new DateTime();

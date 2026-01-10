@@ -8,6 +8,7 @@ use App\Exception\BadGatewayException;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\PageInfoRepository;
+use App\Repository\Repository;
 use DateTime;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -21,9 +22,6 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 class PageInfoApi extends Model {
 	/** @var int Number of days of recent data to show for pageviews. */
 	public const PAGEVIEWS_OFFSET = 30;
-
-	protected AutomatedEditsHelper $autoEditsHelper;
-	protected I18nHelper $i18n;
 
 	/** @var int Number of revisions that belong to the page. */
 	protected int $numRevisions;
@@ -51,27 +49,21 @@ class PageInfoApi extends Model {
 
 	/**
 	 * PageInfoApi constructor.
-	 * @param PageInfoRepository $repository
+	 * @param Repository|PageInfoRepository $repository
 	 * @param I18nHelper $i18n
 	 * @param AutomatedEditsHelper $autoEditsHelper
-	 * @param Page $page The page to process.
+	 * @param ?Page $page The page to process.
 	 * @param false|int $start Start date as Unix timestmap.
 	 * @param false|int $end End date as Unix timestamp.
 	 */
 	public function __construct(
-		PageInfoRepository $repository,
-		I18nHelper $i18n,
-		AutomatedEditsHelper $autoEditsHelper,
-		Page $page,
-		$start = false,
-		$end = false
+		protected Repository|PageInfoRepository $repository,
+		protected I18nHelper $i18n,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected ?Page $page,
+		protected false|int $start = false,
+		protected false|int $end = false
 	) {
-		$this->repository = $repository;
-		$this->i18n = $i18n;
-		$this->autoEditsHelper = $autoEditsHelper;
-		$this->page = $page;
-		$this->start = $start;
-		$this->end = $end;
 	}
 
 	/**
@@ -114,7 +106,6 @@ class PageInfoApi extends Model {
 	 * @return array
 	 */
 	public function getTopEditorsByEditCount( int $limit = 20, bool $noBots = false ): array {
-		// Quick cache, valid only for the same request.
 		if ( isset( $this->topEditors ) ) {
 			return $this->topEditors;
 		}
@@ -164,7 +155,7 @@ class PageInfoApi extends Model {
 
 		try {
 			$html = $this->page->getHTMLContent( $datetime );
-		} catch ( BadGatewayException $e ) {
+		} catch ( BadGatewayException ) {
 			// Prose stats are non-critical, so handle the BadGatewayException gracefully in the views.
 			return null;
 		}
@@ -282,10 +273,10 @@ class PageInfoApi extends Model {
 
 		try {
 			$info = $this->repository->getBasicEditingInfo( $page );
-		} catch ( ServiceUnavailableHttpException $e ) {
+		} catch ( ServiceUnavailableHttpException ) {
 			// No more open database connections.
 			$data['error'] = 'Unable to fetch revision data. Please try again later.';
-		} catch ( HttpException $e ) {
+		} catch ( HttpException ) {
 			/**
 			 * The query most likely exceeded the maximum query time,
 			 * so we'll abort and give only info retrieved by the API.
@@ -308,7 +299,7 @@ class PageInfoApi extends Model {
 				'anon_edits' => (int)$info['anon_edits'],
 				'minor_edits' => (int)$info['minor_edits'],
 				'creator' => $info['creator'],
-				'creator_editcount' => null === $info['creator_editcount'] ? null : (int)$info['creator_editcount'],
+				'creator_editcount' => $info['creator_editcount'] === null ? null : (int)$info['creator_editcount'],
 				'created_at' => $creationDateTime,
 				'created_rev_id' => $info['created_rev_id'],
 				'modified_at' => $modifiedDateTime,
@@ -406,7 +397,8 @@ class PageInfoApi extends Model {
 
 	/**
 	 * Number of edits made to the page by current or former bots.
-	 * @param string[][]|null $bots Used only in unit tests, where we supply mock data for the bots that will get processed.
+	 * @param string[][]|null $bots Used only in unit tests,
+	 *   where we supply mock data for the bots that will get processed.
 	 * @return int
 	 */
 	public function getBotRevisionCount( ?array $bots = null ): int {
@@ -414,7 +406,7 @@ class PageInfoApi extends Model {
 			return $this->botRevisionCount;
 		}
 
-		if ( null === $bots ) {
+		if ( $bots === null ) {
 			$bots = $this->getBots();
 		}
 
@@ -447,7 +439,7 @@ class PageInfoApi extends Model {
 		foreach ( $botData as $bot ) {
 			$this->bots[$bot['username']] = [
 				'count' => (int)$bot['count'],
-				'current' => '1' === $bot['current'],
+				'current' => $bot['current'] === '1',
 			];
 		}
 

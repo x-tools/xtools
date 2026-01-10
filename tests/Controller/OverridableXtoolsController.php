@@ -63,7 +63,6 @@ class OverridableXtoolsController extends XtoolsController {
 			$requestStack,
 			$managerRegistry,
 			$cache,
-			$flashBag,
 			$guzzle,
 			$i18n,
 			$projectRepo,

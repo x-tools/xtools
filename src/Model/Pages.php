@@ -5,6 +5,7 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Repository\PagesRepository;
+use App\Repository\Repository;
 use DateTime;
 
 /**
@@ -35,36 +36,32 @@ class Pages extends Model {
 
 	/**
 	 * Pages constructor.
-	 * @param PagesRepository $repository
+	 * @param Repository|PagesRepository $repository
 	 * @param Project $project
-	 * @param User $user
+	 * @param ?User $user
 	 * @param string|int $namespace Namespace ID or 'all'.
 	 * @param string $redirects One of the Pages::REDIR_ constants.
 	 * @param string $deleted One of the Pages::DEL_ constants.
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @param int|false $offset Unix timestamp. Used for pagination.
+	 * @param bool $countsOnly Whether to only get the counts
 	 */
 	public function __construct(
-		PagesRepository $repository,
-		Project $project,
-		User $user,
-		$namespace = 0,
+		protected Repository|PagesRepository $repository,
+		protected Project $project,
+		protected ?User $user,
+		string|int $namespace = 0,
 		string $redirects = self::REDIR_NONE,
 		string $deleted = self::DEL_ALL,
-		$start = false,
-		$end = false,
-		$offset = false
+		protected int|false $start = false,
+		protected int|false $end = false,
+		protected int|false $offset = false,
+		protected bool $countsOnly = false,
 	) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->user = $user;
-		$this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-		$this->start = $start;
-		$this->end = $end;
+		$this->namespace = $namespace === 'all' ? 'all' : (int)$namespace;
 		$this->redirects = $redirects ?: self::REDIR_NONE;
 		$this->deleted = $deleted ?: self::DEL_ALL;
-		$this->offset = $offset;
 	}
 
 	/**
@@ -84,6 +81,14 @@ class Pages extends Model {
 	}
 
 	/**
+	 * Whether to only calculate counts.
+	 * @return bool
+	 */
+	public function isCountsOnly(): bool {
+		return $this->countsOnly;
+	}
+
+	/**
 	 * Fetch and prepare the pages created by the user.
 	 * @param bool $all Whether to get *all* results. This should only be used for
 	 *     export options. HTTP and JSON should paginate.
@@ -92,6 +97,10 @@ class Pages extends Model {
 	 */
 	public function prepareData( bool $all = false ): array {
 		$this->pages = [];
+
+		if ( $this->countsOnly ) {
+			return [];
+		}
 
 		foreach ( $this->getNamespaces() as $ns ) {
 			$data = $this->fetchPagesCreated( $ns, $all );
@@ -201,7 +210,7 @@ class Pages extends Model {
 	 * @return bool
 	 */
 	public function isMultiNamespace(): bool {
-		return $this->getNumNamespaces() > 1 || ( 'all' === $this->getNamespace() && 1 === $this->getNumNamespaces() );
+		return $this->getNumNamespaces() > 1 || ( $this->getNamespace() === 'all' && $this->getNumNamespaces() === 1 );
 	}
 
 	/**
@@ -329,10 +338,10 @@ class Pages extends Model {
 	 * @return int|false
 	 */
 	public function resultsPerPage( bool $all = false ) {
-		if ( true === $all ) {
+		if ( $all === true ) {
 			return false;
 		}
-		if ( 'all' === $this->namespace ) {
+		if ( $this->namespace === 'all' ) {
 			return self::RESULTS_LIMIT_ALL_NAMESPACES;
 		}
 		return self::RESULTS_LIMIT_SINGLE_NAMESPACE;
@@ -438,7 +447,7 @@ class Pages extends Model {
 				? $this->project->getNamespaces()[$row['namespace']] . ':' . $row['page_title']
 				: $row['page_title'];
 			$pageData = [
-				'deleted' => 'arc' === $row['type'],
+				'deleted' => $row['type'] === 'arc',
 				'namespace' => $row['namespace'],
 				'page_title' => $row['page_title'],
 				'full_page_title' => $fullPageTitle,

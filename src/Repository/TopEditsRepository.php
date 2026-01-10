@@ -10,12 +10,10 @@ use App\Model\Project;
 use App\Model\User;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
-use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Wikimedia\IPUtils;
 
 /**
@@ -25,37 +23,19 @@ use Wikimedia\IPUtils;
  * @codeCoverageIgnore
  */
 class TopEditsRepository extends UserRepository {
-	protected EditRepository $editRepo;
-	protected UserRepository $userRepo;
-
-	/**
-	 * @param ManagerRegistry $managerRegistry
-	 * @param CacheItemPoolInterface $cache
-	 * @param Client $guzzle
-	 * @param LoggerInterface $logger
-	 * @param ParameterBagInterface $parameterBag
-	 * @param bool $isWMF
-	 * @param int $queryTimeout
-	 * @param ProjectRepository $projectRepo
-	 * @param EditRepository $editRepo
-	 * @param UserRepository $userRepo
-	 * @param SessionInterface $session
-	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		ProjectRepository $projectRepo,
-		EditRepository $editRepo,
-		UserRepository $userRepo,
-		RequestStack $requestStack
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected ProjectRepository $projectRepo,
+		protected EditRepository $editRepo,
+		protected UserRepository $userRepo,
+		protected ?RequestStack $requestStack
 	) {
-		$this->editRepo = $editRepo;
-		$this->userRepo = $userRepo;
 		parent::__construct(
 			$managerRegistry,
 			$cache,
@@ -149,8 +129,8 @@ class TopEditsRepository extends UserRepository {
 		Project $project,
 		User $user,
 		int $namespace = 0,
-		$start = false,
-		$end = false,
+		int|false $start = false,
+		int|false $end = false,
 		int $limit = 1000,
 		int $pagination = 0
 	): array {
@@ -211,7 +191,13 @@ class TopEditsRepository extends UserRepository {
 	 * @param int|false $end End date as Unix timestamp.
 	 * @return mixed
 	 */
-	public function countPagesNamespace( Project $project, User $user, $namespace, $start = false, $end = false ) {
+	public function countPagesNamespace(
+		Project $project,
+		User $user,
+		int|string $namespace,
+		int|false $start = false,
+		int|false $end = false
+	) {
 		// Set up cache.
 		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_count_ns' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -254,13 +240,14 @@ class TopEditsRepository extends UserRepository {
 	 * @param int $ns
 	 * @param int|false $start
 	 * @param int|false $end
+	 * @return array
 	 */
 	public function getProjectTotals(
 		Project $project,
 		User $user,
 		int $ns,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'top_edits_wikiprojects' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -319,13 +306,13 @@ class TopEditsRepository extends UserRepository {
 	public function getTopEditsAllNamespaces(
 		Project $project,
 		User $user,
-		$start = false,
-		$end = false,
+		int|false $start = false,
+		int|false $end = false,
 		int $limit = 10
 	): array {
 		// Set up cache.
 		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_all' );
-		if ( $this->cache->hasItem( $cacheKey ) && false ) {
+		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
 		}
 
@@ -386,7 +373,7 @@ class TopEditsRepository extends UserRepository {
 	 * @return string[][] Each row with keys 'id', 'timestamp', 'minor', 'length',
 	 *   'length_change', 'reverted', 'user_id', 'username', 'comment', 'parent_comment'
 	 */
-	public function getTopEditsPage( Page $page, User $user, $start = false, $end = false ): array {
+	public function getTopEditsPage( Page $page, User $user, int|false $start = false, int|false $end = false ): array {
 		// Set up cache.
 		$cacheKey = $this->getCacheKey( func_get_args(), 'topedits_page' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -420,8 +407,8 @@ class TopEditsRepository extends UserRepository {
 	private function queryTopEditsPage(
 		Page $page,
 		User $user,
-		$start = false,
-		$end = false,
+		int|false $start = false,
+		int|false $end = false,
 		bool $childRevs = false
 	): array {
 		$project = $page->getProject();
@@ -430,12 +417,12 @@ class TopEditsRepository extends UserRepository {
 		$commentTable = $project->getTableName( 'comment' );
 		$tagTable = $project->getTableName( 'change_tag' );
 		$tagDefTable = $project->getTableName( 'change_tag_def' );
-
+		// sha1 temporarily disabled, see T407814/T389026
 		if ( $childRevs ) {
 			$childSelect = ", (
                     CASE WHEN
-                        childrevs.rev_sha1 = parentrevs.rev_sha1
-                        OR (
+                        /* childrevs.rev_sha1 = parentrevs.rev_sha1
+                        OR */ (
                             SELECT 1
                             FROM $tagTable
                             WHERE ct_rev_id = revs.rev_id
@@ -462,8 +449,8 @@ class TopEditsRepository extends UserRepository {
 			$childLimit = 'LIMIT 1';
 		}
 
-		$userId = $this->getProjectsConnection( $project )->quote( $user->getId( $page->getProject() ), PDO::PARAM_STR );
-		$username = $this->getProjectsConnection( $project )->quote( $user->getUsername(), PDO::PARAM_STR );
+		$userId = $user->getId( $page->getProject() );
+		$username = $this->getProjectsConnection( $project )->quote( $user->getUsername() );
 
 		// IP range handling.
 		$ipcJoin = '';

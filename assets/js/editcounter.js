@@ -315,7 +315,7 @@ xtools.editcounter.setupMonthYearChart = function (id, datasets, labels, maxTota
  * @param {Array} barLabels i18n'd bar labels for additions, removals and same-size, in that order.
  */
 xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
-	let bars = 11;
+	let bars = 12; // Counting the >10240 interval!
 	// First sanitize input, to get array.
 	let total = Object.keys(data).length;
 	data.length = total;
@@ -335,18 +335,31 @@ xtools.editcounter.setupSizeHistogram = function (data, colors, barLabels) {
 	datasetNeg.data = new Array(bars).fill(0);
 	datasetZero.data = new Array(bars).fill(0);
 	data.forEach((x) => {
-		if (x == 0) {
+		if (x === 0) {
 			datasetZero.data[0] += 1;
 		} else {
 			// That's the slice index
-			let index = Math.ceil(Math.min(11, Math.max(0, Math.log(Math.abs(x) / 10) / Math.log(2))));
+			let index = Math.ceil(
+				Math.min(
+					bars - 1,
+					Math.max(
+						0,
+						Math.log(
+							Math.abs(x) / 10
+						)
+						/
+						Math.log(2)
+					)
+				)
+			);
 			( x < 0 ? datasetNeg : datasetPos ).data[index] += ( x < 0 ? -1 : 1);
 		}
 	});
 	// The labels for intervals
-	let bounds = [0].concat(Array.from(new Array(bars), (_,i) => 10 * 2 * * i));
-	let labels = Array.from(new Array(bars), (_,i) => (new Intl.NumberFormat(i18nLang)).formatRange(bounds[i], bounds[i + 1]));
-	labels.push(">" + bounds[bars].toLocaleString(i18nLang));
+	// phpcs:ignore Squiz.WhiteSpace.OperatorSpacing.NoSpaceAfter, Squiz.WhiteSpace.OperatorSpacing.NoSpaceBefore
+	let bounds = [0].concat(Array.from(new Array(bars - 1), (_,i) => 10 * 2 ** i));
+	let labels = Array.from(new Array(bars - 1), (_,i) => (new Intl.NumberFormat(i18nLang)).formatRange(bounds[i], bounds[i + 1]));
+	labels.push(">" + bounds[bars - 1].toLocaleString(i18nLang));
 
 	window['sizeHistogramChart'] = new Chart($("#sizechart-canvas"), {
 		type: 'bar',

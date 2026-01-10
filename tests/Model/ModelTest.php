@@ -10,6 +10,9 @@ use App\Model\User;
 use App\Repository\SimpleEditCounterRepository;
 use App\Tests\TestAdapter;
 
+/**
+ * @covers \App\Model\Model
+ */
 class ModelTest extends TestAdapter {
 	public function testBasics(): void {
 		// Use SimpleEditCounter since Model is abstract.
@@ -39,7 +42,7 @@ class ModelTest extends TestAdapter {
 		self::assertEquals( $end, $model->getEndDate() );
 		self::assertTrue( $model->hasDateRange() );
 		self::assertNull( $model->getLimit() );
-		self::assertNull( $model->getOffset() );
+		self::assertFalse( $model->getOffset() );
 		self::assertNull( $model->getOffsetISO() );
 	}
 }

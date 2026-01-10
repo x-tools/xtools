@@ -15,7 +15,7 @@ class DefaultControllerTest extends ControllerTestAdapter {
 	use ArraySubsetAsserts;
 
 	/** @var bool Whether we're testing a single-wiki setup */
-	protected $isSingle;
+	protected bool $isSingle;
 
 	/**
 	 * Set whether we're testing a single wiki.
@@ -110,7 +110,8 @@ class DefaultControllerTest extends ControllerTestAdapter {
 			// Check that a correct namespace value was returned
 			$response = (array)json_decode( $this->client->getResponse()->getContent() );
 			$namespaces = (array)$response['namespaces'];
-			static::assertEquals( 'Utilisateur', array_values( $namespaces )[2] ); // User in French
+			// User in French
+			static::assertEquals( 'Utilisateur', array_values( $namespaces )[2] );
 		}
 	}
 

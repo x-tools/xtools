@@ -9,7 +9,6 @@ use App\Model\Edit;
 use App\Model\Page;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
-use PDO;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -20,39 +19,23 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @codeCoverageIgnore
  */
 class PageInfoRepository extends AutoEditsRepository {
-	protected EditRepository $editRepo;
-	protected UserRepository $userRepo;
-
 	/** @var int Maximum number of revisions to process, as configured via APP_MAX_PAGE_REVISIONS */
 	protected int $maxPageRevisions;
 
-	/**
-	 * @param ManagerRegistry $managerRegistry
-	 * @param CacheItemPoolInterface $cache
-	 * @param Client $guzzle
-	 * @param LoggerInterface $logger
-	 * @param ParameterBagInterface $parameterBag
-	 * @param bool $isWMF
-	 * @param int $queryTimeout
-	 * @param EditRepository $editRepo
-	 * @param UserRepository $userRepo
-	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		EditRepository $editRepo,
-		UserRepository $userRepo,
-		ProjectRepository $projectRepo,
-		AutomatedEditsHelper $autoEditsHelper,
-		RequestStack $requestStack
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected EditRepository $editRepo,
+		protected UserRepository $userRepo,
+		protected ProjectRepository $projectRepo,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected ?RequestStack $requestStack
 	) {
-		$this->editRepo = $editRepo;
-		$this->userRepo = $userRepo;
 		parent::__construct(
 			$managerRegistry,
 			$cache,
@@ -97,7 +80,9 @@ class PageInfoRepository extends AutoEditsRepository {
 	 * @param bool $count Return a count rather than the full set of rows.
 	 * @return array with rows with keys 'count', 'username' and 'current'.
 	 */
-	public function getBotData( Page $page, $start, $end, ?int $limit, bool $count = false ): array {
+	public function getBotData(
+		Page $page, false|int $start, false|int $end, ?int $limit, bool $count = false
+	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'page_bot_data' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getitem( $cacheKey )->get();
@@ -120,7 +105,7 @@ class PageInfoRepository extends AutoEditsRepository {
 		}
 
 		$limitClause = '';
-		if ( null !== $limit ) {
+		if ( $limit !== null ) {
 			$limitClause = "LIMIT $limit";
 		}
 
@@ -162,7 +147,7 @@ class PageInfoRepository extends AutoEditsRepository {
 	 * @param false|int $end
 	 * @return string[] each entry with keys 'log_action', 'log_type' and 'timestamp'.
 	 */
-	public function getLogEvents( Page $page, $start, $end ): array {
+	public function getLogEvents( Page $page, false|int $start, false|int $end ): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'page_logevents' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
@@ -213,6 +198,7 @@ class PageInfoRepository extends AutoEditsRepository {
 		$resultQuery = $this->executeProjectsQuery( $page->getProject(), $sql, [ 'pageId' => $page->getId() ] );
 		$transclusionCounts = [];
 
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $result = $resultQuery->fetchAssociative() ) {
 			$transclusionCounts[$result['key']] = (int)$result['val'];
 		}
@@ -258,8 +244,8 @@ class PageInfoRepository extends AutoEditsRepository {
 	 */
 	public function getTopEditorsByEditCount(
 		Page $page,
-		$start = false,
-		$end = false,
+		false|int $start = false,
+		false|int $end = false,
 		int $limit = 20,
 		bool $noBots = false
 	): array {
@@ -315,7 +301,7 @@ class PageInfoRepository extends AutoEditsRepository {
 	 * @param Page $page The page.
 	 * @return string[]|false false if the page was not found.
 	 */
-	public function getBasicEditingInfo( Page $page ) {
+	public function getBasicEditingInfo( Page $page ): array|false {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'page_basicinfo' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
@@ -397,11 +383,11 @@ class PageInfoRepository extends AutoEditsRepository {
 	/**
 	 * Get counts of (semi-)automated tools that were used to edit the page.
 	 * @param Page $page
-	 * @param $start
-	 * @param $end
+	 * @param false|int $start
+	 * @param false|int $end
 	 * @return array
 	 */
-	public function getAutoEditsCounts( Page $page, $start, $end ): array {
+	public function getAutoEditsCounts( Page $page, false|int $start, false|int $end ): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_autoeditcount' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
@@ -418,11 +404,11 @@ class PageInfoRepository extends AutoEditsRepository {
 
 		foreach ( $tools as $toolName => $values ) {
 			[ $condTool, $commentJoin, $tagJoin ] = $this->getInnerAutomatedCountsSql( $project, $toolName, $values );
-			$toolName = $conn->quote( $toolName, PDO::PARAM_STR );
+			$toolName = $conn->getDatabasePlatform()->quoteStringLiteral( $toolName );
 
 			// No regex or tag provided for this tool. This can happen for tag-only tools that are in the global
 			// configuration, but no local tag exists on the said project.
-			if ( '' === $condTool ) {
+			if ( $condTool === '' ) {
 				continue;
 			}
 
@@ -444,6 +430,7 @@ class PageInfoRepository extends AutoEditsRepository {
 
 		$results = [];
 
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $row = $resultQuery->fetchAssociative() ) {
 			// Only track tools that they've used at least once
 			$tool = $row['toolname'];

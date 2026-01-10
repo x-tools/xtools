@@ -5,14 +5,13 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Helper\AutomatedEditsHelper;
+use App\Repository\Repository;
 use App\Repository\TopEditsRepository;
 
 /**
  * TopEdits returns the top-edited pages by a user.
  */
 class TopEdits extends Model {
-	protected AutomatedEditsHelper $autoEditsHelper;
-
 	/** @var string[]|Edit[] Top edits, either to a page or across namespaces. */
 	protected array $topEdits = [];
 
@@ -31,19 +30,16 @@ class TopEdits extends Model {
 	/** @var int Number of reverted top edits. */
 	protected int $totalReverted = 0;
 
-	/** @var int Which page of results to show. */
-	protected int $pagination = 0;
-
 	private const DEFAULT_LIMIT_SINGLE_NAMESPACE = 1000;
 	private const DEFAULT_LIMIT_ALL_NAMESPACES = 20;
 
 	/**
 	 * TopEdits constructor.
-	 * @param TopEditsRepository $repository
+	 * @param Repository|TopEditsRepository $repository
 	 * @param AutomatedEditsHelper $autoEditsHelper
 	 * @param Project $project
-	 * @param User $user
-	 * @param Page|null $page
+	 * @param ?User $user
+	 * @param ?Page $page
 	 * @param string|int $namespace Namespace ID or 'all'.
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
@@ -52,33 +48,26 @@ class TopEdits extends Model {
 	 * @param int $pagination Which page of results to show.
 	 */
 	public function __construct(
-		TopEditsRepository $repository,
-		AutomatedEditsHelper $autoEditsHelper,
-		Project $project,
-		User $user,
-		?Page $page = null,
-		$namespace = 0,
-		$start = false,
-		$end = false,
+		protected Repository|TopEditsRepository $repository,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected Project $project,
+		protected ?User $user,
+		protected ?Page $page = null,
+		string|int $namespace = 0,
+		protected int|false $start = false,
+		protected int|false $end = false,
 		?int $limit = null,
-		int $pagination = 0
+		/** @var int Which page of results to show. */
+		protected int $pagination = 0,
 	) {
-		$this->repository = $repository;
-		$this->autoEditsHelper = $autoEditsHelper;
-		$this->project = $project;
-		$this->user = $user;
-		$this->page = $page;
-		$this->namespace = 'all' === $namespace ? 'all' : (int)$namespace;
-		$this->start = $start;
-		$this->end = $end;
-		$this->pagination = $pagination;
+		$this->namespace = $namespace === 'all' ? 'all' : (int)$namespace;
 
-		if ( null !== $limit ) {
+		if ( $limit !== null ) {
 			$this->limit = $limit;
 		} else {
-			$this->limit = 'all' === $this->namespace
-				? self::DEFAULT_LIMIT_ALL_NAMESPACES
-				: self::DEFAULT_LIMIT_SINGLE_NAMESPACE;
+			$this->limit = $this->namespace === 'all' ?
+				self::DEFAULT_LIMIT_ALL_NAMESPACES :
+				self::DEFAULT_LIMIT_SINGLE_NAMESPACE;
 		}
 	}
 
@@ -159,38 +148,16 @@ class TopEdits extends Model {
 	 * Get the WikiProject totals.
 	 * @param int $ns Namespace ID.
 	 * @return array
+	 * @codeCoverageIgnore Just returns a repository result.
 	 */
 	public function getProjectTotals( int $ns ): array {
-		if ( $this->getNumPagesNamespace() > $this->limit ) {
-			$projectTotals = $this->repository->getProjectTotals(
-				$this->project,
-				$this->user,
-				$ns,
-				$this->start,
-				$this->end
-			);
-		} else {
-			$counts_tmp = [];
-			// List of pages for this namespace
-			$rows = $this->topEdits[$ns];
-			foreach ( $rows as $row ) {
-				$num = $row['count'];
-				// May be null or nonexistent for assessment-less pages
-				$titles = $row['pap_project_title'] ?? '{}';
-				// Had to use json to pass multiple values in SQL select
-				foreach ( json_decode( $titles ) as $projectName ) {
-					$counts_tmp[$projectName] ??= 0;
-					$counts_tmp[$projectName] += $num;
-				}
-			}
-			arsort( $counts_tmp );
-			$counts_tmp = array_slice( $counts_tmp, 0, 10 );
-			$projectTotals = [];
-			foreach ( $counts_tmp as $project => $count ) {
-				$projectTotals[] = [ 'pap_project_title' => $project, 'count' => $count ];
-			}
-		}
-		return $projectTotals;
+		 return $this->repository->getProjectTotals(
+			 $this->project,
+			 $this->user,
+			 $ns,
+			 $this->start,
+			 $this->end
+		 );
 	}
 
 	/**
@@ -235,7 +202,7 @@ class TopEdits extends Model {
 	 * @return string[] Results keyed by namespace.
 	 */
 	private function getTopEditsNamespace(): array {
-		if ( 'all' === $this->namespace ) {
+		if ( $this->namespace === 'all' ) {
 			$pages = $this->repository->getTopEditsAllNamespaces(
 				$this->project,
 				$this->user,
@@ -355,7 +322,7 @@ class TopEdits extends Model {
 			$page['page_title'] = str_replace( '_', ' ', $page['page_title'] );
 
 			// FIXME: needs refactoring, done in PagesController::getPagepileResult() and AppExtension::titleWithNs().
-			if ( 0 === $nsId ) {
+			if ( $nsId === 0 ) {
 				$page['full_page_title'] = $page['page_title'];
 			} else {
 				$page['full_page_title'] = str_replace( '_', ' ', (

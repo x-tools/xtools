@@ -5,15 +5,13 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Repository\EditSummaryRepository;
+use App\Repository\Repository;
 use DateTime;
 
 /**
  * An EditSummary provides statistics about a user's edit summary usage over time.
  */
 class EditSummary extends Model {
-	/** @var int Number of edits from present to consider as 'recent'. */
-	protected int $numEditsRecent;
-
 	/**
 	 * Counts of summaries, raw edits, and per-month breakdown.
 	 * Keys are underscored because this also is served in the API.
@@ -36,30 +34,24 @@ class EditSummary extends Model {
 	/**
 	 * EditSummary constructor.
 	 *
-	 * @param EditSummaryRepository $repository
+	 * @param Repository|EditSummaryRepository $repository
 	 * @param Project $project The project we're working with.
-	 * @param User $user The user to process.
+	 * @param ?User $user The user to process.
 	 * @param int|string $namespace Namespace ID or 'all' for all namespaces.
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @param int $numEditsRecent Number of edits from present to consider as 'recent'.
 	 */
 	public function __construct(
-		EditSummaryRepository $repository,
-		Project $project,
-		User $user,
-		$namespace,
-		$start = false,
-		$end = false,
-		int $numEditsRecent = 150
+		protected Repository|EditSummaryRepository $repository,
+		protected Project $project,
+		protected ?User $user,
+		protected int|string $namespace,
+		protected int|false $start = false,
+		protected int|false $end = false,
+		/** @var int Number of edits from present to consider as 'recent'. */
+		protected int $numEditsRecent = 150
 	) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->user = $user;
-		$this->namespace = $namespace;
-		$this->start = $start;
-		$this->end = $end;
-		$this->numEditsRecent = $numEditsRecent;
 	}
 
 	/**
@@ -168,7 +160,7 @@ class EditSummary extends Model {
 		// Do our database work in the Repository, passing in reference
 		// to $this->processRow so we can do post-processing here.
 		$ret = $this->repository->prepareData(
-			[ $this, 'processRow' ],
+			$this->processRow( ... ),
 			$this->project,
 			$this->user,
 			$this->namespace,
@@ -250,7 +242,7 @@ class EditSummary extends Model {
 	 * @return bool
 	 */
 	private function isMinor( array $row ): bool {
-		return 1 === (int)$row['rev_minor_edit'];
+		return (int)$row['rev_minor_edit'] === 1;
 	}
 
 	/**
@@ -261,7 +253,7 @@ class EditSummary extends Model {
 	 */
 	private function hasSummary( array $row ): bool {
 		$summary = preg_replace( "/^\/\* (.*?) \*\/\s*/", '', $row['comment'] ?: '' );
-		return '' !== $summary;
+		return $summary !== '';
 	}
 
 	/**

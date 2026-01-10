@@ -11,15 +11,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  * An XtoolsHttpException is used to show error messages based on user input and redirect back to a route.
  */
 class XtoolsHttpException extends HttpException {
-	/** @var string What URL to redirect to. */
-	protected string $redirectUrl;
-
-	/** @var array The params to pass in with the URL. */
-	protected array $params;
-
-	/** @var bool Whether the exception was thrown as part of an API request. */
-	protected bool $api;
-
 	/**
 	 * XtoolsHttpException constructor.
 	 * @param string $message
@@ -30,14 +21,14 @@ class XtoolsHttpException extends HttpException {
 	 */
 	public function __construct(
 		string $message,
-		string $redirectUrl,
-		array $params = [],
-		bool $api = false,
+		/** @var string What URL to redirect to. */
+		protected string $redirectUrl,
+		/** @var array The params to pass in with the URL. */
+		protected array $params = [],
+		/** @var bool Whether the exception was thrown as part of an API request. */
+		protected bool $api = false,
 		int $statusCode = Response::HTTP_NOT_FOUND
 	) {
-		$this->redirectUrl = $redirectUrl;
-		$this->params = $params;
-		$this->api = $api;
 		parent::__construct( $statusCode, $message );
 	}
 

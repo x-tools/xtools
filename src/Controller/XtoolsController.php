@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Twig\Environment;
@@ -38,24 +39,6 @@ use Wikimedia\IPUtils;
  * @abstract
  */
 abstract class XtoolsController extends AbstractController {
-	/** DEPENDENCIES */
-
-	protected CacheItemPoolInterface $cache;
-	protected Client $guzzle;
-	protected Environment $twig;
-	protected FlashBagInterface $flashBag;
-	protected I18nHelper $i18n;
-	protected ManagerRegistry $managerRegistry;
-	protected ProjectRepository $projectRepo;
-	protected UserRepository $userRepo;
-	protected PageRepository $pageRepo;
-
-	/** @var bool Whether this is a WMF installation. */
-	protected bool $isWMF;
-
-	/** @var string The configured default project. */
-	protected string $defaultProject;
-
 	/** OTHER CLASS PROPERTIES */
 
 	/** @var Request The request object. */
@@ -80,16 +63,16 @@ abstract class XtoolsController extends AbstractController {
 	protected ?Page $page = null;
 
 	/** @var int|false Start date parsed from the Request. */
-	protected $start = false;
+	protected int|false $start = false;
 
 	/** @var int|false End date parsed from the Request. */
-	protected $end = false;
+	protected int|false $end = false;
 
 	/** @var int|string|null Namespace parsed from the Request, ID as int or 'all' for all namespaces. */
-	protected $namespace;
+	protected int|string|null $namespace;
 
 	/** @var int|false Unix timestamp. Pagination offset that substitutes for $end. */
-	protected $offset = false;
+	protected int|false $offset = false;
 
 	/** @var int|null Number of results to return. */
 	protected ?int $limit = 50;
@@ -184,7 +167,6 @@ abstract class XtoolsController extends AbstractController {
 	 * @param RequestStack $requestStack
 	 * @param ManagerRegistry $managerRegistry
 	 * @param CacheItemPoolInterface $cache
-	 * @param FlashBagInterface $flashBag
 	 * @param Client $guzzle
 	 * @param I18nHelper $i18n
 	 * @param ProjectRepository $projectRepo
@@ -197,31 +179,21 @@ abstract class XtoolsController extends AbstractController {
 	public function __construct(
 		ContainerInterface $container,
 		RequestStack $requestStack,
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		FlashBagInterface $flashBag,
-		Client $guzzle,
-		I18nHelper $i18n,
-		ProjectRepository $projectRepo,
-		UserRepository $userRepo,
-		PageRepository $pageRepo,
-		Environment $twig,
-		bool $isWMF,
-		string $defaultProject
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected I18nHelper $i18n,
+		protected ProjectRepository $projectRepo,
+		protected UserRepository $userRepo,
+		protected PageRepository $pageRepo,
+		protected Environment $twig,
+		/** @var bool Whether this is a WMF installation. */
+		protected bool $isWMF,
+		/** @var string The configured default project. */
+		protected string $defaultProject,
 	) {
 		$this->container = $container;
 		$this->request = $requestStack->getCurrentRequest();
-		$this->managerRegistry = $managerRegistry;
-		$this->cache = $cache;
-		$this->flashBag = $flashBag;
-		$this->guzzle = $guzzle;
-		$this->i18n = $i18n;
-		$this->projectRepo = $projectRepo;
-		$this->userRepo = $userRepo;
-		$this->pageRepo = $pageRepo;
-		$this->twig = $twig;
-		$this->isWMF = $isWMF;
-		$this->defaultProject = $defaultProject;
 		$this->params = $this->parseQueryParams();
 
 		// Parse out the name of the controller and action.
@@ -232,11 +204,11 @@ abstract class XtoolsController extends AbstractController {
 		$this->controllerAction = $matches[1] ?? '';
 
 		// Whether the action is an API action.
-		$this->isApi = 'Api' === substr( $this->controllerAction, -3 ) || 'recordUsage' === $this->controllerAction;
+		$this->isApi = str_ends_with( $this->controllerAction, 'Api' ) || $this->controllerAction === 'recordUsage';
 
 		// Whether we're making a subrequest (the view makes a request to another action).
 		$this->isSubRequest = $this->request->get( 'htmlonly' )
-			|| null !== $requestStack->getParentRequest();
+			|| $requestStack->getParentRequest() !== null;
 
 		// Disallow AJAX (unless it's an API or subrequest).
 		$this->checkIfAjax();
@@ -245,7 +217,7 @@ abstract class XtoolsController extends AbstractController {
 		$this->loadCookies();
 
 		// Set the class-level properties based on params.
-		if ( false !== strpos( strtolower( $this->controllerAction ), 'index' ) ) {
+		if ( str_contains( strtolower( $this->controllerAction ), 'index' ) ) {
 			// Index pages should only set the project, and no other class properties.
 			$this->setProject( $this->getProjectFromQuery() );
 
@@ -257,7 +229,8 @@ abstract class XtoolsController extends AbstractController {
 				$this->params['username'] = 'ipr-' . $this->params['username'];
 			}
 		} else {
-			$this->setProperties(); // Includes the project.
+			// Includes the project.
+			$this->setProperties();
 		}
 
 		// Check if the request is to a restricted API endpoint, where the target user has to opt-in to statistics.
@@ -376,7 +349,7 @@ abstract class XtoolsController extends AbstractController {
 
 		if ( isset( $this->params['project'] ) ) {
 			$this->setProject( $this->validateProject( $this->params['project'] ) );
-		} elseif ( null !== $this->cookies['XtoolsProject'] ) {
+		} elseif ( $this->cookies['XtoolsProject'] !== null ) {
 			// Set from cookie.
 			$this->setProject(
 				$this->validateProject( $this->cookies['XtoolsProject'] )
@@ -399,7 +372,7 @@ abstract class XtoolsController extends AbstractController {
 	private function setDates(): void {
 		$start = $this->params['start'] ?? false;
 		$end = $this->params['end'] ?? false;
-		if ( $start || $end || null !== $this->maxDays() ) {
+		if ( $start || $end || $this->maxDays() !== null ) {
 			[ $this->start, $this->end ] = $this->getUnixFromDateParams( $start, $end );
 
 			// Set $this->params accordingly too, so that for instance API responses will include it.
@@ -416,7 +389,7 @@ abstract class XtoolsController extends AbstractController {
 	 * @return Page|string
 	 */
 	protected function getPageFromNsAndTitle( $ns, string $title, bool $rawTitle = false ) {
-		if ( 0 === (int)$ns ) {
+		if ( (int)$ns === 0 ) {
 			return $rawTitle ? $title : $this->validatePage( $title );
 		}
 
@@ -435,7 +408,7 @@ abstract class XtoolsController extends AbstractController {
 		// Defaults to project stored in cookie, otherwise project specified in parameters.yml.
 		if ( isset( $this->params['project'] ) ) {
 			$project = $this->params['project'];
-		} elseif ( null !== $this->cookies['XtoolsProject'] ) {
+		} elseif ( $this->cookies['XtoolsProject'] !== null ) {
 			$project = $this->cookies['XtoolsProject'];
 		} else {
 			$project = $this->defaultProject;
@@ -556,7 +529,7 @@ abstract class XtoolsController extends AbstractController {
 			// Clear flash bag for API responses, since they get intercepted in ExceptionListener
 			// and would otherwise be shown in subsequent requests.
 			if ( $this->isApi ) {
-				$this->flashBag->clear();
+				$this->getFlashBag()?->clear();
 			}
 
 			throw new XtoolsHttpException(
@@ -665,6 +638,7 @@ abstract class XtoolsController extends AbstractController {
 			'include_pattern',
 			'exclude_pattern',
 			'classonly',
+			'countsOnly',
 
 			// Legacy parameters.
 			'user',
@@ -685,7 +659,7 @@ abstract class XtoolsController extends AbstractController {
 			$value = $this->request->query->get( $param ) ?: $this->request->get( $param );
 
 			// Only store if value is given ('namespace' or 'username' could be '0').
-			if ( null !== $value && '' !== $value ) {
+			if ( $value !== null && $value !== '' ) {
 				$params[$param] = rawurldecode( (string)$value );
 			}
 		}
@@ -707,7 +681,7 @@ abstract class XtoolsController extends AbstractController {
 		// Remove blank values.
 		return array_filter( $params, static function ( $param ) {
 			// 'namespace' or 'username' could be '0'.
-			return null !== $param && '' !== $param;
+			return $param !== null && $param !== '';
 		} );
 	}
 
@@ -736,12 +710,12 @@ abstract class XtoolsController extends AbstractController {
 
 		// Default to $this->defaultDays() or $this->maxDays() before end time if start is not present.
 		$daysOffset = $this->defaultDays() ?? $this->maxDays();
-		if ( false === $startTime && $daysOffset ) {
+		if ( $startTime === false && $daysOffset ) {
 			$startTime = strtotime( "-$daysOffset days", $endTime );
 		}
 
 		// Default to $this->defaultDays() or $this->maxDays() after start time if end is not present.
-		if ( false === $end && $daysOffset ) {
+		if ( $end === false && $daysOffset ) {
 			$endTime = min(
 				strtotime( "+$daysOffset days", $startTime ),
 				$today
@@ -749,7 +723,7 @@ abstract class XtoolsController extends AbstractController {
 		}
 
 		// Reverse if start date is after end date.
-		if ( $startTime > $endTime && false !== $startTime && false !== $end ) {
+		if ( $startTime > $endTime && $startTime !== false && $end !== false ) {
 			$newEndTime = $startTime;
 			$startTime = $endTime;
 			$endTime = $newEndTime;
@@ -819,7 +793,7 @@ abstract class XtoolsController extends AbstractController {
 	 */
 	public function getFormattedResponse( string $templatePath, array $ret ): Response {
 		$format = $this->request->query->get( 'format', 'html' );
-		if ( '' == $format ) {
+		if ( $format == '' ) {
 			// The default above doesn't work when the 'format' parameter is blank.
 			$format = 'html';
 		}
@@ -847,7 +821,7 @@ abstract class XtoolsController extends AbstractController {
 		$this->setCookies( $response );
 
 		// If requested format does not exist, assume HTML.
-		if ( false === $this->twig->getLoader()->exists( "$templatePath.$format.twig" ) ) {
+		if ( $this->twig->getLoader()->exists( "$templatePath.$format.twig" ) === false ) {
 			$format = 'html';
 		}
 
@@ -873,7 +847,7 @@ abstract class XtoolsController extends AbstractController {
 	 */
 	private function getFilenameForRequest(): string {
 		$filename = trim( $this->request->getPathInfo(), '/' );
-		return trim( preg_replace( '/[-\/\\:;*?|<>%#"]+/', '-', $filename ) );
+		return trim( preg_replace( '/[-\/:;*?|<>%#"]+/', '-', $filename ) );
 	}
 
 	/**
@@ -898,11 +872,11 @@ abstract class XtoolsController extends AbstractController {
 		], $data );
 
 		// Merge in flash messages, putting them at the top.
-		$flashes = $this->flashBag->peekAll();
+		$flashes = $this->getFlashBag()?->peekAll() ?? [];
 		$ret = array_merge( $flashes, $ret );
 
 		// Flashes now can be cleared after merging into the response.
-		$this->flashBag->clear();
+		$this->getFlashBag()?->clear();
 
 		// Normalize path param values.
 		$ret = self::normalizeApiProperties( $ret );
@@ -919,10 +893,10 @@ abstract class XtoolsController extends AbstractController {
 	 */
 	public static function normalizeApiProperties( array $params ): array {
 		foreach ( $params as $param => $value ) {
-			if ( false === $value ) {
+			if ( $value === false ) {
 				// False values must be empty params.
 				unset( $params[$param] );
-			} elseif ( is_string( $value ) && false !== strpos( $value, '|' ) ) {
+			} elseif ( is_string( $value ) && str_contains( $value, '|' ) ) {
 				// Any pipe-separated values should be returned as an array.
 				$params[$param] = explode( '|', $value );
 			} elseif ( $value instanceof DateTime ) {
@@ -1010,12 +984,23 @@ abstract class XtoolsController extends AbstractController {
 	}
 
 	/**
+	 * Get the FlashBag instance from the current session, if available.
+	 * @return ?FlashBagInterface
+	 */
+	public function getFlashBag(): ?FlashBagInterface {
+		if ( $this->request->getSession() instanceof FlashBagAwareSessionInterface ) {
+			return $this->request->getSession()->getFlashBag();
+		}
+		return null;
+	}
+
+	/**
 	 * Add a flash message.
 	 * @param string $type
 	 * @param string|Markup $key i18n key or raw message.
 	 * @param array $vars
 	 */
-	public function addFlashMessage( string $type, $key, array $vars = [] ): void {
+	public function addFlashMessage( string $type, string|Markup $key, array $vars = [] ): void {
 		if ( $key instanceof Markup || !$this->i18n->msgExists( $key, $vars ) ) {
 			$msg = $key;
 		} else {

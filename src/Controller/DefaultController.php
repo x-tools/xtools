@@ -9,13 +9,15 @@ use App\Repository\ProjectRepository;
 use MediaWiki\OAuthClient\Client;
 use MediaWiki\OAuthClient\ClientConfig;
 use MediaWiki\OAuthClient\Consumer;
-use MediaWiki\OAuthClient\Exception;
+use MediaWiki\OAuthClient\Exception as OAuthException;
 use MediaWiki\OAuthClient\Token;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -34,27 +36,17 @@ class DefaultController extends XtoolsController {
 		return 'homepage';
 	}
 
-	/**
-	 * Display the homepage.
-	 * @Route("/", name="homepage")
-	 * @Route("/index.php", name="homepageIndexPhp")
-	 * @return Response
-	 */
+	#[Route( '/', name: 'homepage' )]
+	#[Route( '/index.php', name: 'homepageIndexPhp' )]
 	public function indexAction(): Response {
 		return $this->render( 'default/index.html.twig', [
 			'xtPage' => 'home',
 		] );
 	}
 
+	#[Route( '/login', name: 'login' )]
 	/**
 	 * Redirect to the default project (or Meta) for Oauth authentication.
-	 * @Route("/login", name="login")
-	 * @param Request $request
-	 * @param RequestStack $requestStack
-	 * @param ProjectRepository $projectRepo
-	 * @param string $centralAuthProject
-	 * @return RedirectResponse
-	 * @codeCoverageIgnore
 	 */
 	public function loginAction(
 		Request $request,
@@ -66,7 +58,7 @@ class DefaultController extends XtoolsController {
 		try {
 			[ $next, $token ] = $this->getOauthClient( $request, $projectRepo, $urlGenerator, $centralAuthProject )
 				->initiate();
-		} catch ( Exception $oauthException ) {
+		} catch ( OAuthException $oauthException ) {
 			$this->addFlashMessage( 'notice', 'error-login' );
 			return $this->redirectToRoute( 'homepage' );
 		}
@@ -76,15 +68,10 @@ class DefaultController extends XtoolsController {
 		return new RedirectResponse( $next );
 	}
 
+	#[Route( '/oauth_callback', name: 'oauth_callback' )]
+	#[Route( '/oauthredirector.php', name: 'old_oauth_callback' )]
 	/**
 	 * Receive authentication credentials back from the Oauth wiki.
-	 * @Route("/oauth_callback", name="oauth_callback")
-	 * @Route("/oauthredirector.php", name="old_oauth_callback")
-	 * @param RequestStack $requestStack
-	 * @param ProjectRepository $projectRepo
-	 * @param UrlGeneratorInterface $urlGenerator
-	 * @param string $centralAuthProject
-	 * @return RedirectResponse
 	 */
 	public function oauthCallbackAction(
 		RequestStack $requestStack,
@@ -108,19 +95,24 @@ class DefaultController extends XtoolsController {
 			return $this->redirectToRoute( 'homepage' );
 		}
 
-		$verifier = $request->get( 'oauth_verifier' );
-		$accessToken = $client->complete( $token, $verifier );
+		try {
+			$verifier = $request->get( 'oauth_verifier' );
+			$accessToken = $client->complete( $token, $verifier );
 
-		// Store access token, and remove request token.
-		$session->set( 'oauth_access_token', $accessToken );
-		$session->remove( 'oauth_request_token' );
+			// Store access token, and remove request token.
+			$session->set( 'oauth_access_token', $accessToken );
+			$session->remove( 'oauth_request_token' );
 
-		// Store user identity.
-		$ident = $client->identify( $accessToken );
-		$session->set( 'logged_in_user', $ident );
+			// Store user identity.
+			$ident = $client->identify( $accessToken );
+			$session->set( 'logged_in_user', $ident );
 
-		// Store reference to the client.
-		$session->set( 'oauth_client', $this->oauthClient );
+			// Store reference to the client.
+			$session->set( 'oauth_client', $this->oauthClient );
+		} catch ( OAuthException $e ) {
+			$this->addFlashMessage( 'notice', 'error-login' );
+			// Redirect below
+		}
 
 		// Redirect to callback, if given.
 		if ( $request->query->get( 'redirect' ) ) {
@@ -134,11 +126,6 @@ class DefaultController extends XtoolsController {
 	/**
 	 * Get an OAuth client, configured to the default project.
 	 * (This shouldn't really be in this class, but oh well.)
-	 * @param Request $request
-	 * @param ProjectRepository $projectRepo
-	 * @param UrlGeneratorInterface $urlGenerator
-	 * @param string $centralAuthProject
-	 * @return Client
 	 * @codeCoverageIgnore
 	 */
 	protected function getOauthClient(
@@ -175,11 +162,9 @@ class DefaultController extends XtoolsController {
 		return $this->oauthClient;
 	}
 
+	#[Route( '/logout', name: 'logout' )]
 	/**
 	 * Log out the user and return to the homepage.
-	 * @Route("/logout", name="logout")
-	 * @param RequestStack $requestStack
-	 * @return RedirectResponse
 	 */
 	public function logoutAction( RequestStack $requestStack ): RedirectResponse {
 		$requestStack->getSession()->invalidate();
@@ -188,27 +173,28 @@ class DefaultController extends XtoolsController {
 
 	/************************ API endpoints */
 
+	#[OA\Tag( name: "Project API" )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Response(
+		response: 200,
+		description: "The domain, URL, API path and database name.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "domain", type: "string", example: "en.wikipedia.org" ),
+				new OA\Property( property: "url", type: "string", example: "https://en.wikipedia.org" ),
+				new OA\Property( property: "api", type: "string", example: "https://en.wikipedia.org/w/api.php" ),
+				new OA\Property( property: "database", type: "string", example: "enwiki" ),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route( '/api/project/normalize/{project}', name: 'ProjectApiNormalize', methods: [ 'GET' ] )]
 	/**
 	 * Get domain name, URL, API path and database name for the given project.
-	 * @Route("/api/project/normalize/{project}", name="ProjectApiNormalize", methods={"GET"})
-	 * @OA\Tag(name="Project API")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="The domain, URL, API path and database name.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="domain", type="string", example="en.wikipedia.org"),
-	 * @OA\Property(property="url", type="string", example="https://en.wikipedia.org"),
-	 * @OA\Property(property="api", type="string", example="https://en.wikipedia.org/w/api.php"),
-	 * @OA\Property(property="database", type="string", example="enwiki"),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @return JsonResponse
 	 */
 	public function normalizeProjectApiAction(): JsonResponse {
 		return $this->getFormattedApiResponse( [
@@ -219,27 +205,28 @@ class DefaultController extends XtoolsController {
 		] );
 	}
 
+	#[OA\Tag( name: "Project API" )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Response(
+		response: 200,
+		description: "List of localized namespaces keyed by their ID.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "url", type: "string", example: "https://en.wikipedia.org" ),
+				new OA\Property( property: "api", type: "string", example: "https://en.wikipedia.org/w/api.php" ),
+				new OA\Property( property: "database", type: "string", example: "enwiki" ),
+				new OA\Property( property: "namespaces", type: "object", example: [ '0' => '', '3' => 'User talk' ] ),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route( '/api/project/namespaces/{project}', name: 'ProjectApiNamespaces', methods: [ 'GET' ] )]
 	/**
 	 * Get the localized names for each namespaces of the given project.
-	 * @Route("/api/project/namespaces/{project}", name="ProjectApiNamespaces", methods={"GET"})
-	 * @OA\Tag(name="Project API")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="List of localized namespaces keyed by their ID.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="url", type="string", example="https://en.wikipedia.org"),
-	 * @OA\Property(property="api", type="string", example="https://en.wikipedia.org/w/api.php"),
-	 * @OA\Property(property="database", type="string", example="enwiki"),
-	 * @OA\Property(property="namespaces", type="object", example={"0": "", "3": "User talk"}),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @return JsonResponse
 	 */
 	public function namespacesApiAction(): JsonResponse {
 		return $this->getFormattedApiResponse( [
@@ -251,39 +238,43 @@ class DefaultController extends XtoolsController {
 		] );
 	}
 
+	#[OA\Tag( name: "Project API" )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Response(
+		response: 200,
+		description: "List of classifications and importance levels, along with their associated colours and badges.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property(
+					property: "assessments",
+					type: "object",
+					example: [
+						"wikiproject_prefix" => "Wikipedia:WikiProject ",
+						"class" => [
+							"FA" => [
+								"badge" => "b/bc/Featured_article_star.svg",
+								"color" => "#9CBDFF",
+								"category" => "Category:FA-Class articles",
+							],
+						],
+						"importance" => [
+							"Top" => [
+								"color" => "#FF97FF",
+								"category" => "Category:Top-importance articles",
+								"weight" => 5,
+							],
+						],
+					]
+				),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[Route( '/api/project/assessments/{project}', name: 'ProjectApiAssessments', methods: [ 'GET' ] )]
 	/**
 	 * Get page assessment metadata for a project.
-	 * @Route("/api/project/assessments/{project}", name="ProjectApiAssessments", methods={"GET"})
-	 * @OA\Tag(name="Project API")
-	 * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="List of classifications and importance levels, along with their associated colours and badges.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="assessments", type="object", example={
-	 *             "wikiproject_prefix": "Wikipedia:WikiProject ",
-	 *             "class": {
-	 *                 "FA": {
-	 *                     "badge": "b/bc/Featured_article_star.svg",
-	 *                     "color": "#9CBDFF",
-	 *                     "category": "Category:FA-Class articles"
-	 *                 }
-	 *             },
-	 *             "importance": {
-	 *                 "Top": {
-	 *                     "color": "#FF97FF",
-	 *                     "category": "Category:Top-importance articles",
-	 *                     "weight": 5
-	 *                 }
-	 *             }
-	 *         }),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @return JsonResponse
 	 */
 	public function projectAssessmentsApiAction(): JsonResponse {
 		return $this->getFormattedApiResponse( [
@@ -292,42 +283,49 @@ class DefaultController extends XtoolsController {
 		] );
 	}
 
+	#[OA\Tag( name: "Project API" )]
+	#[OA\Response(
+		response: 200,
+		description: "Page assessment metadata for all projects that have\n" .
+			"<a href='https://w.wiki/6o9c'>PageAssessments</a> installed.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property(
+					property: "projects",
+					type: "array",
+					items: new OA\Items( type: "string" ),
+					example: [ "en.wikipedia.org", "fr.wikipedia.org" ]
+				),
+				new OA\Property(
+					property: "config",
+					type: "object",
+					example: [
+						"en.wikipedia.org" => [
+							"wikiproject_prefix" => "Wikipedia:WikiProject ",
+							"class" => [
+								"FA" => [
+									"badge" => "b/bc/Featured_article_star.svg",
+									"color" => "#9CBDFF",
+									"category" => "Category:FA-Class articles",
+								],
+							],
+							"importance" => [
+								"Top" => [
+									"color" => "#FF97FF",
+									"category" => "Category:Top-importance articles",
+									"weight" => 5,
+								],
+							],
+						],
+					]
+				),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[Route( '/api/project/assessments', name: 'ApiAssessmentsConfig', methods: [ 'GET' ] )]
 	/**
 	 * Get assessment metadata for all projects.
-	 * @Route("/api/project/assessments", name="ApiAssessmentsConfig", methods={"GET"})
-	 * @OA\Tag(name="Project API")
-	 * @OA\ExternalDocumentation(url="https://www.mediawiki.org/wiki/Special:MyLanguage/Extension:PageAssessments")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Page assessment metadata for all projects that have
-	 * <a href='https://w.wiki/6o9c'>PageAssessments</a> installed.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="projects", type="array", @OA\Items(type="string"),
-	 *              example={"en.wikipedia.org", "fr.wikipedia.org"}
-	 *         ),
-	 * @OA\Property(property="config", type="object", example={
-	 *             "en.wikipedia.org": {
-	 *                 "wikiproject_prefix": "Wikipedia:WikiProject ",
-	 *                 "class": {
-	 *                     "FA": {
-	 *                         "badge": "b/bc/Featured_article_star.svg",
-	 *                         "color": "#9CBDFF",
-	 *                         "category": "Category:FA-Class articles"
-	 *                     }
-	 *                 },
-	 *                 "importance": {
-	 *                     "Top": {
-	 *                         "color": "#FF97FF",
-	 *                         "category": "Category:Top-importance articles",
-	 *                         "weight": 5
-	 *                     }
-	 *                 }
-	 *             }
-	 *         }),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @return JsonResponse
 	 */
 	public function assessmentsConfigApiAction(): JsonResponse {
 		// Here there is no Project, so we don't use XtoolsController::getFormattedApiResponse().
@@ -342,9 +340,9 @@ class DefaultController extends XtoolsController {
 		return $response;
 	}
 
+	#[Route( '/api/project/parser/{project}' )]
 	/**
 	 * Transform given wikitext to HTML using the XTools parser. Wikitext must be passed in as the query 'wikitext'.
-	 * @Route("/api/project/parser/{project}")
 	 * @return JsonResponse Safe HTML.
 	 */
 	public function wikifyApiAction(): JsonResponse {

@@ -202,7 +202,8 @@ class UserTest extends TestAdapter {
 		static::assertFalse( $user->isIpRange() );
 		static::assertFalse( $user->isIPv6() );
 		static::assertEquals( '192.168.0.0', $user->getUsernameIdent() );
-		static::assertTrue( $user->isAnon( $this->createMock( Project::class ) ) ); // should not call any Project methods
+		// should not call any Project methods
+		static::assertTrue( $user->isAnon( $this->createMock( Project::class ) ) );
 
 		$user = new User( $this->userRepo, '74.24.52.13/20' );
 		static::assertTrue( $user->isIP() );

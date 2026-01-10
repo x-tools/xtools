@@ -37,7 +37,6 @@ class EditCounterControllerTest extends ControllerTestAdapter {
 			'/ec-yearcounts',
 			'/ec-monthcounts',
 			'/ec-rightschanges',
-			'/ec-latestglobal',
 		];
 
 		foreach ( $routes as $route ) {
@@ -125,7 +124,6 @@ class EditCounterControllerTest extends ControllerTestAdapter {
 			'/ec-monthcounts/en.wikipedia/Example',
 			'/ec-monthcounts/en.wikipedia/Example?format=wikitext',
 			'/ec-rightschanges/en.wikipedia/Example',
-			'/ec-latestglobal/en.wikipedia/Example',
 		] );
 	}
 

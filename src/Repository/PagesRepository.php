@@ -29,11 +29,11 @@ class PagesRepository extends UserRepository {
 	public function countPagesCreated(
 		Project $project,
 		User $user,
-		$namespace,
+		string|int $namespace,
 		string $redirects,
 		string $deleted,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'num_user_pages_created' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -48,7 +48,7 @@ class PagesRepository extends UserRepository {
 		$conditions = array_merge(
 			$conditions,
 			$this->getNamespaceRedirectAndDeletedPagesConditions( $namespace, $redirects ),
-			$this->getUserConditions( '' !== $start . $end ),
+			$this->getUserConditions( ( $start . $end ) !== '' ),
 			$this->getPrpConditions( $namespace, $project )
 		);
 
@@ -97,13 +97,13 @@ class PagesRepository extends UserRepository {
 	public function getPagesCreated(
 		Project $project,
 		User $user,
-		$namespace,
+		string|int $namespace,
 		string $redirects,
 		string $deleted,
-		$start = false,
-		$end = false,
+		int|false $start = false,
+		int|false $end = false,
 		?int $limit = 1000,
-		$offset = false
+		int|false $offset = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_pages_created' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -120,7 +120,7 @@ class PagesRepository extends UserRepository {
 		$conditions = array_merge(
 			$conditions,
 			$this->getNamespaceRedirectAndDeletedPagesConditions( $namespace, $redirects ),
-			$this->getUserConditions( '' !== $start . $end ),
+			$this->getUserConditions( $start . $end !== '' ),
 			$this->getPrpConditions( $namespace, $project )
 		);
 
@@ -179,14 +179,14 @@ class PagesRepository extends UserRepository {
 	 * @param string $redirects One of the Pages::REDIR_ constants.
 	 * @return string[] With keys 'namespaceRev', 'namespaceArc' and 'redirects'
 	 */
-	private function getNamespaceRedirectAndDeletedPagesConditions( $namespace, string $redirects ): array {
+	private function getNamespaceRedirectAndDeletedPagesConditions( string|int $namespace, string $redirects ): array {
 		$conditions = [
 			'namespaceArc' => '',
 			'namespaceRev' => '',
 			'redirects' => '',
 		];
 
-		if ( 'all' !== $namespace ) {
+		if ( $namespace !== 'all' ) {
 			$conditions['namespaceRev'] = " AND page_namespace = '" . intval( $namespace ) . "' ";
 			$conditions['namespaceArc'] = " AND ar_namespace = '" . intval( $namespace ) . "' ";
 		}
@@ -206,7 +206,7 @@ class PagesRepository extends UserRepository {
 	 * @param Project $project
 	 * @return string[] With keys 'prpSelect', 'prpArSelect' and 'prpJoin'
 	 */
-	private function getPrpConditions( $namespace, $project ): array {
+	private function getPrpConditions( int|string $namespace, Project $project ): array {
 		$conditions = [
 			'prpSelect' => '',
 			'prpArSelect' => '',
@@ -239,9 +239,9 @@ class PagesRepository extends UserRepository {
 		Project $project,
 		array $conditions,
 		string $deleted,
-		$start,
-		$end,
-		$offset = false,
+		int|false $start,
+		int|false $end,
+		int|false $offset = false,
 		bool $count = false
 	): string {
 		$pageTable = $project->getTableName( 'page' );
@@ -250,7 +250,7 @@ class PagesRepository extends UserRepository {
 		$logTable = $project->getTableName( 'logging', 'logindex' );
 
 		// Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-		$revSelects = "page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
+		$revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
 			. "page_is_redirect AS `redirect`, rev_len AS `rev_length`";
 		if ( !$count ) {
 			$revSelects .= ", page_len AS `length`, rev_timestamp AS `timestamp`, "
@@ -279,7 +279,6 @@ class PagesRepository extends UserRepository {
 		// Only SELECT things that are needed, based on whether or not we're doing a COUNT.
 		$arSelects = "ar_namespace AS `namespace`, 'arc' AS `type`, ar_title AS `page_title`, "
 			. "'0' AS `redirect`, ar_len AS `rev_length`";
-
 		if ( !$count ) {
 			$arSelects .= ", NULL AS `length`, MIN(ar_timestamp) AS `timestamp`, " .
 				"ar_rev_id AS `rev_id`, EXISTS(
@@ -313,9 +312,9 @@ class PagesRepository extends UserRepository {
                 $arDateConditions
             GROUP BY ar_namespace, ar_title";
 
-		if ( 'live' === $deleted ) {
+		if ( $deleted === 'live' ) {
 			return $revisionsSelect;
-		} elseif ( 'deleted' === $deleted ) {
+		} elseif ( $deleted === 'deleted' ) {
 			return $archiveSelect;
 		}
 
@@ -335,10 +334,10 @@ class PagesRepository extends UserRepository {
 	public function getAssessmentCounts(
 		Project $project,
 		User $user,
-		$namespace,
+		int|string $namespace,
 		string $redirects,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_pages_created_assessments' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -351,7 +350,7 @@ class PagesRepository extends UserRepository {
 
 		$conditions = array_merge(
 			$this->getNamespaceRedirectAndDeletedPagesConditions( $namespace, $redirects ),
-			$this->getUserConditions( '' !== $start . $end )
+			$this->getUserConditions( $start . $end !== '' )
 		);
 		$revDateConditions = $this->getDateConditions( $start, $end );
 
@@ -381,8 +380,9 @@ class PagesRepository extends UserRepository {
 		$resultQuery = $this->executeQuery( $sql, $project, $user, $namespace );
 
 		$assessments = [];
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $result = $resultQuery->fetchAssociative() ) {
-			$class = '' == $result['class'] ? '' : $result['class'];
+			$class = $result['class'] == '' ? '' : $result['class'];
 			$assessments[$class] = $result['count'];
 		}
 
@@ -404,10 +404,10 @@ class PagesRepository extends UserRepository {
 	public function getWikiprojectCounts(
 		Project $project,
 		User $user,
-		$namespace,
+		int|string $namespace,
 		string $redirects,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_pages_created_wikiprojects' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -421,7 +421,7 @@ class PagesRepository extends UserRepository {
 
 		$conditions = array_merge(
 			$this->getNamespaceRedirectAndDeletedPagesConditions( $namespace, $redirects ),
-			$this->getUserConditions( '' !== $start . $end )
+			$this->getUserConditions( $start . $end !== '' )
 		);
 		$revDateConditions = $this->getDateConditions( $start, $end );
 

@@ -75,8 +75,8 @@ xtools.application.loadContributions = function (endpointFunc, apiTitle) {
 		if (oldToolPath !== newToolPath) {
 			// Happens when a subrequest is made to a different controller action.
 			// For instance, /autoedits embeds /nonautoedits-contributions.
-			var regexp = new RegExp(` ^ / ${newToolPath} / (.*) / `);
-			newUrl = newUrl.replace(regexp, ` / ${oldToolPath} / $1 / `);
+			const regexp = new RegExp(`^/${ newToolPath }/(.*)/`);
+			newUrl = newUrl.replace(regexp, `/${ oldToolPath }/$1/`);
 		}
 
 		// Do not run on the initial page load. This is to retain a clean URL:

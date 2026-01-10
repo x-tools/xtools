@@ -7,6 +7,9 @@ namespace App\Tests\Exception;
 use App\Exception\XtoolsHttpException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \App\Exception\XtoolsHttpException
+ */
 class XtoolsHttpExceptionTest extends TestCase {
 	public function testParams(): void {
 		$exception = new XtoolsHttpException( 'Hello!', '/', [] );

@@ -106,7 +106,7 @@ class PageInfo extends PageInfoApi {
 	 */
 	private function getLastDay(): int {
 		if ( is_int( $this->end ) ) {
-			return ( new DateTime( "@" . $this->end ) )
+			return ( new DateTime( "@$this->end" ) )
 				->modify( 'last day of this month' )
 				->getTimestamp();
 		} else {
@@ -410,7 +410,10 @@ class PageInfo extends PageInfoApi {
 	 * @return string[]
 	 */
 	public function getHumans( ?int $limit = null ): array {
-		return array_slice( array_diff( array_keys( $this->getEditors() ), array_keys( $this->getBots() ) ), 0, $limit );
+		return array_slice( array_diff(
+			array_keys( $this->getEditors() ),
+			array_keys( $this->getBots() )
+		), 0, $limit );
 	}
 
 	/**
@@ -477,11 +480,13 @@ class PageInfo extends PageInfoApi {
 	private function parseHistory(): void {
 		$limit = $this->tooManyRevisions() ? $this->repository->getMaxPageRevisions() : null;
 
+		// numRevisions is ignored if $limit is null.
 		$revs = $this->page->getRevisions(
 			null,
 			$this->start,
 			$this->end,
-			$limit
+			$limit,
+			$this->getNumRevisions()
 		);
 		$revCount = 0;
 
@@ -511,7 +516,7 @@ class PageInfo extends PageInfoApi {
 			/** @var Edit $edit */
 			$edit = $this->repository->getEdit( $this->page, $rev );
 
-			if ( 0 === $revCount ) {
+			if ( $revCount === 0 ) {
 				$this->firstEdit = $edit;
 			}
 
@@ -563,7 +568,7 @@ class PageInfo extends PageInfoApi {
 		// Update figures regarding content addition/removal, and the revert count.
 		$prevEdits = $this->updateContentSizes( $edit, $prevEdits );
 
-		if ( 0 !== $edit->getDeleted() ) {
+		if ( $edit->getDeleted() !== 0 ) {
 			$this->numDeletedRevisions++;
 		}
 
@@ -580,7 +585,7 @@ class PageInfo extends PageInfoApi {
 		// But first, let's copy over the SHA of the actual previous edit
 		// and put it in our $prevEdits['prev'], so that we'll know
 		// that content added after $prevEdit['prev'] was reverted.
-		if ( null !== $prevEdits['prev'] ) {
+		if ( $prevEdits['prev'] !== null ) {
 			$prevEdits['prevSha'] = $prevEdits['prev']->getSha();
 		}
 		$prevEdits['prev'] = $edit;
@@ -626,10 +631,7 @@ class PageInfo extends PageInfoApi {
 		$this->revertCount++;
 
 		// Adjust addedBytes given this edit was a revert of the previous one.
-		if ( $prevEdits['prev']
-			&& false === $prevEdits['prev']->isReverted()
-			&& $prevEdits['prev']->getSize() > 0
-		) {
+		if ( $prevEdits['prev'] && $prevEdits['prev']->isReverted() === false && $prevEdits['prev']->getSize() > 0 ) {
 			$this->addedBytes -= $prevEdits['prev']->getSize();
 
 			// Also deduct from the user's individual added byte count.
@@ -644,10 +646,12 @@ class PageInfo extends PageInfoApi {
 		// Also remove as max added or deleted, if applicable.
 		if ( $this->maxAddition && $prevEdits['prev']->getId() === $this->maxAddition->getId() ) {
 			$this->maxAddition = $prevEdits['maxAddition'];
-			$prevEdits['maxAddition'] = $prevEdits['prev']; // In the event of edit wars.
+			// In the event of edit wars.
+			$prevEdits['maxAddition'] = $prevEdits['prev'];
 		} elseif ( $this->maxDeletion && $prevEdits['prev']->getId() === $this->maxDeletion->getId() ) {
 			$this->maxDeletion = $prevEdits['maxDeletion'];
-			$prevEdits['maxDeletion'] = $prevEdits['prev']; // In the event of edit wars.
+			// In the event of edit wars.
+			$prevEdits['maxDeletion'] = $prevEdits['prev'];
 		}
 
 		return $prevEdits;
@@ -761,7 +765,8 @@ class PageInfo extends PageInfoApi {
 			'minor' => 0,
 			'anon' => 0,
 			'automated' => 0,
-			'size' => 0, // Keep track of the size by the end of the year.
+			// Keep track of the size by the end of the year.
+			'size' => 0,
 			'events' => [],
 			'months' => [],
 		];
@@ -827,7 +832,7 @@ class PageInfo extends PageInfoApi {
 				'first' => $edit->getTimestamp(),
 				'firstId' => $edit->getId(),
 				'last' => null,
-				'atbe' => null,
+				'atbe' => 0,
 				'added' => 0,
 			];
 		}
@@ -920,7 +925,7 @@ class PageInfo extends PageInfoApi {
 
 		foreach ( $this->editors as $editor => $info ) {
 			// Count how many users are in the top 10% by number of edits, excluding bots.
-			if ( $counter < 10 && !in_array( $editor, array_keys( $this->bots ) ) ) {
+			if ( $counter < 10 && !array_key_exists( $editor, $this->bots ) ) {
 				$topTenCount += $info['all'];
 				$counter++;
 
@@ -984,9 +989,7 @@ class PageInfo extends PageInfoApi {
 			return [
 				'label' => $editor,
 				'value' => $added,
-				'percentage' => 0 === $this->addedBytes
-					? 0
-					: 100 * ( $added / $topTenTotalAdded ),
+				'percentage' => $this->addedBytes === 0 ? 0 : 100 * ( $added / $topTenTotalAdded ),
 			];
 		}, $topTenEditorsByAdded );
 	}
@@ -996,7 +999,7 @@ class PageInfo extends PageInfoApi {
 	 * If the PageInfo instance has a date range, it is used instead of the last N days.
 	 * To reduce logic in the view, this method returns an array also containing the localized string
 	 * for the pageviews count, as well as the tooltip to be used on the link to the Pageviews tool.
-	 * @return array With keys 'count'<int>, 'formatted'<string> and 'tooltip'<string>
+	 * @return ?array With keys 'count'<int>, 'formatted'<string> and 'tooltip'<string>
 	 * @see PageInfoApi::PAGEVIEWS_OFFSET
 	 */
 	public function getPageviews(): ?array {
@@ -1030,9 +1033,9 @@ class PageInfo extends PageInfoApi {
 	 * @return string Formatted number or "Data unavailable".
 	 */
 	private function getPageviewsFormatted( ?int $pageviews ): string {
-		return null !== $pageviews
-			? $this->i18n->numberFormat( $pageviews )
-			: $this->i18n->msg( 'data-unavailable' );
+		return $pageviews !== null ?
+			$this->i18n->numberFormat( $pageviews ) :
+			$this->i18n->msg( 'data-unavailable' );
 	}
 
 	/**

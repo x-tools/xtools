@@ -7,6 +7,7 @@ namespace App\Model;
 use App\Helper\AutomatedEditsHelper;
 use App\Helper\I18nHelper;
 use App\Repository\EditCounterRepository;
+use App\Repository\Repository;
 use DateInterval;
 use DatePeriod;
 use DateTime;
@@ -15,9 +16,6 @@ use DateTime;
  * An EditCounter provides statistics about a user's edits on a project.
  */
 class EditCounter extends Model {
-	protected I18nHelper $i18n;
-	protected UserRights $userRights;
-
 	/** @var int[] Revision and page counts etc. */
 	protected array $pairData;
 
@@ -47,7 +45,7 @@ class EditCounter extends Model {
 
 	/**
 	 * Various data on the last 5000 edits.
-	 * @var string[]
+	 * @var string[] As returned by the DB, unconverted to int or float
 	 */
 	protected array $editData;
 
@@ -56,34 +54,28 @@ class EditCounter extends Model {
 	 *   or false if could not be parsed from log params
 	 * @var int|bool
 	 */
-	protected $longestBlockSeconds;
+	protected int|bool $longestBlockSeconds;
 
 	/** @var int Number of times the user has been thanked. */
 	protected int $thanksReceived;
 
 	/**
 	 * EditCounter constructor.
-	 * @param EditCounterRepository $repository
+	 * @param Repository|EditCounterRepository $repository
 	 * @param I18nHelper $i18n
 	 * @param UserRights $userRights
 	 * @param Project $project The base project to count edits
-	 * @param AutomatedEditsHelper
-	 * @param User $user
+	 * @param ?User $user
+	 * @param ?AutomatedEditsHelper $autoEditsHelper
 	 */
 	public function __construct(
-		EditCounterRepository $repository,
-		I18nHelper $i18n,
-		UserRights $userRights,
-		Project $project,
-		User $user,
-		AutomatedEditsHelper $autoEditsHelper
+		protected Repository|EditCounterRepository $repository,
+		protected I18nHelper $i18n,
+		protected UserRights $userRights,
+		protected Project $project,
+		protected ?User $user,
+		protected ?AutomatedEditsHelper $autoEditsHelper
 	) {
-		$this->repository = $repository;
-		$this->i18n = $i18n;
-		$this->userRights = $userRights;
-		$this->project = $project;
-		$this->user = $user;
-		$this->autoEditsHelper = $autoEditsHelper;
 	}
 
 	/**
@@ -160,7 +152,7 @@ class EditCounter extends Model {
 		// Expressly don't store this.
 		if ( $blocksOnly ) {
 			$blocks = array_filter( $blocks, static function ( $block ) {
-				return ( 'block' === $block['log_action'] || 'reblock' === $block['log_action'] );
+				return $block['log_action'] === 'block' || $block['log_action'] === 'reblock';
 			} );
 		}
 
@@ -343,7 +335,7 @@ class EditCounter extends Model {
 		foreach ( array_values( $blocks ) as $block ) {
 			[ $timestamp, $duration ] = $this->parseBlockLogEntry( $block );
 
-			if ( 'block' === $block['log_action'] ) {
+			if ( $block['log_action'] === 'block' ) {
 				// This is a new block, so first see if the duration of the last
 				// block exceeded our longest duration. -1 duration means indefinite.
 				if ( $lastBlock[1] > $this->longestBlockSeconds || -1 === $lastBlock[1] ) {
@@ -352,7 +344,7 @@ class EditCounter extends Model {
 
 				// Now set this as the last block.
 				$lastBlock = [ $timestamp, $duration ];
-			} elseif ( 'unblock' === $block['log_action'] ) {
+			} elseif ( $block['log_action'] === 'unblock' ) {
 				// The last block was lifted. So the duration will be the time from when the
 				// last block was set to the time of the unblock.
 				$timeSinceLastBlock = $timestamp - $lastBlock[0];
@@ -362,7 +354,7 @@ class EditCounter extends Model {
 					// Reset the last block, as it has now been accounted for.
 					$lastBlock = [ null, null ];
 				}
-			} elseif ( 'reblock' === $block['log_action'] && -1 !== $lastBlock[1] ) {
+			} elseif ( $block['log_action'] === 'reblock' && $lastBlock[1] !== -1 ) {
 				// The last block was modified.
 				// $lastBlock is left unchanged if its duration was indefinite.
 
@@ -412,7 +404,8 @@ class EditCounter extends Model {
 		$block['log_params'] = (string)$block['log_params'];
 
 		// First check if the string is serialized, and if so parse it to get the block duration.
-		if ( false !== @unserialize( $block['log_params'] ) ) {
+		// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+		if ( @unserialize( $block['log_params'] ) !== false ) {
 			$parsedParams = unserialize( $block['log_params'] );
 			$durationStr = $parsedParams['5::duration'] ?? '';
 		} else {
@@ -440,7 +433,8 @@ class EditCounter extends Model {
 	 */
 	public function countPagesProtected(): int {
 		$logCounts = $this->getLogCounts();
-		return $logCounts['protect-protect'] ?? 0;
+		return ( $logCounts['protect-protect'] ?? 0 )
+			+ ( $logCounts['stable-config'] ?? 0 );
 	}
 
 	/**
@@ -449,7 +443,8 @@ class EditCounter extends Model {
 	 */
 	public function countPagesReprotected(): int {
 		$logCounts = $this->getLogCounts();
-		return $logCounts['protect-modify'] ?? 0;
+		return ( $logCounts['protect-modify'] ?? 0 )
+			+ ( $logCounts['stable-modify'] ?? 0 );
 	}
 
 	/**
@@ -458,7 +453,8 @@ class EditCounter extends Model {
 	 */
 	public function countPagesUnprotected(): int {
 		$logCounts = $this->getLogCounts();
-		return $logCounts['protect-unprotect'] ?? 0;
+		return ( $logCounts['protect-unprotect'] ?? 0 )
+			+ ( $logCounts['stable-reset'] ?? 0 );
 	}
 
 	/**
@@ -535,7 +531,7 @@ class EditCounter extends Model {
 	 * @return float
 	 */
 	public function averageRevisionsPerPage(): float {
-		if ( 0 == $this->countAllPagesEdited() ) {
+		if ( $this->countAllPagesEdited() == 0 ) {
 			return 0;
 		}
 		return round( $this->countAllRevisions() / $this->countAllPagesEdited(), 3 );
@@ -546,10 +542,21 @@ class EditCounter extends Model {
 	 * @return float
 	 */
 	public function averageRevisionsPerDay(): float {
-		if ( 0 == $this->getDays() ) {
+		if ( $this->getDays() == 0 ) {
 			return 0;
 		}
 		return round( $this->countAllRevisions() / $this->getDays(), 3 );
+	}
+
+	/**
+	 * Get the total number of edits made by the user with semi-automating tools.
+	 */
+	public function countAutomatedEdits(): int {
+		if ( $this->autoEditCount ) {
+			return $this->autoEditCount;
+		}
+		$this->autoEditCount = $this->repository->countAutomatedEdits( $this->project, $this->user );
+		return $this->autoEditCount;
 	}
 
 	/**
@@ -575,7 +582,7 @@ class EditCounter extends Model {
 			? new DateTime( $this->getFirstAndLatestActions()['rev_latest']['timestamp'] )
 			: false;
 
-		if ( false === $first || false === $latest ) {
+		if ( $first === false || $latest === false ) {
 			return 0;
 		}
 
@@ -770,9 +777,12 @@ class EditCounter extends Model {
 
 		$totals = $this->repository->getMonthCounts( $this->project, $this->user );
 		$out = [
-			'yearLabels' => [], // labels for years
-			'monthLabels' => [], // labels for months
-			'totals' => [], // actual totals, grouped by namespace, year and then month
+			// labels for years
+			'yearLabels' => [],
+			// labels for months
+			'monthLabels' => [],
+			// actual totals, grouped by namespace, year and then month
+			'totals' => [],
 		];
 
 		/** Keep track of the date of their first edit. */
@@ -988,7 +998,7 @@ class EditCounter extends Model {
 		}
 		$tagLists = $editData['tag_lists'];
 		foreach ( $tagLists as $list ) {
-			if ( null !== $list ) {
+			if ( $list !== null ) {
 				$found = false;
 				foreach ( $list as $tag ) {
 					if ( preg_match( '/^proofreadpage\-quality[0-4]$/', $tag ) ) {
@@ -1014,18 +1024,24 @@ class EditCounter extends Model {
 		if ( !isset( $editData['tag_lists'] ) ) {
 			return 0;
 		}
-		$tagLists = $editData['tag_lists'];
+		$tags = $editData['tag_lists'];
 		$autoTags = $this->autoEditsHelper->getTags( $this->project );
-		return count( // Number
+		return count(
+			// Number
 			array_filter(
-				$tagLists, // of revisions
-				static fn ( $a ) => null !== $a && // with tags
-				count( // where the number of tags
+				// of revisions
+				$tags,
+				// with tags
+				static fn ( $a ) => $a !== null &&
+				count(
+				// where the number of tags
 					array_filter(
 						$a,
-						static fn ( $t ) => in_array( $t, $autoTags ) // that mean these edits are auto
+						// that mean these edits are auto
+						static fn ( $t ) => in_array( $t, $autoTags )
 					)
-				) > 0 // is greater than 0
+				// is greater than 0
+				) > 0
 			)
 		);
 	}

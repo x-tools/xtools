@@ -16,15 +16,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * and will throw an exception accordingly.
  */
 class DisabledToolSubscriber implements EventSubscriberInterface {
-
-	protected ParameterBagInterface $parameterBag;
-
 	/**
 	 * Save the container for later use.
 	 * @param ParameterBagInterface $parameterBag
 	 */
-	public function __construct( ParameterBagInterface $parameterBag ) {
-		$this->parameterBag = $parameterBag;
+	public function __construct( protected ParameterBagInterface $parameterBag ) {
 	}
 
 	/**

@@ -135,17 +135,20 @@ class GlobalContribsTest extends TestAdapter {
 			'comment' => 'My user page',
 		] ];
 		return [
-			[ // Dataset #0: normal case. 1 edit, 1 project
+			[
+				// Dataset #0: normal case. 1 edit, 1 project
 				$edit,
 				[ 'wiki1' => $wiki1 ],
 				1,
 				1,
-			], [ // Dataset #1: project for edit is null
+			], [
+				// Dataset #1: project for edit is null
 				$edit,
 				[ 'wiki1' => null ],
 				0,
 				1,
-			], [ // Dataset #2: no projects and no edit
+			], [
+				// Dataset #2: no projects and no edit
 				[],
 				[],
 				0,

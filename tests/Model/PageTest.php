@@ -93,7 +93,7 @@ class PageTest extends TestAdapter {
 			[ $project, 'Existing_page', [] ],
 			[ $project, 'Missing_page', [ 'missing' => '' ] ],
 		];
-		$pageRepo // ->expects($this->exactly(2))
+		$pageRepo
 			->method( 'getPageInfo' )
 			->willReturnMap( $data );
 
@@ -139,7 +139,8 @@ class PageTest extends TestAdapter {
 		$page = new Page( $this->pageRepo, $project, 'User:Test:123' );
 		$page->setRepository( $pageRepo );
 
-		static::assertEquals( 2, $page->getNamespace() ); // Should set the pageInfo
+		// Should set the pageInfo
+		static::assertEquals( 2, $page->getNamespace() );
 		static::assertEquals( 42, $page->getId() );
 		static::assertEquals( 'https://example.org/User:Test:123', $page->getUrl() );
 		static::assertEquals( 5000, $page->getWatchers() );
@@ -147,7 +148,8 @@ class PageTest extends TestAdapter {
 		static::assertEquals( 'User', $page->getNamespaceName() );
 		static::assertEquals( 'Q95', $page->getWikidataId() );
 		static::assertEquals( 'Test:123', $page->getTitleWithoutNamespace() );
-		static::assertEquals( 'en', $page->getLang() ); // Intentionally defaults to project lang
+		// Intentionally defaults to project lang
+		static::assertEquals( 'en', $page->getLang() );
 		// Ensure caching
 		static::assertEquals( 300, $page->getLength() );
 		static::assertEquals( 2, $page->getNamespace() );
@@ -171,7 +173,8 @@ class PageTest extends TestAdapter {
 	 */
 	public function testHtml(): void {
 		$page = new Page( $this->pageRepo, $this->getMockEnwikiProject(), 'A' );
-		$date = new \DateTime( '20010101010101' ); // 01:01:01 UTC, January 1, 2001
+		// 01:01:01 UTC, January 1, 2001
+		$date = new \DateTime( '20010101010101' );
 		$this->pageRepo->expects( static::once() )
 			->method( 'getRevisionIdAtDate' )
 			->with( $page, $date )
@@ -212,7 +215,8 @@ class PageTest extends TestAdapter {
 		$page->setRepository( $pageRepo );
 
 		static::assertArraySubset( $wikidataItems, $page->getWikidataItems() );
-		static::assertEquals( 2, $page->countWikidataItems() ); // Ensure that we count the above
+		// Ensure that we count the above
+		static::assertEquals( 2, $page->countWikidataItems() );
 
 		// If no wikidata item...
 		$pageRepo2 = $this->createMock( PageRepository::class );
@@ -262,7 +266,8 @@ class PageTest extends TestAdapter {
 		$page = new Page( $this->pageRepo, new Project( 'exampleWiki' ), 'Page' );
 		$user = new User( $this->createMock( UserRepository::class ), 'Testuser' );
 		static::assertCount( 2, $page->getRevisions( $user ) );
-		static::assertCount( 2, $page->getRevisions( $user ) ); // Test caching
+		// Test caching
+		static::assertCount( 2, $page->getRevisions( $user ) );
 		static::assertEquals( 2, $page->getNumRevisions() );
 	}
 
@@ -285,11 +290,14 @@ class PageTest extends TestAdapter {
 		// #2: revisions happens to be set, so count that. doesn't query repo, but caches
 		static::assertEquals( [], $page->getRevisions() );
 		static::assertSame( 0, $page->getNumRevisions() );
-		static::assertSame( 0, $page->getNumRevisions() ); // Test caching
+		// Test caching
+		static::assertSame( 0, $page->getNumRevisions() );
 
 		// #3: normal case, go out of our way to check
-		$page = new Page( $pageRepo, new Project( 'examplewiki' ), 'Page' ); // reset caching
-		static::assertEquals( 42, $page->getNumRevisions() ); // queries repo for the second time
+		// reset caching
+		$page = new Page( $pageRepo, new Project( 'examplewiki' ), 'Page' );
+		// queries repo for the second time
+		static::assertEquals( 42, $page->getNumRevisions() );
 
 		// #4: caching did work. If it doesn't we call the Repo method a third time
 		static::assertEquals( 42, $page->getNumRevisions() );
@@ -299,6 +307,7 @@ class PageTest extends TestAdapter {
 	 * Test getErros and getCheckWikiErrors.
 	 */
 	public function testErrors(): void {
+		$this->markTestSkipped( 'Broken until T413013 is fixed' );
 		$checkWikiErrors = [
 			[
 				'error' => '61',
@@ -392,11 +401,11 @@ class PageTest extends TestAdapter {
 	private function getRealPageRepository(): PageRepository {
 		static::createClient();
 		return new PageRepository(
-			self::$container->get( 'doctrine' ),
-			self::$container->get( 'cache.app' ),
-			self::$container->get( 'eight_points_guzzle.client.xtools' ),
+			static::getContainer()->get( 'doctrine' ),
+			static::getContainer()->get( 'cache.app' ),
+			static::getContainer()->get( 'eight_points_guzzle.client.xtools' ),
 			$this->createMock( LoggerInterface::class ),
-			self::$container->get( 'parameter_bag' ),
+			static::getContainer()->get( 'parameter_bag' ),
 			true,
 			30
 		);

@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves everything for the Meta tool.
@@ -24,12 +25,11 @@ class MetaController extends XtoolsController {
 		return 'Meta';
 	}
 
+	#[Route( "/meta", name: "meta" )]
+	#[Route( "/meta", name: "Meta" )]
+	#[Route( "/meta/index.php", name: "MetaIndexPhp" )]
 	/**
 	 * Display the form.
-	 * @Route("/meta", name="meta")
-	 * @Route("/meta", name="Meta")
-	 * @Route("/meta/index.php", name="MetaIndexPhp")
-	 * @return Response
 	 */
 	public function indexAction(): Response {
 		if ( isset( $this->params['start'] ) && isset( $this->params['end'] ) ) {
@@ -43,19 +43,16 @@ class MetaController extends XtoolsController {
 		] );
 	}
 
+	#[Route(
+		"/meta/{start}/{end}/{legacy}",
+		name: "MetaResult",
+		requirements: [
+			"start" => "\d{4}-\d{2}-\d{2}",
+			"end" => "\d{4}-\d{2}-\d{2}",
+		]
+	)]
 	/**
 	 * Display the results.
-	 * @Route(
-	 *     "/meta/{start}/{end}/{legacy}",
-	 *     name="MetaResult",
-	 *     requirements={
-	 *         "start"="\d{4}-\d{2}-\d{2}",
-	 *         "end"="\d{4}-\d{2}-\d{2}",
-	 *     },
-	 * )
-	 * @param ManagerRegistry $managerRegistry
-	 * @param bool $legacy Non-blank value indicates to show stats for legacy XTools
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
 	public function resultAction( ManagerRegistry $managerRegistry, bool $legacy = false ): Response {
@@ -77,9 +74,6 @@ class MetaController extends XtoolsController {
 
 	/**
 	 * Get usage statistics of the core tools.
-	 * @param object $client
-	 * @param string $table Table to query.
-	 * @return array
 	 * @codeCoverageIgnore
 	 */
 	private function getToolUsageStats( object $client, string $table ): array {
@@ -132,8 +126,6 @@ class MetaController extends XtoolsController {
 
 	/**
 	 * Get usage statistics of the API.
-	 * @param object $client
-	 * @return array
 	 * @codeCoverageIgnore
 	 */
 	private function getApiUsageStats( object $client ): array {
@@ -184,10 +176,10 @@ class MetaController extends XtoolsController {
 		];
 	}
 
+	#[Route( "/meta/usage/{tool}/{project}/{token}", name: "RecordMetaUsage" )]
 	/**
 	 * Record usage of a particular XTools tool. This is called automatically
 	 *   in base.html.twig via JavaScript so that it is done asynchronously.
-	 * @Route("/meta/usage/{tool}/{project}/{token}")
 	 * @param Request $request
 	 * @param ParameterBagInterface $parameterBag
 	 * @param ManagerRegistry $managerRegistry
@@ -210,7 +202,7 @@ class MetaController extends XtoolsController {
 		$response = new JsonResponse();
 
 		// Validate method and token.
-		if ( 'PUT' !== $request->getMethod() || !$this->isCsrfTokenValid( 'intention', $token ) ) {
+		if ( $request->getMethod() !== 'PUT' || !$this->isCsrfTokenValid( 'intention', $token ) ) {
 			$response->setStatusCode( Response::HTTP_FORBIDDEN );
 			$response->setContent( json_encode( [
 				'error' => 'This endpoint is for internal use only.',

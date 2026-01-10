@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Model\PageAssessments;
 use App\Model\Project;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use GuzzleHttp\Client;
@@ -19,25 +19,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * @codeCoverageIgnore
  */
 class ProjectRepository extends Repository {
-	protected PageAssessmentsRepository $assessmentsRepo;
-
 	/** @var string[] Basic metadata if XTools is in single-wiki mode. */
 	protected array $singleBasicInfo;
 
 	/** @var string The cache key for the 'all project' metadata. */
 	protected string $cacheKeyAllProjects = 'allprojects';
-
-	/** @var string The configured default project. */
-	protected string $defaultProject;
-
-	/** @var bool Whether XTools is configured to run on a single wiki or not. */
-	protected bool $singleWiki;
-
-	/** @var array Projects that have opted into showing restricted stats to everyone. */
-	protected array $optedIn;
-
-	/** @var string The project's API path. */
-	protected string $apiPath;
 
 	/**
 	 * @param ManagerRegistry $managerRegistry
@@ -54,24 +40,23 @@ class ProjectRepository extends Repository {
 	 * @param string $apiPath
 	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		PageAssessmentsRepository $assessmentsRepo,
-		string $defaultProject,
-		bool $singleWiki,
-		array $optedIn,
-		string $apiPath
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected PageAssessmentsRepository $assessmentsRepo,
+		/** @var string The configured default project. */
+		protected string $defaultProject,
+		/** @var bool Whether XTools is configured to run on a single wiki or not. */
+		protected bool $singleWiki,
+		/** @var array Projects that have opted into showing restricted stats to everyone. */
+		protected array $optedIn,
+		/** @var string The project's API path. */
+		protected string $apiPath,
 	) {
-		$this->assessmentsRepo = $assessmentsRepo;
-		$this->defaultProject = $defaultProject;
-		$this->singleWiki = $singleWiki;
-		$this->optedIn = $optedIn;
-		$this->apiPath = $apiPath;
 		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
 	}
 
@@ -88,7 +73,8 @@ class ProjectRepository extends Repository {
 		if ( $this->singleWiki ) {
 			$this->setSingleBasicInfo( [
 				'url' => $this->parameterBag->get( 'wiki_url' ),
-				'dbName' => '', // Just so this will pass in CI.
+				// Just so this will pass in CI.
+				'dbName' => '',
 				// TODO: this will need to be restored for third party support; KEYWORD: isWMF
 				// 'dbName' => $this->parameterBag->('database_replica_name'),
 			] );
@@ -228,7 +214,7 @@ class ProjectRepository extends Repository {
 			'projectUrl3' => "https://www.$project",
 			'projectUrl4' => "https://www.$project.org",
 		] )->fetchAssociative();
-		$basicInfo = false === $basicInfo ? null : $basicInfo;
+		$basicInfo = $basicInfo === false ? null : $basicInfo;
 
 		// Cache for one hour and return.
 		return $this->setCache( $cacheKey, $basicInfo, 'PT1H' );
@@ -260,7 +246,7 @@ class ProjectRepository extends Repository {
 					'formatversion' => '2',
 				],
 			] )->getBody()->getContents(), true );
-		} catch ( Exception $e ) {
+		} catch ( Exception ) {
 			return null;
 		}
 
@@ -318,7 +304,7 @@ class ProjectRepository extends Repository {
 				$name = null;
 			}
 
-			if ( null !== $name ) {
+			if ( $name !== null ) {
 				$metadata['namespaces'][$namespace['id']] = $name;
 			}
 			$metadata['canonical_namespaces'][$namespace['id']] = $namespace['canonical'] ?? '';
@@ -373,7 +359,6 @@ class ProjectRepository extends Repository {
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
 		}
-
 		$res = json_decode( $this->guzzle->request( 'GET', $project->getApiUrl(), [ 'query' => [
 			'action' => 'query',
 			'meta' => 'siteinfo',
@@ -382,7 +367,6 @@ class ProjectRepository extends Repository {
 		] ] )->getBody()->getContents(), true );
 
 		$extensions = $res['query']['extensions'] ?? [];
-
 		// Cache for one hour and return.
 		return $this->setCache( $cacheKey, array_map( static function ( $extension ) {
 			return $extension['name'];
@@ -438,7 +422,7 @@ class ProjectRepository extends Repository {
                 WHERE ug_group IN (?)
                 GROUP BY user_name, ug_group";
 		$users = $this->getProjectsConnection( $project )
-			->executeQuery( $sql, [ $groups ], [ Connection::PARAM_STR_ARRAY ] )
+			->executeQuery( $sql, [ $groups ], [ ArrayParameterType::STRING ] )
 			->fetchAllAssociative();
 
 		if ( count( $globalGroups ) > 0 && $this->isWMF ) {
@@ -448,7 +432,7 @@ class ProjectRepository extends Repository {
                     WHERE gug_group IN (?)
                     GROUP BY user_name, user_group";
 			$globalUsers = $this->getProjectsConnection( 'centralauth' )
-				->executeQuery( $sql, [ $globalGroups ], [ Connection::PARAM_STR_ARRAY ] )
+				->executeQuery( $sql, [ $globalGroups ], [ ArrayParameterType::STRING ] )
 				->fetchAllAssociative();
 
 			$users = array_merge( $users, $globalUsers );

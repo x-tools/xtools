@@ -146,7 +146,8 @@ class PageInfoTest extends TestAdapter {
 		], $this->pageInfo->getBots() );
 		static::assertEquals( 2, $this->pageInfo->getNumBots() );
 		static::assertEquals( 15, $this->pageInfo->getBotRevisionCount() );
-		static::assertEquals( 15, $this->pageInfo->getBotRevisionCount() ); // second time for caching
+		// second time for caching
+		static::assertEquals( 15, $this->pageInfo->getBotRevisionCount() );
 	}
 
 	public function testTopEditorsByEditCount(): void {
@@ -208,7 +209,8 @@ class PageInfoTest extends TestAdapter {
 
 	public function testLinksAndRedirects(): void {
 		$this->setupData();
-		$this->pageInfo->prepareData(); // Ensure we don't call the revisions (the second time will complain).
+		// Ensure we don't call the revisions (the second time will complain).
+		$this->pageInfo->prepareData();
 		$this->page->expects( static::once() )
 			->method( 'countLinksAndRedirects' )
 			->willReturn( [
@@ -228,7 +230,8 @@ class PageInfoTest extends TestAdapter {
 			->method( 'getErrors' )
 			->willReturn( [] );
 		static::assertSame( [], $this->pageInfo->getBugs() );
-		static::assertSame( [], $this->pageInfo->getBugs() ); // Ensure caching
+		// Ensure caching
+		static::assertSame( [], $this->pageInfo->getBugs() );
 		static::assertSame( 0, $this->pageInfo->numBugs() );
 	}
 
@@ -386,10 +389,10 @@ class PageInfoTest extends TestAdapter {
 			->method( 'getEdit' )
 			->willReturnCallback( fn ( $page, $rev ) => new Edit( $this->editRepo, $this->userRepo, $page, $rev ) );
 		$this->pageInfo->prepareData();
-		static::assertSame( 0, $this->pageInfo->editsPerDay() );
-		static::assertSame( 0, $this->pageInfo->editsPerMonth() );
-		static::assertSame( 0, $this->pageInfo->editsPerYear() );
-		static::assertSame( 0, $this->pageInfo->editsPerEditor() );
+		static::assertSame( 0, (int)$this->pageInfo->editsPerDay() );
+		static::assertSame( 0, (int)$this->pageInfo->editsPerMonth() );
+		static::assertSame( 0, (int)$this->pageInfo->editsPerYear() );
+		static::assertSame( 0, (int)$this->pageInfo->editsPerEditor() );
 	}
 
 	public function testCountHistory(): void {
@@ -498,7 +501,8 @@ class PageInfoTest extends TestAdapter {
 		$this->pageInfoRepo->expects( static::once() )
 			->method( 'getLogEvents' )
 			->willReturn( [ [ 'timestamp' => 'yesterday' ] ] );
-		$this->pageInfo->prepareData(); // Will call setLogEvents under the hood
+		// Will call setLogEvents under the hood
+		$this->pageInfo->prepareData();
 		static::assertSame( [], $this->pageInfo->getYearMonthCounts() );
 	}
 
@@ -674,8 +678,8 @@ class PageInfoTest extends TestAdapter {
 		static::assertEquals( 1500, $this->pageInfo->getPageviews()['count'] );
 
 		// no dates
-		$start->setValue( $this->pageInfo, null );
-		$end->setValue( $this->pageInfo, null );
+		$start->setValue( $this->pageInfo, false );
+		$end->setValue( $this->pageInfo, false );
 		$this->page->expects( static::once() )
 			->method( 'getLength' )
 			->willReturn( 42 );

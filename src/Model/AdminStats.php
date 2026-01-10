@@ -5,6 +5,7 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Repository\AdminStatsRepository;
+use App\Repository\Repository;
 
 /**
  * AdminStats returns information about users with rights defined in admin_stats.yaml.
@@ -23,35 +24,25 @@ class AdminStats extends Model {
 	/** @var string[] Usernames of users who are in the relevant user group (sysop for admins, etc.). */
 	private array $usersInGroup = [];
 
-	/** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
-	private string $type;
-
-	/** @var string[] Which actions to show ('block', 'protect', etc.) */
-	private array $actions;
-
 	/**
 	 * AdminStats constructor.
-	 * @param AdminStatsRepository $repository
+	 * @param Repository|AdminStatsRepository $repository
 	 * @param Project $project
-	 * @param int $start as UTC timestamp.
-	 * @param int $end as UTC timestamp.
-	 * @param string $group Which user group to get stats for. Refer to admin_stats.yaml for possible values.
+	 * @param false|int $start as UTC timestamp.
+	 * @param false|int $end as UTC timestamp.
+	 * @param string $type Which user group to get stats for. Refer to admin_stats.yaml for possible values.
 	 * @param string[] $actions Which actions to query for ('block', 'protect', etc.). Null for all actions.
 	 */
 	public function __construct(
-		AdminStatsRepository $repository,
-		Project $project,
-		int $start,
-		int $end,
-		string $group,
-		array $actions
+		protected Repository|AdminStatsRepository $repository,
+		protected Project $project,
+		protected false|int $start,
+		protected false|int $end,
+		/** @var string Type that we're getting stats for (admin, patroller, steward, etc.). See admin_stats.yaml */
+		private string $type,
+		/** @var string[] Which actions to show ('block', 'protect', etc.) */
+		private array $actions
 	) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->start = $start;
-		$this->end = $end;
-		$this->type = $group;
-		$this->actions = $actions;
 	}
 
 	/**
@@ -69,11 +60,12 @@ class AdminStats extends Model {
 	public function getRelevantUserGroup(): string {
 		// Quick cache, valid only for the same request.
 		static $relevantUserGroup = '';
-		if ( '' !== $relevantUserGroup ) {
+		if ( $relevantUserGroup !== '' ) {
 			return $relevantUserGroup;
 		}
 
-		return $relevantUserGroup = $this->getRepository()->getRelevantUserGroup( $this->type );
+		$relevantUserGroup = $this->getRepository()->getRelevantUserGroup( $this->type );
+		return $relevantUserGroup;
 	}
 
 	/**
@@ -118,10 +110,13 @@ class AdminStats extends Model {
 		// All the user groups that are considered capable of making the relevant actions for $this->group.
 		$groupUserGroups = $this->getRepository()->getUserGroups( $this->project, $this->type );
 
-		$this->usersAndGroups = $this->project->getUsersInGroups( $groupUserGroups['local'], $groupUserGroups['global'] );
+		$this->usersAndGroups = $this->project->getUsersInGroups(
+			$groupUserGroups['local'],
+			$groupUserGroups['global']
+		);
 
 		// Populate $this->usersInGroup with users who are in the relevant user group for $this->group.
-		$this->usersInGroup = array_keys( array_filter( $this->usersAndGroups, function ( $groups ) {
+		$this->usersInGroup = array_keys( array_filter( $this->usersAndGroups, function ( array $groups ) {
 			return in_array( $this->getRelevantUserGroup(), $groups );
 		} ) );
 
@@ -136,7 +131,7 @@ class AdminStats extends Model {
 	public function getUserGroupIcons( bool $wikiPath = false ): array {
 		// Quick cache, valid only for the same request.
 		static $userGroupIcons = null;
-		if ( null !== $userGroupIcons ) {
+		if ( $userGroupIcons !== null ) {
 			$out = $userGroupIcons;
 		} else {
 			$out = $userGroupIcons = $this->getRepository()->getUserGroupIcons();
@@ -185,6 +180,8 @@ class AdminStats extends Model {
 	 * adding in a key/value for user groups.
 	 * @param string[][] $data As retrieved by AdminStatsRepository::getStats
 	 * @return string[] Stats keyed by user name.
+	 * Functionality covered in test for self::getStats().
+	 * @codeCoverageIgnore
 	 */
 	private function groupStatsByUsername( array $data ): array {
 		$usersAndGroups = $this->getUsersAndGroups();
@@ -225,7 +222,7 @@ class AdminStats extends Model {
 		$totalsRow = [];
 		foreach ( $this->adminStats as $data ) {
 			foreach ( $data as $action => $count ) {
-				if ( 'username' === $action || 'user-groups' === $action ) {
+				if ( $action === 'username' || $action === 'user-groups' ) {
 					continue;
 				}
 				$totalsRow[$action] ??= 0;

@@ -5,6 +5,7 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Repository\PageAssessmentsRepository;
+use App\Repository\Repository;
 
 /**
  * A PageAssessments is responsible for handling logic around
@@ -22,11 +23,16 @@ class PageAssessments extends Model {
 		...[ 0, 4, 6, 10, 12, 14 ],
 		// Custom namespaces
 		...[
-			100, // Portal
-			102, // WikiProject (T360774)
-			108, // Book
-			118, // Draft
-			828, // Module
+			// Portal
+			100,
+			// WikiProject (T360774)
+			102,
+			// Book
+			108,
+			// Draft
+			118,
+			// Module
+			828,
 		],
 	];
 
@@ -35,12 +41,13 @@ class PageAssessments extends Model {
 
 	/**
 	 * Create a new PageAssessments.
-	 * @param PageAssessmentsRepository $repository
+	 * @param Repository|PageAssessmentsRepository $repository
 	 * @param Project $project
 	 */
-	public function __construct( PageAssessmentsRepository $repository, Project $project ) {
-		$this->repository = $repository;
-		$this->project = $project;
+	public function __construct(
+		protected Repository|PageAssessmentsRepository $repository,
+		protected Project $project
+	) {
 	}
 
 	/**
@@ -49,7 +56,7 @@ class PageAssessments extends Model {
 	 */
 	public function getConfig(): ?array {
 		if ( !isset( $this->config ) ) {
-			return $this->config = $this->repository->getConfig( $this->project );
+			$this->config = $this->repository->getConfig( $this->project );
 		}
 
 		return $this->config;
@@ -111,7 +118,7 @@ class PageAssessments extends Model {
 	 * @param Page $page
 	 * @return string[]|false With keys 'value' and 'badge', or false if assessments are unsupported.
 	 */
-	public function getAssessment( Page $page ) {
+	public function getAssessment( Page $page ): array|false {
 		if ( !$this->isEnabled() || !$this->isSupportedNamespace( $page->getNamespace() ) ) {
 			return false;
 		}
@@ -170,7 +177,7 @@ class PageAssessments extends Model {
 			$assessment['class'] = $this->getClassFromAssessment( $assessment );
 
 			// Replace the overall assessment with the first non-empty assessment.
-			if ( '???' === $overallAssessment['class'] && '???' !== $assessment['class']['value'] ) {
+			if ( $overallAssessment['class'] === '???' && $assessment['class']['value'] !== '???' ) {
 				$overallAssessment['class'] = $assessment['class']['value'];
 				$overallAssessment['color'] = $assessment['class']['color'];
 				$overallAssessment['category'] = $assessment['class']['category'];
@@ -183,7 +190,7 @@ class PageAssessments extends Model {
 		}
 
 		// Don't show 'Unknown' assessment outside of the mainspace.
-		if ( 0 !== $page->getNamespace() && '???' === $overallAssessment['class'] ) {
+		if ( $page->getNamespace() !== 0 && $overallAssessment['class'] === '???' ) {
 			return [];
 		}
 
@@ -217,7 +224,7 @@ class PageAssessments extends Model {
 		$classValue = $assessment['class'];
 
 		// Use ??? as the presented value when the class is unknown or is not defined in the config
-		if ( 'Unknown' === $classValue || '' === $classValue || !isset( $this->getConfig()['class'][$classValue] ) ) {
+		if ( $classValue === 'Unknown' || $classValue === '' || !isset( $this->getConfig()['class'][$classValue] ) ) {
 			return array_merge( $this->getClassAttrs( 'Unknown' ), [
 				'value' => '???',
 				'badge' => $this->getBadgeURL( 'Unknown' ),
@@ -233,7 +240,7 @@ class PageAssessments extends Model {
 		];
 
 		// add full URL to badge icon
-		if ( '' !== $classAttrs['badge'] ) {
+		if ( $classAttrs['badge'] !== '' ) {
 			$class['badge'] = $this->getBadgeURL( $classValue );
 		}
 
@@ -252,12 +259,12 @@ class PageAssessments extends Model {
 	public function getImportanceFromAssessment( array $assessment ): ?array {
 		$importanceValue = $assessment['importance'];
 
-		if ( '' == $importanceValue && !isset( $this->getConfig()['importance'] ) ) {
+		if ( $importanceValue == '' && !isset( $this->getConfig()['importance'] ) ) {
 			return null;
 		}
 
 		// Known importance level.
-		$importanceUnknown = 'Unknown' === $importanceValue || '' === $importanceValue;
+		$importanceUnknown = $importanceValue === 'Unknown' || $importanceValue === '';
 
 		if ( $importanceUnknown || !isset( $this->getConfig()['importance'][$importanceValue] ) ) {
 			$importanceAttrs = $this->getConfig()['importance']['Unknown'];
@@ -271,7 +278,8 @@ class PageAssessments extends Model {
 			return [
 				'value' => $importanceValue,
 				'color' => $importanceAttrs['color'],
-				'weight' => $importanceAttrs['weight'], // numerical weight for sorting purposes
+				// numerical weight for sorting purposes
+				'weight' => $importanceAttrs['weight'],
 				'category' => $importanceAttrs['category'],
 			];
 		}

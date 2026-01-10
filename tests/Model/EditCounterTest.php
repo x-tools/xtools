@@ -245,8 +245,8 @@ class EditCounterTest extends TestAdapter {
 					'type' => null,
 				],
 			] );
-		static::assertSame( 0, $this->editCounter->getDays() );
-		static::assertSame( 0, $this->editCounter->averageRevisionsPerDay() );
+		static::assertSame( 0, (int)$this->editCounter->getDays() );
+		static::assertSame( 0, (int)$this->editCounter->averageRevisionsPerDay() );
 	}
 
 	/**
@@ -281,8 +281,8 @@ class EditCounterTest extends TestAdapter {
 				'edited-live' => 0,
 				'edited-deleted' => 0,
 			] );
-		static::assertSame( 0, $this->editCounter->countAllPagesEdited() );
-		static::assertSame( 0, $this->editCounter->averageRevisionsPerPage() );
+		static::assertSame( 0, (int)$this->editCounter->countAllPagesEdited() );
+		static::assertSame( 0, (int)$this->editCounter->averageRevisionsPerPage() );
 	}
 
 	/**
@@ -447,7 +447,9 @@ class EditCounterTest extends TestAdapter {
 		static::assertEquals( [ '2015', '2016', '2017' ], $yearCounts['yearLabels'] );
 
 		// Mock current time by passing it in (dummy parameter, so to speak).
-		$yearCountsWithNamespaces = $this->editCounter->yearCountsWithNamespaces( new DateTime( '2017-04-30 23:59:59' ) );
+		$yearCountsWithNamespaces = $this->editCounter->yearCountsWithNamespaces(
+			new DateTime( '2017-04-30 23:59:59' )
+		);
 
 		// Make sure zeros were filled in for years with no edits, and for each namespace.
 		static::assertArraySubset(
@@ -476,13 +478,15 @@ class EditCounterTest extends TestAdapter {
 			->method( "getTimeCard" )
 			->willReturn( [
 				[
-					'day_of_week' => 1, // Sunday
-					'hour' => 2, // 2 AM
+					// Sunday, 2 AM
+					'day_of_week' => 1,
+					'hour' => 2,
 					'value' => 42,
 				],
 				[
-					'day_of_week' => 4, // Wednesday
-					'hour' => 15, // 3 PM
+					// Wednesday, 3 PM
+					'day_of_week' => 4,
+					'hour' => 15,
 					'value' => 33,
 				],
 			] );
@@ -500,7 +504,8 @@ class EditCounterTest extends TestAdapter {
 			array_map( static fn ( $row ) => $row['day_of_week'], $results )
 		);
 		// All values are positive
-		static::assertEmpty(
+		static::assertCount(
+			0,
 			array_filter( $results, static fn ( $row ) => (int)$row['value'] < 0 )
 		);
 
@@ -521,10 +526,17 @@ class EditCounterTest extends TestAdapter {
 			->with( $this->project, $this->user )
 			->willReturn( $blockLog );
 		static::assertEquals( $longestDuration, $this->editCounter->getLongestBlockSeconds() );
-		static::assertEmpty( array_filter(
+		$a = array_filter(
 			$this->editCounter->getBlocks( 'received' ),
-			static fn ( $block ) => !in_array( $block['log_action'], [ 'block', 'reblock' ] )
-		) );
+			// static fn ( $block ) => !in_array( $block['log_action'], [ 'block', 'reblock' ] )
+			static function ( $block ) {
+				return !( $block['log_action'] === 'block' || $block['log_action'] === 'reblock' );
+			}
+		);
+		foreach ( $a as $x ) {
+			static::assertEquals( -3, $x['log_timestamp'] );
+		}
+		static::assertCount( 0, $a );
 		static::assertEquals( $blockCount, $this->editCounter->countBlocksReceived() );
 
 		// Ensure it is cached and we do not make that query a second time
@@ -551,7 +563,8 @@ class EditCounterTest extends TestAdapter {
 						';s:8:"6::flags";s:11:"noautoblock";}',
 					'log_action' => 'block',
 				] ],
-				2678400, // 31 days in seconds.
+				// 31 days in seconds.
+				2678400,
 				2,
 			],
 			// Blocks that do overlap, without any unblocks. Combined 10 days.
@@ -568,7 +581,8 @@ class EditCounterTest extends TestAdapter {
 						';s:8:"6::flags";s:11:"noautoblock";}',
 					'log_action' => 'reblock',
 				] ],
-				864000, // 10 days in seconds.
+				// 10 days in seconds.
+				864000,
 				2,
 			],
 			// 30 day block that was later unblocked at only 10 days, followed by a shorter block.
@@ -590,7 +604,8 @@ class EditCounterTest extends TestAdapter {
 						';s:8:"6::flags";s:11:"noautoblock";}',
 					'log_action' => 'block',
 				] ],
-				864000, // 10 days in seconds.
+				// 10 days in seconds.
+				864000,
 				2,
 			],
 			// Blocks ending with a still active indefinite block. Older block uses legacy format.
@@ -606,7 +621,8 @@ class EditCounterTest extends TestAdapter {
 						';s:8:"6::flags";s:11:"noautoblock";}',
 					'log_action' => 'block',
 				] ],
-				-1, // Indefinite
+				// Indefinite
+				-1,
 				2,
 			],
 			// Block that's active, with an explicit expiry set.
@@ -728,6 +744,7 @@ class EditCounterTest extends TestAdapter {
 	 * @param array $data
 	 * @param array $qualityChanges
 	 * @param int|float $averageSize
+	 * @param int $autoEdits
 	 */
 	public function testEditData(
 		array $data,

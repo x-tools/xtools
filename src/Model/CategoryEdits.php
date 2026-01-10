@@ -5,6 +5,7 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Repository\CategoryEditsRepository;
+use App\Repository\Repository;
 
 /**
  * CategoryEdits returns statistics about edits made by a user to pages in given categories.
@@ -27,32 +28,26 @@ class CategoryEdits extends Model {
 
 	/**
 	 * Constructor for the CategoryEdits class.
-	 * @param CategoryEditsRepository $repository
+	 * @param Repository|CategoryEditsRepository $repository
 	 * @param Project $project
-	 * @param User $user
+	 * @param ?User $user
 	 * @param array $categories
 	 * @param int|false $start As Unix timestamp.
 	 * @param int|false $end As Unix timestamp.
 	 * @param int|false $offset As Unix timestamp. Used for pagination.
 	 */
 	public function __construct(
-		CategoryEditsRepository $repository,
-		Project $project,
-		User $user,
+		protected Repository|CategoryEditsRepository $repository,
+		protected Project $project,
+		protected ?User $user,
 		array $categories,
-		$start = false,
-		$end = false,
-		$offset = false
+		protected int|false $start = false,
+		protected int|false $end = false,
+		protected int|false $offset = false
 	) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->user = $user;
 		$this->categories = array_map( static function ( $category ) {
 			return str_replace( ' ', '_', $category );
 		}, $categories );
-		$this->start = $start;
-		$this->end = $end;
-		$this->offset = $offset;
 	}
 
 	/**

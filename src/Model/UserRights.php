@@ -5,6 +5,7 @@ declare( strict_types = 1 );
 namespace App\Model;
 
 use App\Helper\I18nHelper;
+use App\Repository\Repository;
 use App\Repository\UserRightsRepository;
 use DateInterval;
 use DateTimeImmutable;
@@ -13,8 +14,6 @@ use DateTimeImmutable;
  * An UserRights provides methods around parsing changes to a user's rights.
  */
 class UserRights extends Model {
-	protected I18nHelper $i18n;
-
 	/** @var string[] Rights changes, keyed by timestamp then 'added' and 'removed'. */
 	protected array $rightsChanges;
 
@@ -31,14 +30,17 @@ class UserRights extends Model {
 	protected bool $impossibleLogs = false;
 
 	/**
-	 * @param UserRightsRepository $repository
-	 * @param User $user
+	 * @param Repository|UserRightsRepository $repository
+	 * @param Project $project
+	 * @param User|null $user
+	 * @param I18nHelper $i18n
 	 */
-	public function __construct( UserRightsRepository $repository, Project $project, User $user, I18nHelper $i18n ) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->user = $user;
-		$this->i18n = $i18n;
+	public function __construct(
+		protected Repository|UserRightsRepository $repository,
+		protected Project $project,
+		protected ?User $user,
+		protected I18nHelper $i18n
+	) {
 	}
 
 	/**
@@ -53,7 +55,7 @@ class UserRights extends Model {
 			$this->rightsChanges = $this->processRightsChanges( $logData );
 
 			$acDate = $this->getAutoconfirmedTimestamp();
-			if ( false !== $acDate ) {
+			if ( $acDate !== false ) {
 				$this->rightsChanges[$acDate] = [
 					'logId' => null,
 					'performer' => null,
@@ -77,7 +79,7 @@ class UserRights extends Model {
 	 * Checks the user rights log to see whether the user is an admin or used to be one.
 	 * @return string|false One of false (never an admin), 'current' or 'former'.
 	 */
-	public function getAdminStatus() {
+	public function getAdminStatus(): false|string {
 		$rightsStates = $this->getRightsStates();
 
 		if ( in_array( 'sysop', $rightsStates['local']['current'] ) ) {
@@ -147,12 +149,12 @@ class UserRights extends Model {
 		// Current rights are not fetched from the log because really old
 		// log entries contained little or no metadata, and the rights
 		// changes may be undetectable.
-		if ( 'local' === $type ) {
+		if ( $type === 'local' ) {
 			$currentRights = $this->user->getUserRights( $this->project );
 			$rightsChanges = $this->getRightsChanges();
 
 			$acDate = $this->getAutoconfirmedTimestamp();
-			if ( false !== $acDate && strtotime( $acDate ) <= time() ) {
+			if ( $acDate !== false && strtotime( $acDate ) <= time() ) {
 				$currentRights[] = 'autoconfirmed';
 			}
 		} else {
@@ -224,7 +226,7 @@ class UserRights extends Model {
 		foreach ( $logData as $row ) {
 			// Happens when the log entry has been partially deleted.
 			// This is when comment or performer was deleted.
-			if ( !isset( $row['log_params'] ) || null === $row['log_params'] ) {
+			if ( !isset( $row['log_params'] ) || $row['log_params'] === null ) {
 				// As log_params is NULL, we don't know.
 				// Leave arrays here to not crash later.
 				// Twig will know from log_deleted.
@@ -232,9 +234,10 @@ class UserRights extends Model {
 				$removed = [];
 			// Nothing was deleted.
 			} else {
+				// phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 				$unserialized = @unserialize( $row['log_params'] );
 
-				if ( false !== $unserialized ) {
+				if ( $unserialized !== false ) {
 					$old = $unserialized['4::oldgroups'] ?? $unserialized['oldGroups'];
 					$new = $unserialized['5::newgroups'] ?? $unserialized['newGroups'];
 					$added = array_diff( $new, $old );
@@ -250,16 +253,17 @@ class UserRights extends Model {
 							$newExpiry = $newMetadata[$index]['expiry'] ?? null;
 
 							// Check if an expiry was added, removed, or modified.
-							if ( ( null !== $oldExpiry && null === $newExpiry ) ||
-								( null === $oldExpiry && null !== $newExpiry ) ||
-								( null !== $oldExpiry && null !== $newExpiry )
+							if ( ( $oldExpiry !== null && $newExpiry === null ) ||
+								( $oldExpiry === null && $newExpiry !== null ) ||
+								( $oldExpiry !== null && $newExpiry !== null )
 							) {
 								$added[$index] = $right;
 
 								// Remove the last auto-removal(s), which must exist.
 								foreach ( array_reverse( $rightsChanges, true ) as $timestamp => $change ) {
-									if ( in_array( $right, $change['removed'] ) && !in_array( $right, $change['added'] ) &&
-										'automatic' === $change['grantType']
+									if ( in_array( $right, $change['removed'] ) &&
+										!in_array( $right, $change['added'] ) &&
+										$change['grantType'] === 'automatic'
 									) {
 										unset( $rightsChanges[$timestamp] );
 									}
@@ -310,11 +314,11 @@ class UserRights extends Model {
 
 			$rightsChanges[$row['log_timestamp']] = [
 				'logId' => $row['log_id'],
-				'performer' => 'autopromote' === $row['log_action'] ? null : $row['performer'],
+				'performer' => $row['log_action'] === 'autopromote' ? null : $row['performer'],
 				'comment' => $row['log_comment'],
 				'added' => array_values( $added ),
 				'removed' => array_values( $removed ),
-				'grantType' => 'autopromote' === $row['log_action'] ? 'automatic' : 'manual',
+				'grantType' => $row['log_action'] === 'autopromote' ? 'automatic' : 'manual',
 				'type' => $row['type'],
 				'paramsDeleted' => $row['log_deleted'] > 0,
 				'commentDeleted' => ( $row['log_deleted'] % 4 ) >= 2,
@@ -340,7 +344,7 @@ class UserRights extends Model {
 			$newMetadata = $params['newmetadata'][$index] ?? $params['newMetadata'][$index] ?? null;
 
 			// Skip if no expiry was set.
-			if ( null === $newMetadata || empty( $newMetadata['expiry'] )
+			if ( $newMetadata === null || empty( $newMetadata['expiry'] )
 			) {
 				continue;
 			}
@@ -373,7 +377,7 @@ class UserRights extends Model {
 
 	private function unsetAutoRemoval( array &$rightsChanges, array $removed ): void {
 		foreach ( $rightsChanges as $timestamp => $change ) {
-			if ( 'automatic' === $change['grantType'] ) {
+			if ( $change['grantType'] === 'automatic' ) {
 				$rightsChanges[$timestamp]['removed'] = array_diff( $change['removed'], $removed );
 				if ( empty( $rightsChanges[$timestamp]['removed'] ) ) {
 					unset( $rightsChanges[$timestamp] );
@@ -395,8 +399,8 @@ class UserRights extends Model {
 	 * Get the timestamp of when the user became autoconfirmed.
 	 * @return string|false YmdHis format, or false if date is in the future or if AC status could not be determined.
 	 */
-	public function getAutoconfirmedTimestamp() {
-		if ( isset( $this->acTimestamp ) && null !== $this->acTimestamp ) {
+	public function getAutoconfirmedTimestamp(): false|string {
+		if ( isset( $this->acTimestamp ) && $this->acTimestamp !== null ) {
 			return $this->acTimestamp;
 		}
 
@@ -407,7 +411,7 @@ class UserRights extends Model {
 		$thresholds = $this->repository->getAutoconfirmedAgeAndCount( $this->project );
 
 		// Happens for non-WMF installations, or if there is no autoconfirmed status.
-		if ( null === $thresholds ) {
+		if ( $thresholds === null ) {
 			return false;
 		}
 

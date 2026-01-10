@@ -90,7 +90,8 @@ class BlameTest extends TestAdapter {
 		$blame = new Blame( $this->blameRepo, $this->page, 'Foo bar' );
 		$blame->prepareData();
 		$matches = $blame->getMatches();
-		$blame->prepareData(); // test it does cache
+		// test it does cache
+		$blame->prepareData();
 
 		static::assertCount( 2, $matches );
 		static::assertEquals( [ $mockEdit, $mockEdit ], $blame->getEdits() );

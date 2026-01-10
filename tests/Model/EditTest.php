@@ -92,7 +92,7 @@ class EditTest extends TestAdapter {
 		static::assertEquals( $this->project, $edit->getProject() );
 		static::assertInstanceOf( DateTime::class, $edit->getTimestamp() );
 		static::assertEquals( $this->page, $edit->getPage() );
-		static::assertSame( '1483264800', $edit->getTimestamp()->getTimestamp() );
+		static::assertSame( 1483264800, $edit->getTimestamp()->getTimestamp() );
 		static::assertSame( 1, $edit->getId() );
 		static::assertFalse( $edit->isMinor() );
 		static::assertEquals( 'abcdef', $edit->getSha() );
@@ -148,7 +148,7 @@ class EditTest extends TestAdapter {
 		] );
 		static::assertEquals(
 			"<a target='_blank' href='https://en.wikipedia.org/wiki/Test_page#Section'>&rarr;</a>" .
-				"<em class='text-muted'>Section:</em>",
+				"<em class='text-muted'>Section:</em> ",
 			$edit->getWikifiedSummary()
 		);
 	}

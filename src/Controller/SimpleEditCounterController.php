@@ -6,7 +6,10 @@ namespace App\Controller;
 
 use App\Model\SimpleEditCounter;
 use App\Repository\SimpleEditCounterRepository;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller handles the Simple Edit Counter tool.
@@ -21,12 +24,11 @@ class SimpleEditCounterController extends XtoolsController {
 		return 'SimpleEditCounter';
 	}
 
+	#[Route( path: '/sc', name: 'SimpleEditCounter' )]
+	#[Route( path: '/sc/index.php', name: 'SimpleEditCounterIndexPhp' )]
+	#[Route( path: '/sc/{project}', name: 'SimpleEditCounterProject' )]
 	/**
 	 * The Simple Edit Counter search form.
-	 * @Route("/sc", name="SimpleEditCounter")
-	 * @Route("/sc/index.php", name="SimpleEditCounterIndexPhp")
-	 * @Route("/sc/{project}", name="SimpleEditCounterProject")
-	 * @return Response
 	 */
 	public function indexAction(): Response {
 		// Redirect if project and username are given.
@@ -65,25 +67,23 @@ class SimpleEditCounterController extends XtoolsController {
 		return $sec;
 	}
 
+	#[Route(
+		'/sc/{project}/{username}/{namespace}/{start}/{end}',
+		name: 'SimpleEditCounterResult',
+		requirements: [
+			'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+			'namespace' => '|all|\d+',
+			'start' => '|\d{4}-\d{2}-\d{2}',
+			'end' => '|\d{4}-\d{2}-\d{2}',
+		],
+		defaults: [
+			'start' => false,
+			'end' => false,
+			'namespace' => 'all',
+		]
+	)]
 	/**
 	 * Display the results.
-	 * @Route(
-	 *     "/sc/{project}/{username}/{namespace}/{start}/{end}",
-	 *     name="SimpleEditCounterResult",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "namespace" = "|all|\d+",
-	 *         "start" = "|\d{4}-\d{2}-\d{2}",
-	 *         "end" = "|\d{4}-\d{2}-\d{2}",
-	 *     },
-	 *     defaults={
-	 *         "start"=false,
-	 *         "end"=false,
-	 *         "namespace"="all",
-	 *     }
-	 * )
-	 * @param SimpleEditCounterRepository $simpleEditCounterRepo
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
 	public function resultAction( SimpleEditCounterRepository $simpleEditCounterRepo ): Response {
@@ -98,57 +98,57 @@ class SimpleEditCounterController extends XtoolsController {
 
 	/************************ API endpoints */
 
+	#[OA\Tag( name: "User API" )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Parameter( ref: "#/components/parameters/UsernameOrIp" )]
+	#[OA\Parameter( ref: "#/components/parameters/Namespace" )]
+	#[OA\Parameter( ref: "#/components/parameters/Start" )]
+	#[OA\Parameter( ref: "#/components/parameters/End" )]
+	#[OA\Response(
+		response: 200,
+		description: "Simple edit count, along with user groups and global user groups.",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "username", ref: "#/components/parameters/UsernameOrIp/schema" ),
+				new OA\Property( property: "namespace", ref: "#/components/parameters/Namespace/schema" ),
+				new OA\Property( property: "start", ref: "#/components/parameters/Start/schema" ),
+				new OA\Property( property: "end", ref: "#/components/parameters/End/schema" ),
+				new OA\Property( property: "user_id", type: "integer" ),
+				new OA\Property( property: "live_edit_count", type: "integer" ),
+				new OA\Property( property: "deleted_edit_count", type: "integer" ),
+				new OA\Property( property: "user_groups", type: "array", items: new OA\Items( type: "string" ) ),
+				new OA\Property( property: "global_user_groups", type: "array", items: new OA\Items( type: "string" ) ),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" ),
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route(
+		'/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}',
+		name: 'SimpleEditCounterApi',
+		requirements: [
+			'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+			'namespace' => '|all|\d+',
+			'start' => '|\d{4}-\d{2}-\d{2}',
+			'end' => '|\d{4}-\d{2}-\d{2}',
+		],
+		defaults: [
+			'start' => false,
+			'end' => false,
+			'namespace' => 'all',
+		],
+		methods: [ 'GET' ]
+	)]
 	/**
 	 * API endpoint for the Simple Edit Counter.
-	 * @Route(
-	 *     "/api/user/simple_editcount/{project}/{username}/{namespace}/{start}/{end}",
-	 *     name="SimpleEditCounterApi",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "start" = "|\d{4}-\d{2}-\d{2}",
-	 *         "end" = "|\d{4}-\d{2}-\d{2}",
-	 *         "namespace" = "|all|\d+"
-	 *     },
-	 *     defaults={
-	 *         "start"=false,
-	 *         "end"=false,
-	 *         "namespace"="all",
-	 *     },
-	 *     methods={"GET"}
-	 * )
-	 * @OA\Tag(name="User API")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Parameter(ref="#/components/parameters/UsernameOrIp")
-	 * @OA\Parameter(ref="#/components/parameters/Namespace")
-	 * @OA\Parameter(ref="#/components/parameters/Start")
-	 * @OA\Parameter(ref="#/components/parameters/End")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Simple edit count, along with user groups and global user groups.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="username", ref="#/components/parameters/UsernameOrIp/schema"),
-	 * @OA\Property(property="namespace", ref="#/components/parameters/Namespace/schema"),
-	 * @OA\Property(property="start", ref="#components/parameters/Start/schema"),
-	 * @OA\Property(property="end", ref="#components/parameters/End/schema"),
-	 * @OA\Property(property="user_id", type="integer"),
-	 * @OA\Property(property="live_edit_count", type="integer"),
-	 * @OA\Property(property="deleted_edit_count", type="integer"),
-	 * @OA\Property(property="user_groups", type="array", @OA\Items(type="string")),
-	 * @OA\Property(property="global_user_groups", type="array", @OA\Items(type="string")),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @param SimpleEditCounterRepository $simpleEditCounterRepository
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
-	public function simpleEditCounterApiAction( SimpleEditCounterRepository $simpleEditCounterRepository ): Response {
+	public function simpleEditCounterApiAction( SimpleEditCounterRepository $simpleEditCounterRepo ): JsonResponse {
 		$this->recordApiUsage( 'user/simple_editcount' );
-		$sec = $this->prepareSimpleEditCounter( $simpleEditCounterRepository );
+		$sec = $this->prepareSimpleEditCounter( $simpleEditCounterRepo );
 		$data = $sec->getData();
 		if ( $this->user->isIpRange() ) {
 			unset( $data['deleted_edit_count'] );

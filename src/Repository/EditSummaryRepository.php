@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Model\Project;
 use App\Model\User;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Result;
 use Wikimedia\IPUtils;
 
 /**
@@ -23,22 +23,22 @@ class EditSummaryRepository extends UserRepository {
 	 * @param string|int $namespace Namespace ID or 'all' for all namespaces.
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
-	 * @return ResultStatement
+	 * @return Result
 	 */
 	public function getRevisions(
 		Project $project,
 		User $user,
-		$namespace,
-		$start = false,
-		$end = false
-	): ResultStatement {
+		string|int $namespace,
+		int|false $start = false,
+		int|false $end = false
+	): Result {
 		$revisionTable = $project->getTableName( 'revision' );
 		$commentTable = $project->getTableName( 'comment' );
 		$pageTable = $project->getTableName( 'page' );
 
 		$revDateConditions = $this->getDateConditions( $start, $end );
-		$condNamespace = 'all' === $namespace ? '' : 'AND page_namespace = :namespace';
-		$pageJoin = 'all' === $namespace ? '' : "JOIN $pageTable ON rev_page = page_id";
+		$condNamespace = $namespace === 'all' ? '' : 'AND page_namespace = :namespace';
+		$pageJoin = $namespace === 'all' ? '' : "JOIN $pageTable ON rev_page = page_id";
 		$params = [];
 		$ipcJoin = '';
 		$whereClause = 'rev_actor = :actorId';
@@ -65,7 +65,7 @@ class EditSummaryRepository extends UserRepository {
 
 	/**
 	 * Loop through the revisions and tally up totals, based on callback that lives in the EditSummary model.
-	 * @param array $processRow [EditSummary instance, 'method name']
+	 * @param callable $processRow
 	 * @param Project $project
 	 * @param User $user
 	 * @param int|string $namespace Namespace ID or 'all' for all namespaces.
@@ -74,12 +74,12 @@ class EditSummaryRepository extends UserRepository {
 	 * @return array The final results.
 	 */
 	public function prepareData(
-		array $processRow,
+		callable $processRow,
 		Project $project,
 		User $user,
-		$namespace,
-		$start = false,
-		$end = false
+		int|string $namespace,
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( [ $project, $user, $namespace, $start, $end ], 'edit_summary_usage' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -89,8 +89,9 @@ class EditSummaryRepository extends UserRepository {
 		$resultQuery = $this->getRevisions( $project, $user, $namespace, $start, $end );
 		$data = [];
 
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $row = $resultQuery->fetchAssociative() ) {
-			$data = call_user_func( $processRow, $row );
+			$data = $processRow( $row );
 		}
 
 		// Cache and return.

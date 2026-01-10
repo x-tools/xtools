@@ -4,6 +4,7 @@ declare( strict_types = 1 );
 
 namespace App\Model;
 
+use App\Repository\Repository;
 use App\Repository\UserRepository;
 use DateTime;
 use Exception;
@@ -20,9 +21,6 @@ class User extends Model {
 	/** @var int Maximum queryable range for IPv6. */
 	public const MAX_IPV6_CIDR = 32;
 
-	/** @var string The user's username. */
-	protected string $username;
-
 	/** @var int[] Quick cache of edit counts, keyed by project domain. */
 	protected array $editCounts = [];
 
@@ -31,12 +29,14 @@ class User extends Model {
 
 	/**
 	 * Create a new User given a username.
-	 * @param UserRepository $repository
+	 * @param Repository|UserRepository $repository
 	 * @param string $username
 	 */
-	public function __construct( UserRepository $repository, string $username ) {
-		$this->repository = $repository;
-		if ( 'ipr-' === substr( $username, 0, 4 ) ) {
+	public function __construct(
+		protected Repository|UserRepository $repository,
+		protected string $username
+	) {
+		if ( str_starts_with( $username, 'ipr-' ) ) {
 			$username = substr( $username, 4 );
 		}
 		$this->username = ucfirst( str_replace( '_', ' ', trim( $username ) ) );
@@ -212,9 +212,9 @@ class User extends Model {
 			$this->getUsername()
 		);
 
-		return null !== $ret['regDate']
-			? DateTime::createFromFormat( 'YmdHis', $ret['regDate'] )
-			: null;
+		return $ret['regDate'] !== null ?
+			DateTime::createFromFormat( 'YmdHis', $ret['regDate'] ) :
+			null;
 	}
 
 	/**
@@ -286,7 +286,7 @@ class User extends Model {
 	/**
 	 * Does this user exist globally?
 	 * @return bool
-	 * Just returns a repository result
+	 * Just returns a repository result.
 	 * @codeCoverageIgnore
 	 */
 	public function existsGlobally(): bool {
@@ -299,7 +299,7 @@ class User extends Model {
 	 * @return bool
 	 */
 	public function isAdmin( Project $project ): bool {
-		return false !== array_search( 'sysop', $this->getUserRights( $project ) );
+		return in_array( 'sysop', $this->getUserRights( $project ) );
 	}
 
 	/**
@@ -326,6 +326,7 @@ class User extends Model {
 	 * Does the given username match that of temporary accounts?
 	 * Based on https://w.wiki/BZQY from MediaWiki core (GPL-2.0-or-later)
 	 * @param Project $project
+	 * @param string $username
 	 * @return bool
 	 */
 	public static function isTempUsername( Project $project, string $username ): bool {
@@ -334,16 +335,16 @@ class User extends Model {
 		}
 		foreach ( $project->getTempAccountPatterns() as $pattern ) {
 			$varPos = strpos( $pattern, '$1' );
-			if ( false === $varPos ) {
+			if ( $varPos === false ) {
 				throw new UnexpectedValueException( 'Invalid temp account pattern: ' . $pattern );
 			}
 			$prefix = substr( $pattern, 0, $varPos );
 			$suffix = substr( $pattern, $varPos + 2 );
 			$match = true;
-			if ( '' !== $prefix ) {
+			if ( $prefix !== '' ) {
 				$match = str_starts_with( $username, $prefix );
 			}
-			if ( $match && '' !== $suffix ) {
+			if ( $match && $suffix !== '' ) {
 				$match = str_ends_with( $username, $suffix )
 					&& strlen( $username ) >= strlen( $prefix ) + strlen( $suffix );
 			}
@@ -405,13 +406,18 @@ class User extends Model {
 	 * Get edit count within given timeframe and namespace
 	 * @param Project $project
 	 * @param int|string $namespace Namespace ID or 'all' for all namespaces
-	 * @param int|false $start Start date as Unix timestamp.
+	 * @param false|int $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @return int
 	 * Just returns a repository result.
 	 * @codeCoverageIgnore
 	 */
-	public function countEdits( Project $project, $namespace = 'all', $start = false, $end = false ): int {
+	public function countEdits(
+		Project $project,
+		int|string $namespace = 'all',
+		false|int $start = false,
+		false|int $end = false
+	): int {
 		return $this->repository->countEdits( $project, $this, $namespace, $start, $end );
 	}
 
@@ -422,7 +428,7 @@ class User extends Model {
 	public function isCurrentlyLoggedIn(): bool {
 		try {
 			$ident = $this->repository->getXtoolsUserInfo();
-		} catch ( Exception $exception ) {
+		} catch ( Exception ) {
 			return false;
 		}
 		return isset( $ident->username ) && $ident->username === $this->getUsername();

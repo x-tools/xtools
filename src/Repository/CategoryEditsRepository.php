@@ -8,9 +8,9 @@ use App\Helper\AutomatedEditsHelper;
 use App\Model\Edit;
 use App\Model\Project;
 use App\Model\User;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Result;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Client;
 use Psr\Cache\CacheItemPoolInterface;
@@ -24,11 +24,6 @@ use Wikimedia\IPUtils;
  * @codeCoverageIgnore
  */
 class CategoryEditsRepository extends Repository {
-	protected AutomatedEditsHelper $autoEditsHelper;
-	protected EditRepository $editRepo;
-	protected PageRepository $pageRepo;
-	protected UserRepository $userRepo;
-
 	/**
 	 * @param ManagerRegistry $managerRegistry
 	 * @param CacheItemPoolInterface $cache
@@ -43,22 +38,18 @@ class CategoryEditsRepository extends Repository {
 	 * @param UserRepository $userRepo
 	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		AutomatedEditsHelper $autoEditsHelper,
-		EditRepository $editRepo,
-		PageRepository $pageRepo,
-		UserRepository $userRepo
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected EditRepository $editRepo,
+		protected PageRepository $pageRepo,
+		protected UserRepository $userRepo
 	) {
-		$this->autoEditsHelper = $autoEditsHelper;
-		$this->editRepo = $editRepo;
-		$this->pageRepo = $pageRepo;
-		$this->userRepo = $userRepo;
 		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
 	}
 
@@ -75,8 +66,8 @@ class CategoryEditsRepository extends Repository {
 		Project $project,
 		User $user,
 		array $categories,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): int {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_categoryeditcount' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -100,7 +91,7 @@ class CategoryEditsRepository extends Repository {
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions";
 		$result = (int)$this->executeStmt( $sql, $project, $user, $categories )->fetchOne();
 
@@ -121,8 +112,8 @@ class CategoryEditsRepository extends Repository {
 		Project $project,
 		User $user,
 		array $categories,
-		$start = false,
-		$end = false
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_categorycounts' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -141,20 +132,21 @@ class CategoryEditsRepository extends Repository {
 			$whereClause = 'ipc_hex BETWEEN ? AND ?';
 		}
 
-		$sql = "SELECT cl_to AS cat, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
+		$sql = "SELECT cl_target_id, COUNT(rev_id) AS edit_count, COUNT(DISTINCT rev_page) AS page_count
                 FROM $revisionTable revs
                 $ipcJoin
                 JOIN $categorylinksTable ON cl_from = rev_page
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions
-                GROUP BY cl_to
+                GROUP BY cl_target_id
                 ORDER BY edit_count DESC";
 
 		$counts = [];
 		$stmt = $this->executeStmt( $sql, $project, $user, $categories );
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		while ( $result = $stmt->fetchAssociative() ) {
-			$counts[$result['cat']] = [
+			$counts[$this->getCategoryTargetIds( $project, $categories )[$result['cl_target_id']]] = [
 				'editCount' => (int)$result['edit_count'],
 				'pageCount' => (int)$result['page_count'],
 			];
@@ -179,9 +171,9 @@ class CategoryEditsRepository extends Repository {
 		Project $project,
 		User $user,
 		array $categories,
-		$start = false,
-		$end = false,
-		$offset = false
+		int|false $start = false,
+		int|false $end = false,
+		int|false $offset = false
 	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'user_categoryedits' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -190,7 +182,7 @@ class CategoryEditsRepository extends Repository {
 
 		$pageTable = $project->getTableName( 'page' );
 		$revisionTable = $project->getTableName( 'revision' );
-		$commentTable = $project->getTableName( 'comment' );
+		$commentTable = $project->getTableName( 'comment', 'revision' );
 		$categorylinksTable = $project->getTableName( 'categorylinks' );
 		$revDateConditions = $this->getDateConditions( $start, $end, $offset, 'revs.' );
 		$whereClause = 'revs.rev_actor = ?';
@@ -213,7 +205,7 @@ class CategoryEditsRepository extends Repository {
                 LEFT JOIN $commentTable comment ON revs.rev_comment_id = comment_id
                 LEFT JOIN $revisionTable parentrevs ON revs.rev_parent_id = parentrevs.rev_id
                 WHERE $whereClause
-                    AND cl_to IN (?)
+                    AND cl_target_id IN (?)
                     $revDateConditions
                 GROUP BY revs.rev_id
                 ORDER BY revs.rev_timestamp DESC
@@ -225,40 +217,57 @@ class CategoryEditsRepository extends Repository {
 		return $this->setCache( $cacheKey, $result );
 	}
 
+	private function getCategoryTargetIds( Project $project, array $categories ): array {
+		static $result = null;
+		if ( $result ) {
+			return $result;
+		}
+		$linktargetTable = $project->getTableName( 'linktarget' );
+		$sql = "SELECT lt_id, lt_title FROM $linktargetTable WHERE lt_title IN (?) AND lt_namespace = 14";
+		$result = $this->getProjectsConnection( $project )
+			->executeQuery(
+				$sql,
+				[ $categories ],
+				[ ArrayParameterType::STRING ]
+			)->fetchAllKeyValue();
+		return $result;
+	}
+
 	/**
 	 * Bind dates, username and categories then execute the query.
 	 * @param string $sql
 	 * @param Project $project
 	 * @param User $user
 	 * @param string[] $categories
-	 * @return ResultStatement
+	 * @return Result
 	 */
 	private function executeStmt(
 		string $sql,
 		Project $project,
 		User $user,
 		array $categories
-	): ResultStatement {
+	): Result {
+		$catLinkIds = array_keys( $this->getCategoryTargetIds( $project, $categories ) );
 		if ( $user->isIpRange() ) {
 			[ $hexStart, $hexEnd ] = IPUtils::parseRange( $user->getUsername() );
 			$params = [
 				$hexStart,
 				$hexEnd,
-				$categories,
+				$catLinkIds,
 			];
 			$types = [
 				ParameterType::STRING,
 				ParameterType::STRING,
-				Connection::PARAM_STR_ARRAY,
+				ArrayParameterType::STRING,
 			];
 		} else {
 			$params = [
 				$user->getActorId( $project ),
-				$categories,
+				$catLinkIds,
 			];
 			$types = [
 				ParameterType::STRING,
-				Connection::PARAM_STR_ARRAY,
+				ArrayParameterType::STRING,
 			];
 		}
 

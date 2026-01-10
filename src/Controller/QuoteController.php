@@ -4,10 +4,12 @@ declare( strict_types=1 );
 
 namespace App\Controller;
 
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 /**
@@ -27,18 +29,17 @@ class QuoteController extends XtoolsController {
 		return 'Quote';
 	}
 
+	#[Route( "/bash", name: "Bash" )]
+	#[Route( "/quote", name: "Quote" )]
+	#[Route( "/bash/base.php", name: "BashBase" )]
 	/**
 	 * Method for rendering the Bash Main Form. This method redirects if valid parameters are found,
 	 * making it a valid form endpoint as well.
-	 * @Route("/bash", name="Bash")
-	 * @Route("/quote", name="Quote")
-	 * @Route("/bash/base.php", name="BashBase")
-	 * @return Response
 	 */
 	public function indexAction(): Response {
 		// Check to see if the quote is a param.  If so,
 		// redirect to the proper route.
-		if ( '' != $this->request->query->get( 'id' ) ) {
+		if ( $this->request->query->get( 'id' ) != '' ) {
 			return $this->redirectToRoute(
 				'QuoteID',
 				[ 'id' => $this->request->query->get( 'id' ) ]
@@ -56,11 +57,10 @@ class QuoteController extends XtoolsController {
 		);
 	}
 
+	#[Route( "/quote/random", name: "QuoteRandom" )]
+	#[Route( "/bash/random", name: "BashRandom" )]
 	/**
 	 * Method for rendering a random quote. This should redirect to the /quote/{id} path below.
-	 * @Route("/quote/random", name="QuoteRandom")
-	 * @Route("/bash/random", name="BashRandom")
-	 * @return RedirectResponse
 	 */
 	public function randomQuoteAction(): RedirectResponse {
 		// Choose a random quote by ID. If we can't find the quotes, return back to
@@ -75,11 +75,10 @@ class QuoteController extends XtoolsController {
 		return $this->redirectToRoute( 'QuoteID', [ 'id' => $id ] );
 	}
 
+	#[Route( "/quote/all", name: "QuoteAll" )]
+	#[Route( "/bash/all", name: "BashAll" )]
 	/**
 	 * Method to show all quotes.
-	 * @Route("/quote/all", name="QuoteAll")
-	 * @Route("/bash/all", name="BashAll")
-	 * @return Response
 	 */
 	public function quoteAllAction(): Response {
 		// Load up an array of all the quotes.
@@ -102,12 +101,10 @@ class QuoteController extends XtoolsController {
 		);
 	}
 
+	#[Route( "/quote/{id}", name: "QuoteID", requirements: [ "id" => "\d+" ] )]
+	#[Route( "/bash/{id}", name: "BashID", requirements: [ "id" => "\d+" ] )]
 	/**
 	 * Method to render a single quote.
-	 * @param int $id ID of the quote
-	 * @Route("/quote/{id}", name="QuoteID")
-	 * @Route("/bash/{id}", name="BashID")
-	 * @return Response
 	 */
 	public function quoteAction( int $id ): Response {
 		// Get the singular quote.
@@ -143,20 +140,25 @@ class QuoteController extends XtoolsController {
 
 	/************************ API endpoints */
 
+	#[OA\Tag( name: "Quote API" )]
+	#[OA\Get(
+		description: "Get a random quote. The quotes are sourced from [developer quips](https://w.wiki/6rpo) " .
+			"and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).",
+		responses: [
+			new OA\Response(
+				response: 200,
+				description: "Quote keyed by ID.",
+				content: new OA\JsonContent(
+					properties: [
+						new OA\Property( property: "<quote-id>", type: "string" )
+					]
+				)
+			)
+		]
+	)]
+	#[Route( "/api/quote/random", name: "QuoteApiRandom", methods: [ "GET" ] )]
 	/**
 	 * Get random quote.
-	 * @Route("/api/quote/random", name="QuoteApiRandom", methods={"GET"})
-	 * @OA\Tag(name="Quote API")
-	 * @OA\Get(description="Get a random quote. The quotes are sourced from [developer quips](https://w.wiki/6rpo)
-	 * and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Quote keyed by ID.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="<quote-id>", type="string")
-	 *     )
-	 * )
-	 * @return JsonResponse
 	 * @codeCoverageIgnore
 	 */
 	public function randomQuoteApiAction(): JsonResponse {
@@ -172,23 +174,28 @@ class QuoteController extends XtoolsController {
 		);
 	}
 
+	#[OA\Tag( name: "Quote API" )]
+	#[OA\Get(
+		description: "Get a list of all quotes, sourced from [developer quips](https://w.wiki/6rpo) and " .
+			"[IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).",
+		responses: [
+			new OA\Response(
+				response: 200,
+				description: "All quotes, keyed by ID.",
+				content: new OA\JsonContent(
+					properties: [
+						new OA\Property( property: "<quote-id>", type: "string" )
+					]
+				)
+			)
+		]
+	 )]
+	#[Route( "/api/quote/all", name: "QuoteApiAll", methods: [ "GET" ] )]
 	/**
 	 * Get all quotes.
-	 * @Route("/api/quote/all", name="QuoteApiAll", methods={"GET"})
-	 * @OA\Tag(name="Quote API")
-	 * @OA\Get(description="Get a list of all quotes, sourced from [developer quips](https://w.wiki/6rpo)
-	 * and [IRC quotes](https://meta.wikimedia.org/wiki/IRC/Quotes/archives).")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="All quotes, keyed by ID.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="<quote-id>", type="string")
-	 *     )
-	 * )
-	 * @return Response
 	 * @codeCoverageIgnore
 	 */
-	public function allQuotesApiAction(): Response {
+	public function allQuotesApiAction(): JsonResponse {
 		$this->validateIsEnabled();
 
 		$this->recordApiUsage( 'quote/all' );
@@ -203,21 +210,30 @@ class QuoteController extends XtoolsController {
 		return new JsonResponse( $numberedQuotes, Response::HTTP_OK );
 	}
 
+	#[OA\Tag( name: "Quote API" )]
+	#[OA\Get(
+		description: "Get a quote with the given ID.",
+		responses: [
+			new OA\Response(
+				response: 200,
+				description: "Quote keyed by ID.",
+				content: new OA\JsonContent(
+					properties: [
+						new OA\Property( property: "<quote-id>", type: "string" )
+					]
+				)
+			)
+		]
+	)]
+	#[OA\Parameter(
+		name: "id",
+		in: "path",
+		required: true,
+		schema: new OA\Schema( type: "integer", minimum: 0 )
+	)]
+	#[Route( "/api/quote/{id}", name: "QuoteApiQuote", requirements: [ "id" => "\d+" ], methods: [ "GET" ] )]
 	/**
 	 * Get the quote with the given ID.
-	 * @Route("/api/quote/{id}", name="QuoteApiQuote", requirements={"id"="\d+"}, methods={"GET"})
-	 * @OA\Tag(name="Quote API")
-	 * @OA\Get(description="Get a quote with the given ID.")
-	 * @OA\Parameter(name="id", in="path", required="true", @OA\Schema(type="integer", minimum=0))
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Quote keyed by ID.",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="<quote-id>", type="string")
-	 *     )
-	 * )
-	 * @param int $id
-	 * @return JsonResponse
 	 * @codeCoverageIgnore
 	 */
 	public function singleQuotesApiAction( int $id ): JsonResponse {

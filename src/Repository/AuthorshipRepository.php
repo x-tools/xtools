@@ -38,7 +38,8 @@ class AuthorshipRepository extends Repository {
 			. "/?o_rev_id=$oRevId&editor=true&token_id=false&out=false&in=false";
 
 		$opts = [
-			'http_errors' => false, // Ignore HTTP errors to fail gracefully.
+			// Ignore HTTP errors to fail gracefully.
+			'http_errors' => false,
 			'timeout' => 60,
 			'read_timeout' => 60,
 		];

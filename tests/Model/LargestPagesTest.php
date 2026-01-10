@@ -9,7 +9,11 @@ use App\Model\Project;
 use App\Repository\LargestPagesRepository;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \App\Model\LargestPages
+ */
 class LargestPagesTest extends TestCase {
+
 	public function testGetters(): void {
 		$largestPages = new LargestPages(
 			$this->createMock( LargestPagesRepository::class ),

@@ -7,19 +7,13 @@ namespace App\Model;
 use App\Repository\AutoEditsRepository;
 use App\Repository\EditRepository;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use App\Repository\UserRepository;
 
 /**
  * AutoEdits returns statistics about automated edits made by a user.
  */
 class AutoEdits extends Model {
-	protected EditRepository $editRepo;
-	protected PageRepository $pageRepo;
-	protected UserRepository $userRepo;
-
-	/** @var null|string The tool we're searching for when fetching (semi-)automated edits. */
-	protected ?string $tool;
-
 	/** @var Edit[] The list of non-automated contributions. */
 	protected array $nonAutomatedEdits;
 
@@ -43,44 +37,34 @@ class AutoEdits extends Model {
 
 	/**
 	 * Constructor for the AutoEdits class.
-	 * @param AutoEditsRepository $repository
+	 * @param Repository|AutoEditsRepository $repository
 	 * @param EditRepository $editRepo
 	 * @param PageRepository $pageRepo
 	 * @param UserRepository $userRepo
 	 * @param Project $project
-	 * @param User $user
+	 * @param ?User $user
 	 * @param int|string $namespace Namespace ID or 'all'
 	 * @param false|int $start Start date as Unix timestamp.
 	 * @param false|int $end End date as Unix timestamp.
-	 * @param null $tool The tool we're searching for when fetching (semi-)automated edits.
+	 * @param ?string $tool The tool we're searching for when fetching (semi-)automated edits.
 	 * @param false|int $offset Unix timestamp. Used for pagination.
 	 * @param int|null $limit Number of results to return.
 	 */
 	public function __construct(
-		AutoEditsRepository $repository,
-		EditRepository $editRepo,
-		PageRepository $pageRepo,
-		UserRepository $userRepo,
-		Project $project,
-		User $user,
-		$namespace = 0,
-		$start = false,
-		$end = false,
-		$tool = null,
-		$offset = false,
+		protected Repository|AutoEditsRepository $repository,
+		protected EditRepository $editRepo,
+		protected PageRepository $pageRepo,
+		protected UserRepository $userRepo,
+		protected Project $project,
+		protected ?User $user,
+		protected int|string $namespace = 0,
+		protected false|int $start = false,
+		protected false|int $end = false,
+		/** @var ?string The tool we're searching for when fetching (semi-)automated edits. */
+		protected ?string $tool = null,
+		protected false|int $offset = false,
 		?int $limit = self::RESULTS_PER_PAGE
 	) {
-		$this->repository = $repository;
-		$this->editRepo = $editRepo;
-		$this->pageRepo = $pageRepo;
-		$this->userRepo = $userRepo;
-		$this->project = $project;
-		$this->user = $user;
-		$this->namespace = $namespace;
-		$this->start = $start;
-		$this->end = $end;
-		$this->tool = $tool;
-		$this->offset = $offset;
 		$this->limit = $limit ?? self::RESULTS_PER_PAGE;
 	}
 
@@ -147,25 +131,28 @@ class AutoEdits extends Model {
 	 * @return string[]|Edit[]
 	 */
 	public function getNonAutomatedEdits( bool $forJson = false ): array {
-		if ( !isset( $this->nonAutomatedEdits ) ) {
-			$revs = $this->repository->getNonAutomatedEdits(
-				$this->project,
-				$this->user,
-				$this->namespace,
-				$this->start,
-				$this->end,
-				$this->offset,
-				$this->limit
-			);
-			$this->nonAutomatedEdits = Edit::getEditsFromRevs(
-				$this->pageRepo,
-				$this->editRepo,
-				$this->userRepo,
-				$this->project,
-				$this->user,
-				$revs
-			);
+		if ( isset( $this->nonAutomatedEdits ) ) {
+			return $this->nonAutomatedEdits;
 		}
+
+		$revs = $this->repository->getNonAutomatedEdits(
+			$this->project,
+			$this->user,
+			$this->namespace,
+			$this->start,
+			$this->end,
+			$this->offset,
+			$this->limit
+		);
+
+		$this->nonAutomatedEdits = Edit::getEditsFromRevs(
+			$this->pageRepo,
+			$this->editRepo,
+			$this->userRepo,
+			$this->project,
+			$this->user,
+			$revs
+		);
 
 		if ( $forJson ) {
 			return array_map( static function ( Edit $edit ) {
@@ -182,26 +169,29 @@ class AutoEdits extends Model {
 	 * @return Edit[]
 	 */
 	public function getAutomatedEdits( bool $forJson = false ): array {
-		if ( !isset( $this->automatedEdits ) ) {
-			$revs = $this->repository->getAutomatedEdits(
-				$this->project,
-				$this->user,
-				$this->namespace,
-				$this->start,
-				$this->end,
-				$this->tool,
-				$this->offset,
-				$this->limit
-			);
-			$this->automatedEdits = Edit::getEditsFromRevs(
-				$this->pageRepo,
-				$this->editRepo,
-				$this->userRepo,
-				$this->project,
-				$this->user,
-				$revs
-			);
+		if ( isset( $this->automatedEdits ) ) {
+			return $this->automatedEdits;
 		}
+
+		$revs = $this->repository->getAutomatedEdits(
+			$this->project,
+			$this->user,
+			$this->namespace,
+			$this->start,
+			$this->end,
+			$this->tool,
+			$this->offset,
+			$this->limit
+		);
+
+		$this->automatedEdits = Edit::getEditsFromRevs(
+			$this->pageRepo,
+			$this->editRepo,
+			$this->userRepo,
+			$this->project,
+			$this->user,
+			$revs
+		);
 
 		if ( $forJson ) {
 			return array_map( static function ( Edit $edit ) {

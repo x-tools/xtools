@@ -18,13 +18,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * and interactions with the Intuition library.
  */
 class I18nHelper {
-	private string $projectDir;
 	protected ContainerInterface $container;
 	protected Intuition $intuition;
 	protected IntlDateFormatter $dateFormatter;
 	protected NumberFormatter $numFormatter;
 	protected NumberFormatter $percentFormatter;
-	protected RequestStack $requestStack;
 
 	/**
 	 * Constructor for the I18nHelper.
@@ -32,11 +30,9 @@ class I18nHelper {
 	 * @param string $projectDir
 	 */
 	public function __construct(
-		RequestStack $requestStack,
-		string $projectDir
+		protected RequestStack $requestStack,
+		private readonly string $projectDir
 	) {
-		$this->requestStack = $requestStack;
-		$this->projectDir = $projectDir;
 	}
 
 	/**
@@ -193,11 +189,11 @@ class I18nHelper {
 
 	/**
 	 * Format a number based on language settings.
-	 * @param int|float $number
+	 * @param int|float|null $number
 	 * @param int $decimals Number of decimals to format to.
 	 * @return string
 	 */
-	public function numberFormat( $number, int $decimals = 0 ): string {
+	public function numberFormat( int|float|null $number, int $decimals = 0 ): string {
 		$lang = $this->getLangForTranslatingNumerals();
 		if ( !isset( $this->numFormatter ) ) {
 			$this->numFormatter = new NumberFormatter( $lang, NumberFormatter::DECIMAL );
@@ -215,7 +211,7 @@ class I18nHelper {
 	 * @param int $precision Number of decimal places to show.
 	 * @return string Formatted percentage.
 	 */
-	public function percentFormat( $numerator, ?int $denominator = null, int $precision = 1 ): string {
+	public function percentFormat( int|float $numerator, ?int $denominator = null, int $precision = 1 ): string {
 		$lang = $this->getLangForTranslatingNumerals();
 		if ( !isset( $this->percentFormatter ) ) {
 			$this->percentFormatter = new NumberFormatter( $lang, NumberFormatter::PERCENT );
@@ -223,9 +219,9 @@ class I18nHelper {
 
 		$this->percentFormatter->setAttribute( NumberFormatter::MAX_FRACTION_DIGITS, $precision );
 
-		if ( null === $denominator ) {
+		if ( $denominator === null ) {
 			$quotient = $numerator / 100;
-		} elseif ( 0 === $denominator ) {
+		} elseif ( $denominator === 0 ) {
 			$quotient = 0;
 		} else {
 			$quotient = $numerator / $denominator;
@@ -243,7 +239,7 @@ class I18nHelper {
 	 * @see http://userguide.icu-project.org/formatparse/datetime
 	 * @return string
 	 */
-	public function dateFormat( $datetime, string $pattern = 'yyyy-MM-dd HH:mm' ): string {
+	public function dateFormat( string|int|DateTime $datetime, string $pattern = 'yyyy-MM-dd HH:mm' ): string {
 		$lang = $this->getLangForTranslatingNumerals();
 		if ( !isset( $this->dateFormatter ) ) {
 			$this->dateFormatter = new IntlDateFormatter(
@@ -258,7 +254,8 @@ class I18nHelper {
 		} elseif ( is_int( $datetime ) ) {
 			$datetime = DateTime::createFromFormat( 'U', (string)$datetime );
 		} elseif ( !is_a( $datetime, 'DateTime' ) ) {
-			return ''; // Unknown format.
+			// Unknown format.
+			return '';
 		}
 
 		$this->dateFormatter->setPattern( $pattern );
@@ -276,7 +273,7 @@ class I18nHelper {
 	 * @return string
 	 */
 	private function getLangForTranslatingNumerals(): string {
-		return 'ar' === $this->getIntuition()->getLang() ? 'en' : $this->getIntuition()->getLang();
+		return $this->getIntuition()->getLang() === 'ar' ? 'en' : $this->getIntuition()->getLang();
 	}
 
 	/**

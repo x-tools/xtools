@@ -19,22 +19,17 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * @codeCoverageIgnore
  */
 class EditRepository extends Repository {
-	protected AutomatedEditsHelper $autoEditsHelper;
-	protected PageRepository $pageRepo;
-
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		AutomatedEditsHelper $autoEditsHelper,
-		PageRepository $pageRepo
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected AutomatedEditsHelper $autoEditsHelper,
+		protected PageRepository $pageRepo
 	) {
-		$this->autoEditsHelper = $autoEditsHelper;
-		$this->pageRepo = $pageRepo;
 		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
 	}
 
@@ -66,7 +61,7 @@ class EditRepository extends Repository {
 		$pageSelect = '';
 		$pageJoin = '';
 
-		if ( null === $page ) {
+		if ( $page === null ) {
 			$pageTable = $project->getTableName( 'page' );
 			$pageSelect = "page_title,";
 			$pageJoin = "JOIN $pageTable ON revs.rev_page = page_id";
@@ -95,7 +90,7 @@ class EditRepository extends Repository {
 		}
 
 		// Create the Page instance.
-		if ( null === $page ) {
+		if ( $page === null ) {
 			$page = new Page( $this->pageRepo, $project, $result['page_title'] );
 		}
 

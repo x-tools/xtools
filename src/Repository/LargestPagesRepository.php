@@ -17,8 +17,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * @codeCoverageIgnore
  */
 class LargestPagesRepository extends Repository {
-	protected PageRepository $pageRepo;
-
 	/**
 	 * @param ManagerRegistry $managerRegistry
 	 * @param CacheItemPoolInterface $cache
@@ -30,16 +28,15 @@ class LargestPagesRepository extends Repository {
 	 * @param PageRepository $pageRepo
 	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		PageRepository $pageRepo
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected PageRepository $pageRepo
 	) {
-		$this->pageRepo = $pageRepo;
 		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
 	}
 
@@ -74,13 +71,18 @@ class LargestPagesRepository extends Repository {
 	 *   or a wildcard pattern with % as the wildcard symbol.
 	 * @return array
 	 */
-	public function getData( Project $project, $namespace, string $includePattern, string $excludePattern ): array {
+	public function getData(
+		Project $project,
+		int|string $namespace,
+		string $includePattern,
+		string $excludePattern
+	): array {
 		$pageTable = $project->getTableName( 'page' );
 
 		$where = '';
 		$likeCond = $this->getLikeSql( $includePattern, $excludePattern );
 		$namespaceCond = '';
-		if ( 'all' !== $namespace ) {
+		if ( $namespace !== 'all' ) {
 			$namespaceCond = 'page_namespace = :namespace';
 			if ( $likeCond ) {
 				$namespaceCond .= ' AND ';

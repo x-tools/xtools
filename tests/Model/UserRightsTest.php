@@ -135,8 +135,9 @@ class UserRightsTest extends TestAdapter {
 		$this->userRightsRepo->expects( static::once() )
 			->method( 'getAutoConfirmedAgeAndCount' )
 			->willReturn( [
-				'wgAutoConfirmAge' => 1, // 1 second
-				'wgAutoConfirmCount' => 1, // 1 edit
+				// 1 second, 1 edit
+				'wgAutoConfirmAge' => 1,
+				'wgAutoConfirmCount' => 1,
 			] );
 		$this->userRightsRepo->expects( static::once() )
 			->method( 'getNumEditsByTimestamp' )
@@ -331,9 +332,9 @@ class UserRightsTest extends TestAdapter {
 	/**
 	 * Test various edge cases and unexpected incidents during log processsing
 	 * @dataProvider edgeCaseProvider
-	 * @param $logData
-	 * @param $hasImpossibleLogs
-	 * @param $result
+	 * @param array $logData
+	 * @param bool $hasImpossibleLogs
+	 * @param array $result
 	 */
 	public function testChangesEdgeCases(
 		array $logData,
@@ -348,9 +349,11 @@ class UserRightsTest extends TestAdapter {
 	}
 
 	public function edgeCaseProvider(): array {
-		return [ [ // Dataset #0: Expiry modification
+		return [ [
+			// Dataset #0: Expiry modification
 			[
-				[ // Temporary intadmin grant until timestamp 4
+				[
+					// Temporary intadmin grant until timestamp 4
 					'log_id' => '1234',
 					'log_timestamp' => '0',
 					'log_params' => 'a:4:{s:12:"4::oldgroups";a:0:{}s:12:"5::newgroups";a:1:{i:0;s:15:' .
@@ -362,7 +365,8 @@ class UserRightsTest extends TestAdapter {
 					'type' => 'local',
 					'log_deleted' => 0,
 				],
-				[ // One second before, extended until 8
+				[
+				   // One second before, extended until 8
 					'log_id' => '5678',
 					'log_timestamp' => '3',
 					'log_params' => 'a:4:{s:12:"4::oldgroups";a:1:{i:0;s:15:"interface-admin";}s:12:"5::newgroups";' .
@@ -414,9 +418,11 @@ class UserRightsTest extends TestAdapter {
 					'performerDeleted' => false,
 				],
 			],
-		], [ // Dataset #1: Impossible logs
+		], [
+			// Dataset #1: Impossible logs
 			[
-				[ // removal of sysop
+				[
+					// removal of sysop
 					'log_id' => '1234',
 					'log_timestamp' => '0',
 					'log_params' => "sysop\n",
@@ -442,9 +448,11 @@ class UserRightsTest extends TestAdapter {
 					'performerDeleted' => false,
 				],
 			],
-		], [ // Dataset #2: everything revdeleted
+		], [
+			// Dataset #2: everything revdeleted
 			[
-				[ // removal of sysop
+				[
+					// removal of sysop
 					'log_id' => '1234',
 					'log_timestamp' => '0',
 					'log_params' => null,
@@ -470,9 +478,11 @@ class UserRightsTest extends TestAdapter {
 					'performerDeleted' => true,
 				],
 			],
-		], [ // Dataset #3: (none)s to splice out
+		], [
+			// Dataset #3: (none)s to splice out
 			[
-				[ // none in old
+				[
+					// none in old
 					'log_id' => '1234',
 					'log_timestamp' => '0',
 					'log_params' => "(none)\nsysop",
@@ -482,7 +492,8 @@ class UserRightsTest extends TestAdapter {
 					'type' => 'local',
 					'log_deleted' => 0,
 				],
-				[ // none in new
+				[
+					// none in new
 					'log_id' => '5678',
 					'log_timestamp' => '1',
 					'log_params' => "sysop\n(none)",
@@ -520,9 +531,11 @@ class UserRightsTest extends TestAdapter {
 					'performerDeleted' => false,
 				],
 			],
-		], [ // Dataset #4: removing pending auto removals on manual removal
+		], [
+			// Dataset #4: removing pending auto removals on manual removal
 			[
-				[ // Temporary intadmin grant until timestamp 4
+				[
+					// Temporary intadmin grant until timestamp 4
 					'log_id' => '1234',
 					'log_timestamp' => '0',
 					'log_params' => 'a:4:{s:12:"4::oldgroups";a:0:{}s:12:"5::newgroups";a:1:{i:0;s:15:' .
@@ -534,7 +547,8 @@ class UserRightsTest extends TestAdapter {
 					'type' => 'local',
 					'log_deleted' => 0,
 				],
-				[ // One second before, removed manually
+				[
+					// One second before, removed manually
 					'log_id' => '5678',
 					'log_timestamp' => '3',
 					'log_params' => 'a:4:{s:12:"4::oldgroups";a:1:{i:0;s:15:"interface-admin";}s:12:"5::newgroups";' .

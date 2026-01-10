@@ -6,6 +6,7 @@ namespace App\Model;
 
 use App\Repository\EditRepository;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use App\Repository\UserRepository;
 use DateTime;
 use TypeError;
@@ -18,8 +19,6 @@ class Edit extends Model {
 	public const DELETED_COMMENT = 2;
 	public const DELETED_USER = 4;
 	public const DELETED_RESTRICTED = 8;
-
-	protected UserRepository $userRepo;
 
 	/** @var int ID of the revision */
 	protected int $id;
@@ -53,16 +52,17 @@ class Edit extends Model {
 
 	/**
 	 * Edit constructor.
-	 * @param EditRepository $repository
+	 * @param Repository|EditRepository $repository
 	 * @param UserRepository $userRepo
-	 * @param Page $page
+	 * @param ?Page $page
 	 * @param string[] $attrs Attributes, as retrieved by PageRepository::getRevisions()
 	 */
-	public function __construct( EditRepository $repository, UserRepository $userRepo, Page $page, array $attrs = [] ) {
-		$this->repository = $repository;
-		$this->userRepo = $userRepo;
-		$this->page = $page;
-
+	public function __construct(
+		protected Repository|EditRepository $repository,
+		protected UserRepository $userRepo,
+		protected ?Page $page,
+		array $attrs = []
+	) {
 		// Copy over supported attributes
 		$this->id = isset( $attrs['id'] ) ? (int)$attrs['id'] : (int)$attrs['rev_id'];
 
@@ -83,10 +83,11 @@ class Edit extends Model {
 		if ( ( $this->deleted & self::DELETED_USER ) || ( $this->deleted & self::DELETED_RESTRICTED ) ) {
 			$this->user = null;
 		} else {
-			$this->user = $attrs['user'] ?? ( $attrs['username'] ? new User( $this->userRepo, $attrs['username'] ) : null );
+			$this->user = $attrs['user'] ??
+				( $attrs['username'] ? new User( $this->userRepo, $attrs['username'] ) : null );
 		}
 
-		$this->minor = 1 === (int)$attrs['minor'];
+		$this->minor = (int)$attrs['minor'] === 1;
 		$this->length = isset( $attrs['length'] ) ? (int)$attrs['length'] : null;
 		$this->lengthChange = isset( $attrs['length_change'] ) ? (int)$attrs['length_change'] : null;
 		$this->comment = $attrs['comment'] ?? '';
@@ -319,7 +320,6 @@ class Edit extends Model {
 	 * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
 	 *   an API call. This should be used only if you fetched the page title via other
 	 *   means (SQL query), and is not from user input alone.
-	 * @static
 	 * @return string
 	 */
 	public static function wikifyString(
@@ -352,13 +352,13 @@ class Edit extends Model {
 			$sectionTitleLink = html_entity_decode( html_entity_decode( str_replace( ' ', '_', $sectionTitle ) ) );
 
 			$sectionWikitext = "<a target='_blank' href='$pageUrl#$sectionTitleLink'>&rarr;</a>" .
-				"<em class='text-muted'>" . $sectionTitle . ":</em>";
+				"<em class='text-muted'>" . $sectionTitle . ":</em> ";
 			$summary = str_replace( $sectionMatch[0][0], $sectionWikitext, $summary );
 		}
 
 		$linkMatch = null;
 
-		while ( preg_match_all( "/\[\[:?(.*?)]]/", $summary, $linkMatch ) ) {
+		while ( preg_match_all( "/\[\[:?([^\[\]]*?)]]/", $summary, $linkMatch ) ) {
 			$wikiLinkParts = explode( '|', $linkMatch[1][0] );
 			$wikiLinkPath = htmlspecialchars( $wikiLinkParts[0] );
 			$wikiLinkText = htmlspecialchars(
@@ -452,8 +452,6 @@ class Edit extends Model {
 	/**
 	 * Get HTML for the diff of this Edit.
 	 * @return string|null Raw HTML, must be wrapped in a <table> tag. Null if no comparison could be made.
-	 * Just returns a repository result.
-	 * @codeCoverageIgnore
 	 */
 	public function getDiffHtml(): ?string {
 		return $this->repository->getDiffHtml( $this );
@@ -492,7 +490,7 @@ class Edit extends Model {
 			'length_change' => $this->lengthChange,
 			'comment' => $this->comment,
 		];
-		if ( null !== $this->reverted ) {
+		if ( $this->reverted !== null ) {
 			$ret['reverted'] = $this->reverted;
 		}
 

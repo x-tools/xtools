@@ -140,10 +140,6 @@ class TopEditsTest extends TestAdapter {
 		$this->teRepo->expects( static::once() )
 			->method( 'countEdits' )
 			->willReturn( 42 );
-		$this->teRepo->expects( static::once() )
-			->method( 'countPagesNamespace' )
-			->with( $this->project, $this->user, 0 )
-			->willReturn( 2 );
 		$te->setRepository( $this->teRepo );
 		$te->prepareData();
 
@@ -161,25 +157,6 @@ class TopEditsTest extends TestAdapter {
 			'pap_project_title' => null,
 			'assessment' => [ 'class' => 'C' ],
 		], $result[0][1] );
-		static::assertEquals( [
-			[ 'pap_project_title' => 'Biography', 'count' => 24 ],
-			[ 'pap_project_title' => 'India', 'count' => 24 ],
-		], $te->getProjectTotals( 0 ) );
-	}
-
-	/**
-	 * Ensure we do default to a standalone query if there is more.
-	 */
-	public function testProjectsStandalone(): void {
-		$te = $this->getTopEdits( null, 0, false, false, 2 );
-		$this->teRepo->expects( static::once() )
-			->method( 'countPagesNamespace' )
-			->with( $this->project, $this->user, 0 )
-			->willReturn( 3 );
-		$this->teRepo->expects( static::once() )
-			->method( 'getProjectTotals' )
-			->willReturn( [ 'What the repo gives.' ] );
-		static::assertEquals( [ 'What the repo gives.' ], $te->getProjectTotals( 0 ) );
 	}
 
 	/**
@@ -197,7 +174,7 @@ class TopEditsTest extends TestAdapter {
 			$this->user
 		);
 		$te->prepareData();
-		static::assertEmpty( $te->getTopEdits() );
+		static::assertCount( 0, $te->getTopEdits() );
 	}
 
 	/**
@@ -333,6 +310,7 @@ class TopEditsTest extends TestAdapter {
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @param int|null $limit Number of rows to fetch.
+	 * @param int $pagination = 0
 	 * @return TopEdits
 	 */
 	private function getTopEdits(

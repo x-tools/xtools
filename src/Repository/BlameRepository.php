@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  * @codeCoverageIgnore
  */
 class BlameRepository extends AuthorshipRepository {
-	protected EditRepository $editRepo;
-	protected UserRepository $userRepo;
-
 	/**
 	 * @param ManagerRegistry $managerRegistry
 	 * @param CacheItemPoolInterface $cache
@@ -32,18 +29,16 @@ class BlameRepository extends AuthorshipRepository {
 	 * @param UserRepository $userRepo
 	 */
 	public function __construct(
-		ManagerRegistry $managerRegistry,
-		CacheItemPoolInterface $cache,
-		Client $guzzle,
-		LoggerInterface $logger,
-		ParameterBagInterface $parameterBag,
-		bool $isWMF,
-		int $queryTimeout,
-		EditRepository $editRepo,
-		UserRepository $userRepo
+		protected ManagerRegistry $managerRegistry,
+		protected CacheItemPoolInterface $cache,
+		protected Client $guzzle,
+		protected LoggerInterface $logger,
+		protected ParameterBagInterface $parameterBag,
+		protected bool $isWMF,
+		protected int $queryTimeout,
+		protected EditRepository $editRepo,
+		protected UserRepository $userRepo
 	) {
-		$this->editRepo = $editRepo;
-		$this->userRepo = $userRepo;
 		parent::__construct( $managerRegistry, $cache, $guzzle, $logger, $parameterBag, $isWMF, $queryTimeout );
 	}
 

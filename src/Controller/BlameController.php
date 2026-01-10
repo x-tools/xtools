@@ -8,6 +8,7 @@ use App\Model\Authorship;
 use App\Model\Blame;
 use App\Repository\BlameRepository;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller provides the search form and results page for the Blame tool.
@@ -30,11 +31,10 @@ class BlameController extends XtoolsController {
 		return Authorship::SUPPORTED_PROJECTS;
 	}
 
+	#[Route( "/blame", name: "Blame" )]
+	#[Route( "/blame/{project}", name: "BlameProject" )]
 	/**
 	 * The search form.
-	 * @Route("/blame", name="Blame")
-	 * @Route("/blame/{project}", name="BlameProject")
-	 * @return Response
 	 */
 	public function indexAction(): Response {
 		$this->params['target'] = $this->request->query->get( 'target', '' );
@@ -66,19 +66,17 @@ class BlameController extends XtoolsController {
 		] ) );
 	}
 
+	#[Route(
+		"/blame/{project}/{page}/{target}",
+		name: "BlameResult",
+		requirements: [
+			"page" => "(.+?)",
+			"target" => "|latest|\d+|\d{4}-\d{2}-\d{2}",
+		],
+		defaults: [ "target" => "latest" ]
+	)]
 	/**
-	 * @Route(
-	 *     "/blame/{project}/{page}/{target}",
-	 *     name="BlameResult",
-	 *     requirements={
-	 *         "page"="(.+?)",
-	 *         "target"="|latest|\d+|\d{4}-\d{2}-\d{2}",
-	 *     },
-	 *     defaults={"target"="latest"}
-	 * )
-	 * @param string $target
-	 * @param BlameRepository $blameRepo
-	 * @return Response
+	 * The results page.
 	 */
 	public function resultAction( string $target, BlameRepository $blameRepo ): Response {
 		if ( !isset( $this->params['q'] ) ) {
@@ -86,7 +84,7 @@ class BlameController extends XtoolsController {
 				'project' => $this->project->getDomain(),
 			] );
 		}
-		if ( 0 !== $this->page->getNamespace() ) {
+		if ( $this->page->getNamespace() !== 0 ) {
 			$this->addFlashMessage( 'danger', 'error-authorship-non-mainspace' );
 			return $this->redirectToRoute( 'BlameProject', [
 				'project' => $this->project->getDomain(),

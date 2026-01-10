@@ -23,7 +23,13 @@ class SimpleEditCounterRepository extends Repository {
 	 * @param int|false $end Unix timestamp.
 	 * @return string[] Counts, each row with keys 'source' and 'value'.
 	 */
-	public function fetchData( Project $project, User $user, $namespace = 'all', $start = false, $end = false ): array {
+	public function fetchData(
+		Project $project,
+		User $user,
+		int|string $namespace = 'all',
+		int|false $start = false,
+		int|false $end = false
+	): array {
 		$cacheKey = $this->getCacheKey( func_get_args(), 'simple_editcount' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
 			return $this->cache->getItem( $cacheKey )->get();
@@ -50,9 +56,9 @@ class SimpleEditCounterRepository extends Repository {
 	private function fetchDataNormal(
 		Project $project,
 		User $user,
-		$namespace = 'all',
-		$start = false,
-		$end = false
+		int|string $namespace = 'all',
+		int|false $start = false,
+		int|false $end = false,
 	): array {
 		$userTable = $project->getTableName( 'user' );
 		$pageTable = $project->getTableName( 'page' );
@@ -65,8 +71,8 @@ class SimpleEditCounterRepository extends Repository {
 
 		// Always JOIN on page, see T325492
 		$revNamespaceJoinSql = "JOIN $pageTable ON rev_page = page_id";
-		$revNamespaceWhereSql = 'all' === $namespace ? '' : "AND page_namespace = $namespace";
-		$arNamespaceWhereSql = 'all' === $namespace ? '' : "AND ar_namespace = $namespace";
+		$revNamespaceWhereSql = $namespace === 'all' ? '' : "AND page_namespace = $namespace";
+		$arNamespaceWhereSql = $namespace === 'all' ? '' : "AND ar_namespace = $namespace";
 
 		$sql = "SELECT 'id' AS source, user_id as value
                     FROM $userTable
@@ -115,9 +121,9 @@ class SimpleEditCounterRepository extends Repository {
 	private function fetchDataIpRange(
 		Project $project,
 		User $user,
-		$namespace = 'all',
-		$start = false,
-		$end = false
+		int|string $namespace = 'all',
+		int|false $start = false,
+		int|false $end = false
 	): array {
 		$ipcTable = $project->getTableName( 'ip_changes' );
 		$revTable = $project->getTableName( 'revision', '' );
@@ -126,9 +132,9 @@ class SimpleEditCounterRepository extends Repository {
 		$revDateConditions = $this->getDateConditions( $start, $end, false, "$ipcTable.", 'ipc_rev_timestamp' );
 		[ $startHex, $endHex ] = IPUtils::parseRange( $user->getUsername() );
 
-		$revNamespaceJoinSql = 'all' === $namespace ? '' : "JOIN $revTable ON rev_id = ipc_rev_id " .
+		$revNamespaceJoinSql = $namespace === 'all' ? '' : "JOIN $revTable ON rev_id = ipc_rev_id " .
 			"JOIN $pageTable ON rev_page = page_id";
-		$revNamespaceWhereSql = 'all' === $namespace ? '' : "AND page_namespace = $namespace";
+		$revNamespaceWhereSql = $namespace === 'all' ? '' : "AND page_namespace = $namespace";
 
 		$sql = "SELECT 'rev' AS source, COUNT(*) AS value
                 FROM $ipcTable

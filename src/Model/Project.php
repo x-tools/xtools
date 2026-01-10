@@ -10,9 +10,6 @@ namespace App\Model;
 class Project extends Model {
 	protected PageAssessments $pageAssessments;
 
-	/** @var string The project name as supplied by the user. */
-	protected string $nameUnnormalized;
-
 	/** @var string[]|null Basic metadata about the project */
 	protected ?array $metadata;
 
@@ -27,10 +24,12 @@ class Project extends Model {
 
 	/**
 	 * Create a new Project.
-	 * @param string $nameOrUrl The project's database name or URL.
+	 * @param string $nameUnnormalized The project's database name or URL.
 	 */
-	public function __construct( string $nameOrUrl ) {
-		$this->nameUnnormalized = $nameOrUrl;
+	public function __construct(
+		/** @var string The project name as supplied by the user. */
+		protected string $nameUnnormalized
+	) {
 	}
 
 	/**
@@ -55,8 +54,9 @@ class Project extends Model {
 	 * @param int|string|null $nsId Namespace ID, null if checking if project has page assessments for any namespace.
 	 * @return bool
 	 */
-	public function hasPageAssessments( $nsId = null ): bool {
-		if ( null !== $nsId && (int)$nsId > 0 ) {
+	// phpcs:disable MediaWiki.Usage.NullableType.ExplicitNullableTypes
+	public function hasPageAssessments( int|string|null $nsId = null ): bool {
+		if ( $nsId !== null && (int)$nsId > 0 ) {
 			return $this->pageAssessments->isSupportedNamespace( (int)$nsId );
 		} else {
 			return $this->pageAssessments->isEnabled();
@@ -73,7 +73,7 @@ class Project extends Model {
 		return $this->hasProofreadPage() &&
 			(
 				!is_numeric( $namespace ) ||
-				'Page' === $this->getCanonicalNamespace( $namespace )
+				$this->getCanonicalNamespace( $namespace ) === 'Page'
 			);
 	}
 
@@ -178,7 +178,7 @@ class Project extends Model {
 	 *    is a Page object.
 	 * @return string
 	 */
-	public function getUrlForPage( $page, bool $useUnnormalizedPageTitle = false ): string {
+	public function getUrlForPage( Page|string $page, bool $useUnnormalizedPageTitle = false ): string {
 		if ( $page instanceof Page ) {
 			$page = $page->getTitle( $useUnnormalizedPageTitle );
 		}
@@ -240,7 +240,7 @@ class Project extends Model {
 	 */
 	public function getNamespaces(): array {
 		$metadata = $this->getMetadata();
-		return $metadata['namespaces'];
+		return ( $metadata === null ? [] : $metadata['namespaces'] );
 	}
 
 	/**
@@ -249,7 +249,7 @@ class Project extends Model {
 	 * @param int $namespace
 	 * @return string
 	 */
-	public function getCanonicalNamespace( $namespace ): string {
+	public function getCanonicalNamespace( int $namespace ): string {
 		$canonicalNamespaces = $this->getMetadata()['canonical_namespaces'];
 		if ( array_key_exists( $namespace, $canonicalNamespaces ) ) {
 			return $canonicalNamespaces[$namespace];
@@ -272,7 +272,6 @@ class Project extends Model {
 	 * @return string[]
 	 */
 	public function getInstalledExtensions(): array {
-		// Quick cache, valid only for the same request.
 		if ( !isset( $this->installedExtensions ) ||
 			!is_array( $this->installedExtensions )
 		) {
@@ -314,7 +313,7 @@ class Project extends Model {
 	 */
 	public function hasTempAccounts(): bool {
 		$metadata = $this->getMetadata();
-		return null !== $metadata['tempAccountPatterns'];
+		return $metadata['tempAccountPatterns'] !== null;
 	}
 
 	/**

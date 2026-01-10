@@ -299,7 +299,15 @@ class ProjectTest extends TestAdapter {
 			[ $optedInProjects, 'project1', 'test.example.org', null, false, false, true ],
 			[ $optedInProjects, 'project2', 'test2.example.org', null, false, false, false ],
 			[ $optedInProjects, 'project3', 'test3.example.org', null, false, false, false ],
-			[ $optedInProjects, 'project4', 'test4.example.org', (object)[ 'username' => 'TestUser' ], false, false, true ],
+			[
+				$optedInProjects,
+				'project4',
+				'test4.example.org',
+				(object)[ 'username' => 'TestUser' ],
+				false,
+				false,
+				true
+			],
 			[ $optedInProjects, 'project5', 'test5.example.org', null, true, false, true ],
 			[ $optedInProjects, 'project6', 'test6.example.org', null, false, true, true ],
 		];

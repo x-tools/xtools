@@ -7,16 +7,13 @@ namespace App\Tests\Model;
 use App\Model\AdminStats;
 use App\Model\Project;
 use App\Repository\AdminStatsRepository;
-use App\Repository\ProjectRepository;
 use App\Tests\TestAdapter;
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 
 /**
  * Tests of the AdminStats class.
  * @covers \App\Model\AdminStats
  */
 class AdminStatsTest extends TestAdapter {
-	use ArraySubsetAsserts;
 
 	protected AdminStatsRepository $asRepo;
 	protected Project $project;
@@ -122,18 +119,20 @@ class AdminStatsTest extends TestAdapter {
 		$ret = $as->prepareStats();
 
 		// Test results.
-		static::assertArraySubset(
-			[
-				'Bob' => array_merge(
-					$this->adminStatsFactory()[0],
-					[ 'user-groups' => [ 'sysop', 'checkuser' ] ]
-				),
-				'Sarah' => array_merge(
-					$this->adminStatsFactory()[1], // empty results
-					[ 'username' => 'Sarah', 'user-groups' => [ 'epcoordinator' ] ]
-				),
-			],
-			$ret
+		static::assertEquals(
+			array_merge(
+				$this->adminStatsFactory()[0],
+				[ 'user-groups' => [ 'sysop', 'checkuser' ] ]
+			),
+			$ret['Bob']
+		);
+		static::assertEquals(
+			array_merge(
+				// empty results
+				$this->adminStatsFactory()[1],
+				[ 'username' => 'Sarah', 'user-groups' => [ 'epcoordinator' ] ]
+			),
+			$ret['Sarah']
 		);
 
 		// At this point get stats should be the same.

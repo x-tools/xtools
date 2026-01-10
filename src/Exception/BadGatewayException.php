@@ -13,15 +13,12 @@ use Throwable;
  * XTools maintainers. These errors (502s) are not logged by Monolog and hence no error email is sent out.
  */
 class BadGatewayException extends HttpException {
-	protected array $msgParams;
-
 	/**
 	 * @param string $msgKey i18n key
 	 * @param array $msgParams Params for i18n message, if applicable.
 	 * @param Throwable|null $e
 	 */
-	public function __construct( string $msgKey, array $msgParams = [], ?Throwable $e = null ) {
-		$this->msgParams = $msgParams;
+	public function __construct( string $msgKey, protected array $msgParams = [], ?Throwable $e = null ) {
 		parent::__construct( Response::HTTP_BAD_GATEWAY, $msgKey, $e );
 	}
 

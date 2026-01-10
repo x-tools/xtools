@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -25,34 +26,16 @@ use Twig\Error\RuntimeError;
  * handled, so that a friendly error page is shown to the user.
  */
 class ExceptionListener {
-	protected Environment $templateEngine;
-	protected FlashBagInterface $flashBag;
-	protected I18nHelper $i18n;
-	protected LoggerInterface $logger;
+	protected ?FlashBagInterface $flashBag;
 
-	/** @var string The environment. */
-	protected string $environment;
-
-	/**
-	 * Constructor for the ExceptionListener.
-	 * @param Environment $templateEngine
-	 * @param LoggerInterface $logger
-	 * @param FlashBagInterface $flashBag
-	 * @param I18nHelper $i18n
-	 * @param string $environment
-	 */
 	public function __construct(
-		Environment $templateEngine,
-		LoggerInterface $logger,
-		FlashBagInterface $flashBag,
-		I18nHelper $i18n,
-		string $environment = 'prod'
+		protected Environment $templateEngine,
+		RequestStack $requestStack,
+		protected LoggerInterface $logger,
+		protected I18nHelper $i18n,
+		protected string $environment = 'prod'
 	) {
-		$this->templateEngine = $templateEngine;
-		$this->logger = $logger;
-		$this->flashBag = $flashBag;
-		$this->i18n = $i18n;
-		$this->environment = $environment;
+		$this->flashBag = $requestStack->getSession()?->getFlashBag();
 	}
 
 	/**
@@ -66,11 +49,11 @@ class ExceptionListener {
 		// We only care about the previous (original) exception, not the one Twig put on top of it.
 		$prevException = $exception->getPrevious();
 
-		$isApi = '/api/' === substr( $event->getRequest()->getRequestUri(), 0, 5 );
+		$isApi = str_starts_with( $event->getRequest()->getRequestUri(), '/api/' );
 
 		if ( $exception instanceof XtoolsHttpException && !$isApi ) {
 			$response = $this->getXtoolsHttpResponse( $exception );
-		} elseif ( $exception instanceof RuntimeError && null !== $prevException ) {
+		} elseif ( $exception instanceof RuntimeError && $prevException !== null ) {
 			$response = $this->getTwigErrorResponse( $prevException );
 		} elseif ( $exception instanceof AccessDeniedHttpException ) {
 			// FIXME: For some reason the automatic error page rendering doesn't work for 403 responses...
@@ -81,8 +64,8 @@ class ExceptionListener {
 					'exception' => $exception,
 				] )
 			);
-		} elseif ( $isApi && 'json' === $event->getRequest()->get( 'format', 'json' ) ) {
-			$normalizer = new ProblemNormalizer( 'prod' !== $this->environment );
+		} elseif ( $isApi && $event->getRequest()->get( 'format', 'json' ) === 'json' ) {
+			$normalizer = new ProblemNormalizer( $this->environment !== 'prod' );
 			$params = array_merge(
 				$normalizer->normalize( FlattenException::createFromThrowable( $exception ) ),
 				$event->getRequest()->attributes->get( '_route_params' ) ?? [],
@@ -108,9 +91,9 @@ class ExceptionListener {
 	 */
 	private function getXtoolsHttpResponse( XtoolsHttpException $exception ) {
 		if ( $exception->isApi() ) {
-			$this->flashBag->add( 'error', $exception->getMessage() );
-			$flashes = $this->flashBag->peekAll();
-			$this->flashBag->clear();
+			$this->flashBag?->add( 'error', $exception->getMessage() );
+			$flashes = $this->flashBag?->peekAll() ?? [];
+			$this->flashBag?->clear();
 			return new JsonResponse( array_merge(
 				array_merge( $flashes, FlattenException::createFromThrowable( $exception )->toArray() ),
 				$exception->getParams()
@@ -127,7 +110,7 @@ class ExceptionListener {
 	 * @throws Throwable
 	 */
 	private function getTwigErrorResponse( Throwable $exception ): Response {
-		if ( 'prod' !== $this->environment ) {
+		if ( $this->environment !== 'prod' ) {
 			throw $exception;
 		}
 
@@ -140,7 +123,7 @@ class ExceptionListener {
 
 		return new Response(
 			$this->templateEngine->render( 'bundles/TwigBundle/Exception/error.html.twig', [
-				'status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+				'status_code' => $exception->getCode(),
 				'status_text' => 'Internal Server Error',
 				'exception' => $exception,
 			] ),

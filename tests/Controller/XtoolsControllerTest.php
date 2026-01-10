@@ -41,7 +41,9 @@ class XtoolsControllerTest extends ControllerTestAdapter {
 	 * @param array $methodOverrides Keys are method names, values are what they should return.
 	 * @return XtoolsController
 	 */
-	private function getControllerWithRequest( array $requestParams = [], array $methodOverrides = [] ): XtoolsController {
+	private function getControllerWithRequest(
+		array $requestParams = [], array $methodOverrides = []
+	): XtoolsController {
 		$session = $this->createSession( $this->client );
 		$requestStack = $this->getRequestStack( $session, $requestParams );
 
@@ -467,7 +469,10 @@ class XtoolsControllerTest extends ControllerTestAdapter {
 		] );
 		$controller->addFlashMessage( 'warning', 'You had better watch yourself!' );
 		$response = json_decode(
-			$controller->getFormattedApiResponse( [ 'data' => [ 'test' => 5 ] ], Response::HTTP_BAD_GATEWAY )->getContent(),
+			$controller->getFormattedApiResponse(
+				[ 'data' => [ 'test' => 5 ] ],
+				Response::HTTP_BAD_GATEWAY
+			)->getContent(),
 			true
 		);
 		static::assertArraySubset( [

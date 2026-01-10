@@ -6,17 +6,15 @@ namespace App\Model;
 
 use App\Exception\BadGatewayException;
 use App\Repository\PageRepository;
+use App\Repository\Repository;
 use DateTime;
-use Doctrine\DBAL\Driver\ResultStatement;
+use Doctrine\DBAL\Result;
 use GuzzleHttp\Exception\ClientException;
 
 /**
  * A Page is a single wiki page in one project.
  */
 class Page extends Model {
-	/** @var string The page name as provided at instantiation. */
-	protected string $unnormalizedPageName;
-
 	/** @var string[]|null Metadata about this page. */
 	protected ?array $pageInfo;
 
@@ -37,14 +35,16 @@ class Page extends Model {
 
 	/**
 	 * Page constructor.
-	 * @param PageRepository $repository
+	 * @param Repository|PageRepository $repository
 	 * @param Project $project
-	 * @param string $pageName
+	 * @param string $unnormalizedPageName
 	 */
-	public function __construct( PageRepository $repository, Project $project, string $pageName ) {
-		$this->repository = $repository;
-		$this->project = $project;
-		$this->unnormalizedPageName = $pageName;
+	public function __construct(
+		protected Repository|PageRepository $repository,
+		protected Project $project,
+		/** @var string The page name as provided at instantiation. */
+		protected string $unnormalizedPageName
+	) {
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Page extends Model {
 	public static function newFromRow( PageRepository $repository, Project $project, array $row ): self {
 		$pageTitle = $row['page_title'];
 
-		if ( 0 === (int)$row['namespace'] ) {
+		if ( (int)$row['namespace'] === 0 ) {
 			$fullPageTitle = $pageTitle;
 		} else {
 			$namespaces = $project->getNamespaces();
@@ -205,7 +205,8 @@ class Page extends Model {
 	 *   assumed to be the actual revision ID. If null, use the last revision.
 	 * @return string
 	 */
-	public function getHTMLContent( $target = null ): string {
+	// phpcs:ignore MediaWiki.Usage.NullableType.ExplicitNullableTypes
+	public function getHTMLContent( DateTime|int|null $target = null ): string {
 		if ( is_a( $target, 'DateTime' ) ) {
 			$target = $this->repository->getRevisionIdAtDate( $this, $target );
 		}
@@ -218,7 +219,10 @@ class Page extends Model {
 	 */
 	public function exists(): bool {
 		$info = $this->getPageInfo();
-		return null !== $info && !isset( $info['missing'] ) && !isset( $info['invalid'] ) && !isset( $info['interwiki'] );
+		return $info !== null &&
+			!isset( $info['missing'] ) &&
+			!isset( $info['invalid'] ) &&
+			!isset( $info['interwiki'] );
 	}
 
 	/**
@@ -255,9 +259,9 @@ class Page extends Model {
 	 * @param false|int $end
 	 * @return int
 	 */
-	public function getNumRevisions( ?User $user = null, $start = false, $end = false ): int {
+	public function getNumRevisions( ?User $user = null, false|int $start = false, false|int $end = false ): int {
 		// If a user is given, we will not cache the result via instance variable.
-		if ( null !== $user ) {
+		if ( $user !== null ) {
 			return $this->repository->getNumRevisions( $this, $user, $start, $end );
 		}
 
@@ -283,15 +287,13 @@ class Page extends Model {
 	 * @param false|int $start
 	 * @param false|int $end
 	 * @param int|null $limit
-	 * @param int|null $numRevisions
 	 * @return array
 	 */
 	public function getRevisions(
 		?User $user = null,
-		$start = false,
-		$end = false,
-		?int $limit = null,
-		?int $numRevisions = null
+		false|int $start = false,
+		false|int $end = false,
+		?int $limit = null
 	): array {
 		if ( isset( $this->revisions ) ) {
 			return $this->revisions;
@@ -322,16 +324,16 @@ class Page extends Model {
 	 * @param ?int $limit Max number of revisions to process.
 	 * @param false|int $start
 	 * @param false|int $end
-	 * @return ResultStatement
+	 * @return Result
 	 * Just returns a Repo result.
 	 * @codeCoverageIgnore
 	 */
 	public function getRevisionsStmt(
 		?User $user = null,
 		?int $limit = null,
-		$start = false,
-		$end = false
-	): ResultStatement {
+		false|int $start = false,
+		false|int $end = false
+	): Result {
 		return $this->repository->getRevisionsStmt( $this, $user, $limit, $start, $end );
 	}
 
@@ -351,7 +353,9 @@ class Page extends Model {
 	 * @return string[] See getErrors() for format
 	 */
 	public function getCheckWikiErrors(): array {
-		return $this->repository->getCheckWikiErrors( $this );
+		return [];
+		// FIXME: Re-enable after solving T413013
+		// return $this->repository->getCheckWikiErrors($this);
 	}
 
 	/**
@@ -406,13 +410,13 @@ class Page extends Model {
 	 * @param string|DateTime $end In the format YYYYMMDD
 	 * @return int|null Total pageviews or null if data is unavailable.
 	 */
-	public function getPageviews( $start, $end ): ?int {
+	public function getPageviews( string|DateTime $start, string|DateTime $end ): ?int {
 		try {
 			$pageviews = $this->repository->getPageviews( $this, $start, $end );
-		} catch ( ClientException $e ) {
+		} catch ( ClientException ) {
 			// 404 means zero pageviews
 			return 0;
-		} catch ( BadGatewayException $e ) {
+		} catch ( BadGatewayException ) {
 			// Upstream error, so return null so the view can customize messaging.
 			return null;
 		}

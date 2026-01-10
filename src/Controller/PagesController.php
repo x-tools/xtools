@@ -8,10 +8,12 @@ use App\Model\Pages;
 use App\Model\Project;
 use App\Repository\PagesRepository;
 use GuzzleHttp\Exception\ClientException;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * This controller serves the Pages tool.
@@ -45,11 +47,10 @@ class PagesController extends XtoolsController {
 
 	/**
 	 * Display the form.
-	 * @Route("/pages", name="Pages")
-	 * @Route("/pages/index.php", name="PagesIndexPhp")
-	 * @Route("/pages/{project}", name="PagesProject")
-	 * @return Response
 	 */
+	#[Route( '/pages', name: 'Pages' )]
+	#[Route( '/pages/index.php', name: 'PagesIndexPhp' )]
+	#[Route( '/pages/{project}', name: 'PagesProject' )]
 	public function indexAction(): Response {
 		// Redirect if at minimum project and username are given.
 		if ( isset( $this->params['project'] ) && isset( $this->params['username'] ) ) {
@@ -80,7 +81,12 @@ class PagesController extends XtoolsController {
 	 * @return Pages
 	 * @codeCoverageIgnore
 	 */
-	protected function setUpPages( PagesRepository $pagesRepo, string $redirects, string $deleted ): Pages {
+	protected function setUpPages(
+		PagesRepository $pagesRepo,
+		string $redirects,
+		string $deleted,
+		bool $countsOnly = false
+	): Pages {
 		if ( $this->user->isIpRange() ) {
 			$this->params['username'] = $this->user->getUsername();
 			$this->throwXtoolsException( $this->getIndexRoute(), 'error-ip-range-unsupported' );
@@ -95,56 +101,60 @@ class PagesController extends XtoolsController {
 			$deleted,
 			$this->start,
 			$this->end,
-			$this->offset
+			$this->offset,
+			$countsOnly
 		);
 	}
 
+	#[Route(
+		'/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}',
+		name: 'PagesResult',
+		requirements: [
+			'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+			'namespace' => '|all|\d+',
+			'redirects' => '|[^/]+',
+			'deleted' => '|all|live|deleted',
+			'start' => '|\d{4}-\d{2}-\d{2}',
+			'end' => '|\d{4}-\d{2}-\d{2}',
+			'offset' => '|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?',
+		],
+		defaults: [
+			'namespace' => 0,
+			'start' => false,
+			'end' => false,
+			'offset' => false,
+		]
+	)]
 	/**
 	 * Display the results.
-	 * @Route(
-	 *     "/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
-	 *     name="PagesResult",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "namespace"="|all|\d+",
-	 *         "redirects"="|[^/]+",
-	 *         "deleted"="|all|live|deleted",
-	 *         "start"="|\d{4}-\d{2}-\d{2}",
-	 *         "end"="|\d{4}-\d{2}-\d{2}",
-	 *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-	 *     },
-	 *     defaults={
-	 *         "namespace"=0,
-	 *         "start"=false,
-	 *         "end"=false,
-	 *         "offset"=false,
-	 *     }
-	 * )
-	 * @param PagesRepository $pagesRepo
-	 * @param string $redirects One of the Pages::REDIR_ constants.
-	 * @param string $deleted One of the Pages::DEL_ constants.
-	 * @return RedirectResponse|Response
 	 * @codeCoverageIgnore
 	 */
 	public function resultAction(
 		PagesRepository $pagesRepo,
 		string $redirects = Pages::REDIR_NONE,
 		string $deleted = Pages::DEL_ALL
-	) {
+	): RedirectResponse|Response {
+		$countsOnly = filter_var(
+			$this->request->query->get( 'countsOnly', 'false' ),
+			FILTER_VALIDATE_BOOLEAN,
+		) && (
+			$this->request->query->get( 'format', 'html' ) === 'html'
+		);
 		// Check for legacy values for 'redirects', and redirect
 		// back with correct values if need be. This could be refactored
 		// out to XtoolsController, but this is the only tool in the suite
 		// that deals with redirects, so we'll keep it confined here.
 		$validRedirects = [ '', Pages::REDIR_NONE, Pages::REDIR_ONLY, Pages::REDIR_ALL ];
-		if ( 'none' === $redirects || !in_array( $redirects, $validRedirects ) ) {
+		if ( $redirects === 'none' || !in_array( $redirects, $validRedirects ) ) {
 			return $this->redirectToRoute( 'PagesResult', array_merge( $this->params, [
 				'redirects' => Pages::REDIR_NONE,
 				'deleted' => $deleted,
 				'offset' => $this->offset,
+				'countsOnly' => $countsOnly,
 			] ) );
 		}
 
-		$pages = $this->setUpPages( $pagesRepo, $redirects, $deleted );
+		$pages = $this->setUpPages( $pagesRepo, $redirects, $deleted, $countsOnly );
 		$pages->prepareData();
 
 		$ret = [
@@ -154,7 +164,7 @@ class PagesController extends XtoolsController {
 			'pages' => $pages,
 		];
 
-		if ( 'PagePile' === $this->request->query->get( 'format' ) ) {
+		if ( $this->request->query->get( 'format' ) === 'PagePile' ) {
 			return $this->getPagepileResult( $this->project, $pages );
 		}
 
@@ -164,9 +174,6 @@ class PagesController extends XtoolsController {
 
 	/**
 	 * Create a PagePile for the given pages, and get a Redirect to that PagePile.
-	 * @param Project $project
-	 * @param Pages $pages
-	 * @return RedirectResponse
 	 * @throws HttpException
 	 * @see https://pagepile.toolforge.org
 	 * @codeCoverageIgnore
@@ -177,7 +184,7 @@ class PagesController extends XtoolsController {
 
 		foreach ( array_values( $pages->getResults() ) as $pagesData ) {
 			foreach ( $pagesData as $page ) {
-				if ( 0 === (int)$page['namespace'] ) {
+				if ( (int)$page['namespace'] === 0 ) {
 					$pageTitles[] = $page['page_title'];
 				} else {
 					$pageTitles[] = (
@@ -196,8 +203,6 @@ class PagesController extends XtoolsController {
 
 	/**
 	 * Create a PagePile with the given titles.
-	 * @param Project $project
-	 * @param string[] $pageTitles
 	 * @return int The PagePile ID.
 	 * @throws HttpException
 	 * @see https://pagepile.toolforge.org/
@@ -212,7 +217,7 @@ class PagesController extends XtoolsController {
 				'wiki' => $project->getDatabaseName(),
 				'data' => implode( "\n", $pageTitles ),
 			] ] );
-		} catch ( ClientException $e ) {
+		} catch ( ClientException ) {
 			throw new HttpException(
 				414,
 				'error-pagepile-too-large'
@@ -221,7 +226,7 @@ class PagesController extends XtoolsController {
 
 		$ret = json_decode( $res->getBody()->getContents(), true );
 
-		if ( !isset( $ret['status'] ) || 'OK' !== $ret['status'] ) {
+		if ( !isset( $ret['status'] ) || $ret['status'] !== 'OK' ) {
 			throw new HttpException(
 				500,
 				'Failed to create PagePile. There may be an issue with the PagePile API.'
@@ -233,71 +238,73 @@ class PagesController extends XtoolsController {
 
 	/************************ API endpoints */
 
+	#[OA\Tag( name: "User API" )]
+	#[OA\Get( description: "Get the number of pages created by a user, keyed by namespace." )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Parameter( ref: "#/components/parameters/UsernameOrSingleIp" )]
+	#[OA\Parameter( ref: "#/components/parameters/Namespace" )]
+	#[OA\Parameter( ref: "#/components/parameters/Redirects" )]
+	#[OA\Parameter( ref: "#/components/parameters/Deleted" )]
+	#[OA\Parameter( ref: "#/components/parameters/Start" )]
+	#[OA\Parameter( ref: "#/components/parameters/End" )]
+	#[OA\Response(
+		response: 200,
+		description: "Page counts",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "username", ref: "#/components/parameters/UsernameOrSingleIp/schema" ),
+				new OA\Property( property: "namespace", ref: "#/components/schemas/Namespace" ),
+				new OA\Property( property: "redirects", ref: "#/components/parameters/Redirects/schema" ),
+				new OA\Property( property: "deleted", ref: "#/components/parameters/Deleted/schema" ),
+				new OA\Property( property: "start", ref: "#/components/parameters/Start/schema" ),
+				new OA\Property( property: "end", ref: "#/components/parameters/End/schema" ),
+				new OA\Property(
+					property: "counts",
+					type: "object",
+					example: [
+						"0" => [
+							"count" => 5,
+							"total_length" => 500,
+							"avg_length" => 100
+						],
+						"2" => [
+							"count" => 1,
+							"total_length" => 200,
+							"avg_length" => 200
+						]
+					]
+				),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" )
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/501", response: 501 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route(
+		'/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}',
+		name: 'UserApiPagesCount',
+		requirements: [
+			'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+			'namespace' => '|all|\d+',
+			'redirects' => '|noredirects|onlyredirects|all',
+			'deleted' => '|all|live|deleted',
+			'start' => '|\d{4}-\d{2}-\d{2}',
+			'end' => '|\d{4}-\d{2}-\d{2}',
+		],
+		defaults: [
+			'namespace' => 0,
+			'redirects' => Pages::REDIR_NONE,
+			'deleted' => Pages::DEL_ALL,
+			'start' => false,
+			'end' => false,
+		],
+		methods: [ 'GET' ]
+	)]
 	/**
 	 * Count the number of pages created by a user.
-	 * @Route(
-	 *     "/api/user/pages_count/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}",
-	 *     name="UserApiPagesCount",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "namespace"="|\d+|all",
-	 *         "redirects"="|noredirects|onlyredirects|all",
-	 *         "deleted"="|all|live|deleted",
-	 *         "start"="|\d{4}-\d{2}-\d{2}",
-	 *         "end"="|\d{4}-\d{2}-\d{2}",
-	 *     },
-	 *     defaults={
-	 *         "namespace"=0,
-	 *         "redirects"="noredirects",
-	 *         "deleted"="all",
-	 *         "start"=false,
-	 *         "end"=false,
-	 *     },
-	 *     methods={"GET"}
-	 * )
-	 * @OA\Tag(name="User API")
-	 * @OA\Get(description="Get the number of pages created by a user, keyed by namespace.")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Parameter(ref="#/components/parameters/UsernameOrSingleIp")
-	 * @OA\Parameter(ref="#/components/parameters/Namespace")
-	 * @OA\Parameter(ref="#/components/parameters/Redirects")
-	 * @OA\Parameter(ref="#/components/parameters/Deleted")
-	 * @OA\Parameter(ref="#/components/parameters/Start")
-	 * @OA\Parameter(ref="#/components/parameters/End")
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Page counts",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="username", ref="#/components/parameters/UsernameOrSingleIp/schema"),
-	 * @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
-	 * @OA\Property(property="redirects", ref="#/components/parameters/Redirects/schema"),
-	 * @OA\Property(property="deleted", ref="#components/parameters/Deleted/schema"),
-	 * @OA\Property(property="start", ref="#components/parameters/Start/schema"),
-	 * @OA\Property(property="end", ref="#components/parameters/End/schema"),
-	 * @OA\Property(property="counts", type="object", example={
-	 *             "0": {
-	 *                 "count": 5,
-	 *                 "total_length": 500,
-	 *                 "avg_length": 100
-	 *             },
-	 *             "2": {
-	 *                 "count": 1,
-	 *                 "total_length": 200,
-	 *                 "avg_length": 200
-	 *             }
-	 *         }),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=501, ref="#/components/responses/501")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @param PagesRepository $pagesRepo
-	 * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-	 * @param string $deleted One of 'live', 'deleted' or 'all' for both.
-	 * @return JsonResponse
 	 * @codeCoverageIgnore
 	 */
 	public function countPagesApiAction(
@@ -313,68 +320,76 @@ class PagesController extends XtoolsController {
 		return $this->getFormattedApiResponse( [ 'counts' => (object)$counts ] );
 	}
 
+	#[OA\Tag( name: "User API" )]
+	#[OA\Get( description: "Get pages created by a user, keyed by namespace." )]
+	#[OA\Parameter( ref: "#/components/parameters/Project" )]
+	#[OA\Parameter( ref: "#/components/parameters/UsernameOrSingleIp" )]
+	#[OA\Parameter( ref: "#/components/parameters/Namespace" )]
+	#[OA\Parameter( ref: "#/components/parameters/Redirects" )]
+	#[OA\Parameter( ref: "#/components/parameters/Deleted" )]
+	#[OA\Parameter( ref: "#/components/parameters/Start" )]
+	#[OA\Parameter( ref: "#/components/parameters/End" )]
+	#[OA\Parameter( ref: "#/components/parameters/Offset" )]
+	#[OA\Parameter(
+		name: "format",
+		in: "query",
+		schema: new OA\Schema(
+			type: "string",
+			default: "json",
+			enum: [ "json", "wikitext", "pagepile", "csv", "tsv" ]
+		)
+	)]
+	#[OA\Response(
+		response: 200,
+		description: "Pages created",
+		content: new OA\JsonContent(
+			properties: [
+				new OA\Property( property: "project", ref: "#/components/parameters/Project/schema" ),
+				new OA\Property( property: "username", ref: "#/components/parameters/UsernameOrSingleIp/schema" ),
+				new OA\Property( property: "namespace", ref: "#/components/schemas/Namespace" ),
+				new OA\Property( property: "redirects", ref: "#/components/parameters/Redirects/schema" ),
+				new OA\Property( property: "deleted", ref: "#/components/parameters/Deleted/schema" ),
+				new OA\Property( property: "start", ref: "#/components/parameters/Start/schema" ),
+				new OA\Property( property: "end", ref: "#/components/parameters/End/schema" ),
+				new OA\Property(
+					property: "pages",
+					properties: [
+						new OA\Property( property: "namespace ID", ref: "#/components/schemas/PageCreation" )
+					],
+					type: "object"
+				),
+				new OA\Property( property: "elapsed_time", ref: "#/components/schemas/elapsed_time" )
+			]
+		)
+	)]
+	#[OA\Response( ref: "#/components/responses/404", response: 404 )]
+	#[OA\Response( ref: "#/components/responses/501", response: 501 )]
+	#[OA\Response( ref: "#/components/responses/503", response: 503 )]
+	#[OA\Response( ref: "#/components/responses/504", response: 504 )]
+	#[Route(
+		'/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}',
+		name: 'UserApiPagesCreated',
+		requirements: [
+			'username' => '(ipr-.+\/\d+[^\/])|([^\/]+)',
+			'namespace' => '|all|\d+',
+			'redirects' => '|noredirects|onlyredirects|all',
+			'deleted' => '|all|live|deleted',
+			'start' => '|\d{4}-\d{2}-\d{2}',
+			'end' => '|\d{4}-\d{2}-\d{2}',
+			'offset' => '|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?',
+		],
+		defaults: [
+			'namespace' => 0,
+			'redirects' => Pages::REDIR_NONE,
+			'deleted' => Pages::DEL_ALL,
+			'start' => false,
+			'end' => false,
+			'offset' => false,
+		],
+		methods: [ 'GET' ]
+	)]
 	/**
-	 * Get the pages created by by a user.
-	 * @Route(
-	 *     "/api/user/pages/{project}/{username}/{namespace}/{redirects}/{deleted}/{start}/{end}/{offset}",
-	 *     name="UserApiPagesCreated",
-	 *     requirements={
-	 *         "username" = "(ipr-.+\/\d+[^\/])|([^\/]+)",
-	 *         "namespace"="|\d+|all",
-	 *         "redirects"="|noredirects|onlyredirects|all",
-	 *         "deleted"="|all|live|deleted",
-	 *         "start"="|\d{4}-\d{2}-\d{2}",
-	 *         "end"="|\d{4}-\d{2}-\d{2}",
-	 *         "offset"="|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?",
-	 *     },
-	 *     defaults={
-	 *         "namespace"=0,
-	 *         "redirects"="noredirects",
-	 *         "deleted"="all",
-	 *         "start"=false,
-	 *         "end"=false,
-	 *         "offset"=false,
-	 *     },
-	 *     methods={"GET"}
-	 * )
-	 * @OA\Tag(name="User API")
-	 * @OA\Get(description="Get pages created by a user, keyed by namespace.")
-	 * @OA\Parameter(ref="#/components/parameters/Project")
-	 * @OA\Parameter(ref="#/components/parameters/UsernameOrSingleIp")
-	 * @OA\Parameter(ref="#/components/parameters/Namespace")
-	 * @OA\Parameter(ref="#/components/parameters/Redirects")
-	 * @OA\Parameter(ref="#/components/parameters/Deleted")
-	 * @OA\Parameter(ref="#/components/parameters/Start")
-	 * @OA\Parameter(ref="#/components/parameters/End")
-	 * @OA\Parameter(ref="#/components/parameters/Offset")
-	 * @OA\Parameter(name="format", in="query",
-	 * @OA\Schema(default="json", type="string", enum={"json","wikitext","pagepile","csv","tsv"})
-	 * )
-	 * @OA\Response(
-	 *     response=200,
-	 *     description="Pages created",
-	 * @OA\JsonContent(
-	 * @OA\Property(property="project", ref="#/components/parameters/Project/schema"),
-	 * @OA\Property(property="username", ref="#/components/parameters/UsernameOrSingleIp/schema"),
-	 * @OA\Property(property="namespace", ref="#/components/schemas/Namespace"),
-	 * @OA\Property(property="redirects", ref="#/components/parameters/Redirects/schema"),
-	 * @OA\Property(property="deleted", ref="#components/parameters/Deleted/schema"),
-	 * @OA\Property(property="start", ref="#components/parameters/Start/schema"),
-	 * @OA\Property(property="end", ref="#components/parameters/End/schema"),
-	 * @OA\Property(property="pages", type="object",
-	 * @OA\Property(property="namespace ID", ref="#/components/schemas/PageCreation")
-	 *         ),
-	 * @OA\Property(property="elapsed_time", ref="#/components/schemas/elapsed_time")
-	 *     )
-	 * )
-	 * @OA\Response(response=404, ref="#/components/responses/404")
-	 * @OA\Response(response=501, ref="#/components/responses/501")
-	 * @OA\Response(response=503, ref="#/components/responses/503")
-	 * @OA\Response(response=504, ref="#/components/responses/504")
-	 * @param PagesRepository $pagesRepo
-	 * @param string $redirects One of 'noredirects', 'onlyredirects' or 'all' for both.
-	 * @param string $deleted One of 'live', 'deleted' or blank for both.
-	 * @return JsonResponse
+	 * Get the pages created by a user.
 	 * @codeCoverageIgnore
 	 */
 	public function getPagesApiAction(
@@ -394,13 +409,13 @@ class PagesController extends XtoolsController {
 		return $this->getFormattedApiResponse( $ret );
 	}
 
+	#[Route(
+		'/api/pages/deletion_summary/{project}/{namespace}/{pageTitle}/{timestamp}',
+		name: 'PagesApiDeletionSummary',
+		methods: [ 'GET' ]
+	)]
 	/**
 	 * Get the deletion summary to be shown when hovering over the "Deleted" text in the UI.
-	 * @Route(
-	 *     "/pages/deletion_summary/{project}/{username}/{namespace}/{pageTitle}/{timestamp}",
-	 *     name="PagesApiDeletionSummary"
-	 * )
-	 * @return JsonResponse
 	 * @codeCoverageIgnore
 	 * @internal
 	 */

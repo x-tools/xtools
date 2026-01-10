@@ -7,6 +7,9 @@ namespace App\Tests\Exception;
 use App\Exception\BadGatewayException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \App\Exception\BadGatewayException
+ */
 class BadGatewayExceptionTest extends TestCase {
 	public function testMsgParams(): void {
 		$exception = new BadGatewayException( 'api-error-wikimedia', [ 'REST' ] );

@@ -26,7 +26,8 @@ class PagesControllerTest extends ControllerTestAdapter {
 
 		// assert that the namespaces were correctly loaded from API
 		$namespaceOptions = $crawler->filter( '#namespace_select option' );
-		static::assertEquals( 'Diskussion', trim( $namespaceOptions->eq( 2 )->text() ) ); // Talk in German
+		// Talk in German
+		static::assertEquals( 'Diskussion', trim( $namespaceOptions->eq( 2 )->text() ) );
 	}
 
 	/**
@@ -42,6 +43,7 @@ class PagesControllerTest extends ControllerTestAdapter {
 			'/pages/en.wikipedia/Example/0',
 			'/pages/en.wikipedia.org/MusikVarmint/4',
 			'/pages/en.wikipedia.org/MusikVarmint/4?format=wikitext',
+			'/pages/en.wikipedia.org/MusikVarmint/all',
 			'/pages/en.wikipedia/Example/0/noredirects/all/2018-01-01//2018-01-15T12:00:00',
 			'/pages/en.wikipedia/Foobar/0/noredirects/all/2018-01-01//2018-01-15T12:00:00?format=wikitext',
 			'/pages/en.wikipedia/Foobar/0/noredirects/all//2018-01-01/2018-01-15T12:00:00?format=csv',
