@@ -250,7 +250,7 @@ class PagesRepository extends UserRepository {
 		$logTable = $project->getTableName( 'logging', 'logindex' );
 
 		// Only SELECT things that are needed, based on whether or not we're doing a COUNT.
-		$revSelects = "DISTINCT page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
+		$revSelects = "page_namespace AS `namespace`, 'rev' AS `type`, page_title, "
 			. "page_is_redirect AS `redirect`, rev_len AS `rev_length`";
 		if ( !$count ) {
 			$revSelects .= ", page_len AS `length`, rev_timestamp AS `timestamp`, "
