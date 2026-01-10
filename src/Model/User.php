@@ -191,6 +191,8 @@ class User extends Model {
 	 * Get the user's actor ID on the given project.
 	 * @param Project $project
 	 * @return int
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function getActorId( Project $project ): int {
 		return (int)$this->repository->getActorId(
@@ -228,6 +230,8 @@ class User extends Model {
 	 * Get a list of this user's global rights.
 	 * @param Project|null $project A project to query; if not provided, the default will be used.
 	 * @return string[]
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function getGlobalUserRights( ?Project $project = null ): array {
 		return $this->repository->getGlobalUserRights( $this->getUsername(), $project );
@@ -255,6 +259,8 @@ class User extends Model {
 	/**
 	 * Number of edits which if exceeded, will require the user to log in.
 	 * @return int
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function numEditsRequiringLogin(): int {
 		return $this->repository->numEditsRequiringLogin();
@@ -280,6 +286,8 @@ class User extends Model {
 	/**
 	 * Does this user exist globally?
 	 * @return bool
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function existsGlobally(): bool {
 		return $this->repository->existsGlobally( $this );
@@ -401,6 +409,8 @@ class User extends Model {
 	 * @param false|int $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @return int
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function countEdits(
 		Project $project,

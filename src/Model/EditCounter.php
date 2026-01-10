@@ -44,10 +44,10 @@ class EditCounter extends Model {
 	protected array $timeCardData;
 
 	/**
-	 * Revision size data, with keys 'average_size', 'large_edits' and 'small_edits'.
+	 * Various data on the last 5000 edits.
 	 * @var string[] As returned by the DB, unconverted to int or float
 	 */
-	protected array $editSizeData;
+	protected array $editData;
 
 	/**
 	 * Duration of the longest block in seconds; -1 if indefinite,
@@ -139,15 +139,17 @@ class EditCounter extends Model {
 	 * @param bool $blocksOnly Whether to include only blocks, and not reblocks and unblocks.
 	 * @return array
 	 */
-	protected function getBlocks( string $type, bool $blocksOnly = true ): array {
+	public function getBlocks( string $type, bool $blocksOnly = true ): array {
 		if ( isset( $this->blocks[$type] ) && is_array( $this->blocks[$type] ) ) {
-			return $this->blocks[$type];
+			$blocks = $this->blocks[$type];
+		} else {
+			$method = "getBlocks" . ucfirst( $type );
+			$blocks = $this->repository->$method( $this->project, $this->user );
+			$this->blocks[$type] = $blocks;
 		}
-		$method = "getBlocks" . ucfirst( $type );
-		$blocks = $this->repository->$method( $this->project, $this->user );
-		$this->blocks[$type] = $blocks;
 
 		// Filter out unblocks unless requested.
+		// Expressly don't store this.
 		if ( $blocksOnly ) {
 			$blocks = array_filter( $blocks, static function ( $block ) {
 				return $block['log_action'] === 'block' || $block['log_action'] === 'reblock';
@@ -352,7 +354,7 @@ class EditCounter extends Model {
 					// Reset the last block, as it has now been accounted for.
 					$lastBlock = [ null, null ];
 				}
-			} elseif ( $block['log_action'] === 'reblock' && -1 !== $lastBlock[1] ) {
+			} elseif ( $block['log_action'] === 'reblock' && $lastBlock[1] !== -1 ) {
 				// The last block was modified.
 				// $lastBlock is left unchanged if its duration was indefinite.
 
@@ -726,27 +728,28 @@ class EditCounter extends Model {
 		foreach ( $totals as $total ) {
 			$max = max( $max, $total['value'] );
 		}
-		foreach ( $totals as &$total ) {
-			$total['scale'] = round( ( $total['value'] / $max ) * 20 );
+		foreach ( $totals as $index => $total ) {
+			$totals[$index]['scale'] = round( ( $total['value'] / $max ) * 20 );
 		}
 
 		// Fill in zeros for timeslots that have no values.
 		$sortedTotals = [];
 		$index = 0;
-		$sortedIndex = 0;
 		foreach ( range( 1, 7 ) as $day ) {
 			foreach ( range( 0, 23 ) as $hour ) {
-				if ( isset( $totals[$index] ) && (int)$totals[$index]['hour'] === $hour ) {
-					$sortedTotals[$sortedIndex] = $totals[$index];
+				if ( isset( $totals[$index] )
+					&& (int)$totals[$index]['day_of_week'] === $day
+					&& (int)$totals[$index]['hour'] === $hour
+				) {
+					$sortedTotals[] = $totals[$index];
 					$index++;
 				} else {
-					$sortedTotals[$sortedIndex] = [
+					$sortedTotals[] = [
 						'day_of_week' => $day,
 						'hour' => $hour,
 						'value' => 0,
 					];
 				}
-				$sortedIndex++;
 			}
 		}
 
@@ -765,10 +768,12 @@ class EditCounter extends Model {
 			return $this->monthCounts;
 		}
 
+		// @codeCoverageIgnoreStart
 		// Set to current month if we're not unit-testing
 		if ( !( $currentTime instanceof DateTime ) ) {
 			$currentTime = new DateTime( 'last day of this month' );
 		}
+		// @codeCoverageIgnoreEnd
 
 		$totals = $this->repository->getMonthCounts( $this->project, $this->user );
 		$out = [
@@ -837,8 +842,6 @@ class EditCounter extends Model {
 	 *           string[] - Modified $out filled with month stats,
 	 *           DateTime - timestamp of first edit
 	 *         ]
-	 * Tests covered in self::monthCounts().
-	 * @codeCoverageIgnore
 	 */
 	private function fillInMonthCounts( array $out, array $totals, DateTime $firstEdit ): array {
 		foreach ( $totals as $total ) {
@@ -861,8 +864,6 @@ class EditCounter extends Model {
 	 * @param array $out
 	 * @param DatePeriod $dateRange From first edit to present.
 	 * @return array Modified $out filled with month stats.
-	 * Tests covered in self::monthCounts().
-	 * @codeCoverageIgnore
 	 */
 	private function fillInMonthTotalsAndLabels( array $out, DatePeriod $dateRange ): array {
 		foreach ( $dateRange as $monthObj ) {
@@ -958,15 +959,15 @@ class EditCounter extends Model {
 	}
 
 	/**
-	 * Get average edit size, and number of large and small edits.
-	 * @return array
+	 * Get average edit size, number of large and small edits, and change tags.
+	 * @return array With keys "sizes", "average_size", "small_edits", "large_edits", "tag_lists".
 	 */
-	public function getEditSizeData(): array {
-		if ( !isset( $this->editSizeData ) ) {
-			$this->editSizeData = $this->repository
-				->getEditSizeData( $this->project, $this->user );
+	public function getEditData(): array {
+		if ( !isset( $this->editData ) ) {
+			$this->editData = $this->repository
+				->getEditData( $this->project, $this->user );
 		}
-		return $this->editSizeData;
+		return $this->editData;
 	}
 
 	/**
@@ -979,21 +980,39 @@ class EditCounter extends Model {
 	}
 
 	/**
-	 * Get the number of edits under 20 bytes of the user's past 5000 edits.
-	 * @return int
+	 * Get the ProofreadPage tagged quality changes in the last 5000 edits.
+	 * @return int[] With keys 0, 1, 2, 3, 4, and 'total'.
 	 */
-	public function countSmallEdits(): int {
-		$editSizeData = $this->getEditSizeData();
-		return isset( $editSizeData['small_edits'] ) ? (int)$editSizeData['small_edits'] : 0;
-	}
-
-	/**
-	 * Get the total number of edits over 1000 bytes of the user's past 5000 edits.
-	 * @return int
-	 */
-	public function countLargeEdits(): int {
-		$editSizeData = $this->getEditSizeData();
-		return isset( $editSizeData['large_edits'] ) ? (int)$editSizeData['large_edits'] : 0;
+	public function countQualityChanges(): array {
+		$editData = $this->getEditData();
+		$res = [
+			0 => 0,
+			1 => 0,
+			2 => 0,
+			3 => 0,
+			4 => 0,
+			'total' => 0,
+		];
+		if ( !isset( $editData['tag_lists'] ) ) {
+			return $res;
+		}
+		$tagLists = $editData['tag_lists'];
+		foreach ( $tagLists as $list ) {
+			if ( $list !== null ) {
+				$found = false;
+				foreach ( $list as $tag ) {
+					if ( preg_match( '/^proofreadpage\-quality[0-4]$/', $tag ) ) {
+						$res[intval( substr( $tag, -1 ) )] += 1;
+						$found = true;
+						break;
+					}
+				}
+				if ( $found ) {
+					$res['total'] += 1;
+				}
+			}
+		}
+		return $res;
 	}
 
 	/**
@@ -1001,11 +1020,11 @@ class EditCounter extends Model {
 	 * @return int
 	 */
 	public function countAutoEdits(): int {
-		$editSizeData = $this->getEditSizeData();
-		if ( !isset( $editSizeData['tag_lists'] ) ) {
+		$editData = $this->getEditData();
+		if ( !isset( $editData['tag_lists'] ) ) {
 			return 0;
 		}
-		$tags = json_decode( $editSizeData['tag_lists'] );
+		$tags = $editData['tag_lists'];
 		$autoTags = $this->autoEditsHelper->getTags( $this->project );
 		return count(
 			// Number
@@ -1032,9 +1051,9 @@ class EditCounter extends Model {
 	 * @return float Size in bytes.
 	 */
 	public function averageEditSize(): float {
-		$editSizeData = $this->getEditSizeData();
-		if ( isset( $editSizeData['average_size'] ) ) {
-			return round( (float)$editSizeData['average_size'], 3 );
+		$editData = $this->getEditData();
+		if ( isset( $editData['average_size'] ) ) {
+			return round( (float)$editData['average_size'], 3 );
 		} else {
 			return 0;
 		}

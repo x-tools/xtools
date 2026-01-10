@@ -188,7 +188,6 @@ class AdminStatsRepository extends Repository {
 			// If they are able to add and remove user groups, we'll treat them as having the 'userrights' permission.
 			if ( isset( $userGroup['add'] ) || isset( $userGroup['remove'] ) ) {
 				$userGroup['rights'][] = 'userrights';
-				$userGroup['rights'][] = 'userrights';
 			}
 			if ( count( array_intersect( $userGroup['rights'], $permissions ) ) > 0 ) {
 				$userGroups[] = $userGroup['name'];

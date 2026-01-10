@@ -73,8 +73,39 @@ class GlobalContribsTest extends TestAdapter {
 
 	/**
 	 * Test global edits.
+	 * @dataProvider globalEditsProvider
+	 * @param array $contribs
+	 * @param array $projects
+	 * @param int $count
+	 * @param int $projectCount
 	 */
-	public function testGlobalEdits(): void {
+	public function testGlobalEdits(
+		array $contribs,
+		array $projects,
+		int $count,
+		int $projectCount
+	): void {
+		$globalContribsRepo = $this->createMock( GlobalContribsRepository::class );
+		$globalContribsRepo->expects( static::exactly( 2 + ( count( $projects ) ? 0 : 1 ) ) )
+			->method( 'getProjectsWithEdits' )
+			->willReturn( $projects );
+		$globalContribsRepo->expects( static::any() )
+			->method( 'getRevisions' )
+			->willReturn( $contribs );
+		$this->globalContribs->setRepository( $globalContribsRepo );
+
+		$edits = $this->globalContribs->globalEdits();
+
+		static::assertCount( $count, $edits );
+		if ( $count > 0 ) {
+			static::assertEquals( 'My user page', $edits['1514764800-1']->getComment() );
+		}
+		static::assertEquals( $projectCount, $this->globalContribs->numProjectsWithEdits() );
+
+		$this->globalContribs->globalEdits();
+	}
+
+	public function globalEditsProvider(): array {
 		/** @var ProjectRepository|MockObject $wiki1Repo */
 		$wiki1Repo = $this->createMock( ProjectRepository::class );
 		$wiki1Repo->expects( static::once() )
@@ -88,8 +119,7 @@ class GlobalContribsTest extends TestAdapter {
 			] );
 		$wiki1 = new Project( 'wiki1' );
 		$wiki1->setRepository( $wiki1Repo );
-
-		$contribs = [ [
+		$edit = [ [
 			'dbName' => 'wiki1',
 			'id' => 1,
 			'timestamp' => '20180101000000',
@@ -104,19 +134,26 @@ class GlobalContribsTest extends TestAdapter {
 			'namespace' => '2',
 			'comment' => 'My user page',
 		] ];
-
-		$this->globalContribsRepo->expects( static::once() )
-			->method( 'getProjectsWithEdits' )
-			->willReturn( [
-				'wiki1' => $wiki1,
-			] );
-		$this->globalContribsRepo->expects( static::once() )
-			->method( 'getRevisions' )
-			->willReturn( $contribs );
-
-		$edits = $this->globalContribs->globalEdits();
-
-		static::assertCount( 1, $edits );
-		static::assertEquals( 'My user page', $edits['1514764800-1']->getComment() );
+		return [
+			[
+				// Dataset #0: normal case. 1 edit, 1 project
+				$edit,
+				[ 'wiki1' => $wiki1 ],
+				1,
+				1,
+			], [
+				// Dataset #1: project for edit is null
+				$edit,
+				[ 'wiki1' => null ],
+				0,
+				1,
+			], [
+				// Dataset #2: no projects and no edit
+				[],
+				[],
+				0,
+				0,
+			],
+		];
 	}
 }

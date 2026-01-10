@@ -115,10 +115,10 @@ class AutoEditsTest extends TestAdapter {
 			$page,
 			array_merge( $rev, [ 'user' => $this->user ] )
 		);
-		static::assertEquals( $edit, $autoEdits->getNonAutomatedEdits()[0] );
+		static::assertEquals( $edit, $autoEdits->getNonAutomatedEdits( false )[0] );
 
 		// One more time to ensure things are re-queried.
-		static::assertEquals( $edit, $autoEdits->getNonAutomatedEdits()[0] );
+		static::assertEquals( $edit, $autoEdits->getNonAutomatedEdits( false )[0] );
 	}
 
 	/**
@@ -191,10 +191,10 @@ class AutoEditsTest extends TestAdapter {
 			$page,
 			array_merge( $rev, [ 'user' => $this->user ] )
 		);
-		static::assertEquals( $edit, $autoEdits->getAutomatedEdits()[0] );
+		static::assertEquals( $edit, $autoEdits->getAutomatedEdits( false )[0] );
 
 		// One more time to ensure things are re-queried.
-		static::assertEquals( $edit, $autoEdits->getAutomatedEdits()[0] );
+		static::assertEquals( $edit, $autoEdits->getAutomatedEdits( false )[0] );
 	}
 
 	/**

@@ -92,6 +92,8 @@ class PageInfoApi extends Model {
 	 * intentionally disabled, because using the gadget, this will get hit for a different page constantly, where
 	 * the likelihood of cache benefiting us is slim.
 	 * @return string[]|false false if the page was not found.
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function getBasicEditingInfo() {
 		return $this->repository->getBasicEditingInfo( $this->page );
@@ -104,10 +106,8 @@ class PageInfoApi extends Model {
 	 * @return array
 	 */
 	public function getTopEditorsByEditCount( int $limit = 20, bool $noBots = false ): array {
-		// Quick cache, valid only for the same request.
-		static $topEditors = null;
-		if ( $topEditors !== null ) {
-			return $topEditors;
+		if ( isset( $this->topEditors ) ) {
+			return $this->topEditors;
 		}
 
 		$rows = $this->repository->getTopEditorsByEditCount(
@@ -118,10 +118,10 @@ class PageInfoApi extends Model {
 			$noBots
 		);
 
-		$topEditors = [];
+		$this->topEditors = [];
 		$rank = 0;
 		foreach ( $rows as $row ) {
-			$topEditors[] = [
+			$this->topEditors[] = [
 				'rank' => ++$rank,
 				'username' => $row['username'],
 				'count' => $row['count'],
@@ -139,7 +139,7 @@ class PageInfoApi extends Model {
 			];
 		}
 
-		return $topEditors;
+		return $this->topEditors;
 	}
 
 	/**
@@ -462,6 +462,8 @@ class PageInfoApi extends Model {
 	/**
 	 * Get counts of (semi-)automated tools used to edit the page.
 	 * @return array
+	 * Just returns a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function getAutoEditsCounts(): array {
 		return $this->repository->getAutoEditsCounts( $this->page, $this->start, $this->end );

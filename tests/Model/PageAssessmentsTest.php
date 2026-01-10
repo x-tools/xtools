@@ -63,7 +63,13 @@ class PageAssessmentsTest extends TestAdapter {
 	 * Badges
 	 */
 	public function testBadges(): void {
-		$pa = new PageAssessments( $this->paRepo, $this->project );
+		$config = $this->paRepo->getConfig( $this->project );
+		$config['class']['Unknown'] = null;
+		$paRepo = $this->createMock( PageAssessmentsRepository::class );
+		$paRepo->expects( $this->once() )
+			->method( 'getConfig' )
+			->willReturn( $config );
+		$pa = new PageAssessments( $paRepo, $this->project );
 
 		static::assertEquals(
 			'https://upload.wikimedia.org/wikipedia/commons/b/bc/Featured_article_star.svg',
@@ -73,6 +79,11 @@ class PageAssessmentsTest extends TestAdapter {
 		static::assertEquals(
 			'Featured_article_star.svg',
 			$pa->getBadgeURL( 'FA', true )
+		);
+
+		static::assertSame(
+			'',
+			$pa->getBadgeURL( 'Bonjour', true )
 		);
 	}
 
@@ -87,7 +98,7 @@ class PageAssessmentsTest extends TestAdapter {
 		] );
 		$page = new Page( $pageRepo, $this->project, 'Test_page' );
 
-		$this->paRepo->expects( $this->once() )
+		$this->paRepo->expects( $this->exactly( 2 ) )
 			->method( 'getAssessments' )
 			->with( $page )
 			->willReturn( [
@@ -106,6 +117,7 @@ class PageAssessmentsTest extends TestAdapter {
 		$pa = new PageAssessments( $this->paRepo, $this->project );
 
 		$assessments = $pa->getAssessments( $page );
+		$assessment = $pa->getAssessment( $page );
 
 		// Picks the first assessment.
 		static::assertEquals( [
@@ -114,7 +126,67 @@ class PageAssessmentsTest extends TestAdapter {
 			'category' => 'Category:Start-Class articles',
 			'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
 		], $assessments['assessment'] );
+		static::assertEquals( [
+			'color' => '#FFAA66',
+			'category' => 'Category:Start-Class articles',
+			'badge' => 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Symbol_start_class.svg',
+			'value' => 'Start',
+		], $assessment );
 
 		static::assertCount( 2, $assessments['wikiprojects'] );
+	}
+
+	public function testWrongNsAssessments(): void {
+		$pageRepo = $this->createMock( PageRepository::class );
+		$pageRepo->method( 'getPageInfo' )->willReturn( [
+			'title' => 'Talk:Test Page',
+			'ns' => 1,
+		] );
+		$page = new Page( $pageRepo, $this->project, 'Talk:Test_page' );
+		$pa = new PageAssessments( $this->paRepo, $this->project );
+		static::assertFalse( $pa->getAssessment( $page ) );
+		static::assertNull( $pa->getAssessments( $page ) );
+	}
+
+	public function testUnknownAssessment(): void {
+		$pageRepo = $this->createMock( PageRepository::class );
+		$pageRepo->method( 'getPageInfo' )->willReturn( [
+			'title' => 'Test Page',
+			'ns' => 6,
+		] );
+		$page = new Page( $pageRepo, $this->project, 'Test_page' );
+		$this->paRepo->expects( static::exactly( 2 ) )
+			->method( 'getAssessments' )
+			->willReturn( [] );
+		$pa = new PageAssessments( $this->paRepo, $this->project );
+		static::assertEquals( [
+			'badge' => 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Symbol_question.svg',
+			'color' => '',
+			'category' => 'Category:Unassessed articles',
+			'value' => '???',
+		], $pa->getAssessment( $page ) );
+		static::assertEquals( [], $pa->getAssessments( $page ) );
+	}
+
+	public function testImportanceFromUnknownAssessment(): void {
+		$pa = new PageAssessments( $this->paRepo, $this->project );
+		static::assertEquals( [
+			'color' => '',
+			'category' => 'Category:Unknown-importance articles',
+			'weight' => 0,
+			'value' => '???',
+		], $pa->getImportanceFromAssessment( [ 'importance' => '' ] ) );
+	}
+
+	public function testImportanceWithMissingConfig(): void {
+		// To make it happy about being used once:
+		$this->paRepo->getConfig( $this->project );
+		// Also ensures we don't use it by mistake in the next tests.
+		$paRepo = $this->createMock( PageAssessmentsRepository::class );
+		$paRepo->expects( static::once() )
+			->method( 'getConfig' )
+			->willReturn( [] );
+		$pa = new PageAssessments( $paRepo, $this->project );
+		static::assertNull( $pa->getImportanceFromAssessment( [ 'importance' => '' ] ) );
 	}
 }

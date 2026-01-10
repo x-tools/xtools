@@ -69,6 +69,8 @@ class Authorship extends Model {
 	/**
 	 * Domains of supported wikis.
 	 * @return string[]
+	 * Is a constant.
+	 * @codeCoverageIgnore
 	 */
 	public function getSupportedWikis(): array {
 		return self::SUPPORTED_PROJECTS;
@@ -100,18 +102,18 @@ class Authorship extends Model {
 
 	/**
 	 * Get the total number of authors.
-	 * @return int
+	 * @return int|null
 	 */
-	public function getTotalAuthors(): int {
-		return $this->data['totalAuthors'];
+	public function getTotalAuthors(): int|null {
+		return $this->data['totalAuthors'] ?? null;
 	}
 
 	/**
 	 * Get the total number of characters added.
-	 * @return int
+	 * @return int|null
 	 */
-	public function getTotalCount(): int {
-		return $this->data['totalCount'];
+	public function getTotalCount(): int|null {
+		return $this->data['totalCount'] ?? null;
 	}
 
 	/**

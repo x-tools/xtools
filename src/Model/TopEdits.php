@@ -148,6 +148,7 @@ class TopEdits extends Model {
 	 * Get the WikiProject totals.
 	 * @param int $ns Namespace ID.
 	 * @return array
+	 * @codeCoverageIgnore Just returns a repository result.
 	 */
 	public function getProjectTotals( int $ns ): array {
 		 return $this->repository->getProjectTotals(

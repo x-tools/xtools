@@ -19,6 +19,10 @@
 {% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
 {% set columns = columns|merge(['assessment']) %}
 {% endif %}
+{% if project.isPrpPage(ns) %}
+{% set columns = columns|merge(['proofreadpage-quality']) %}
+{% set qualityNames = project.prpQualityNames %}
+{% endif %}
 {% for thKey in columns %}
 ! {{ msg(thKey)|ucfirst }}
 {% endfor %}
@@ -41,6 +45,9 @@
 | {% if page.assessment is defined %}
 [[File:{{ project.pageAssessments.badgeURL(page.assessment.class, true) }}|20px]] {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
 {% endif %}
+{% endif %}
+{% if page.prp_quality is defined %}
+| {{ qualityNames[page.prp_quality] }}
 {% endif %}
 {% endif %}
 | [{{ wiki.pageLogUrlRaw(pageTitle, project) }} {{ msg('log') }}]{% if not(page.deleted) %} &middot; [{{ wiki.pageHistUrlRaw(pageTitle, project) }} {{ msg('history') }}]{% if enabled('PageInfo') %} &middot; [{{ url('PageInfoResult', {'project': project.domain, 'page': pageTitle}) }} {{ msg('tool-pageinfo') }}]{% endif %}{% if enabled('TopEdits') %} &middot; [{{ url('topedits', {'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title}) }} {{ msg('tool-topedits') }}]{% endif %}{% if isWMF() %} &middot; [https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pageTitle|e('url') }} {{ msg('pageviews') }}]{% endif %}{% endif %}
