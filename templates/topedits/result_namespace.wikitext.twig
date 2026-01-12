@@ -15,12 +15,16 @@
 ==== {{ nsName(ns, project.namespaces) }} ====
 
 {% set showPageAssessment = ns == 0 and project.hasPageAssessments %}
+{% set showProofreadQuality = project.hasProofreadPage and project.isPrpPage(ns) %}
 {{ te.numPagesNamespace(ns) }} {{ msg('pages')|lower }}.
 {| class="wikitable sortable"
 ! {{ msg('edits')|ucfirst }}
 ! {{ msg('page-title') }}
 {% if showPageAssessment %}
 ! {{ msg('assessment') }}
+{% endif %}
+{% if showProofreadQuality %}
+! {{ msg('proofreadpage-quality') }}{% set qualityNames = project.prpQualityNames %}
 {% endif %}
 ! {{ msg('links') }}
 {% for page in pages %}
@@ -32,6 +36,9 @@
 {% if badge is defined %}
 [[File:{{ badge }}|20px]] {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
 {% endif %}{% endif %}
+{% if showProofreadQuality %}
+| {{ qualityNames[page.prp_quality] }}
+{% endif %}
 | [{% verbatim %}{{{% endverbatim %}fullurl:Special:Log|page={{ page.full_page_title|replace({' ': '_'}) }}}} {{ msg('log') }}] &middot; [{{ url('PageInfoResult', {project:project.domain, page:page.full_page_title}) }} {{ msg('tool-pageinfo') }}] &middot; [{{ url('TopEditsResultPage', {project:project.domain, username:user.usernameIdent, namespace:page.namespace, page:page.page_title}) }} {{ msg('tool-topedits') }}]
 {% endfor %}
 {% if pages|length >= 10 and te.topEdits|length > 1 %}

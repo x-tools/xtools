@@ -60,6 +60,61 @@ class TopEditsRepository extends UserRepository {
 	}
 
 	/**
+	 * Get the selects for PageAssessments class and projects.
+	 * @param Project $project
+	 * @param int|string $namespace
+	 * @return string
+	 */
+	private function getPaSelects(
+		Project $project,
+		$namespace
+	): string {
+		$hasPageAssessments = $this->isWMF && $project->hasPageAssessments( $namespace );
+		$paTable = $project->getTableName( 'page_assessments' );
+		$paSelect = $hasPageAssessments
+			? ", (
+                    SELECT pa_class
+                    FROM $paTable
+                    WHERE pa_page_id = page_id
+                    AND pa_class != ''
+                    LIMIT 1
+                ) AS pa_class"
+			: '';
+		$paProjectsTable = $project->getTableName( 'page_assessments_projects' );
+		$paProjectsSelect = $hasPageAssessments
+			? ", (
+                    SELECT JSON_ARRAYAGG(pap_project_title)
+                    FROM $paTable
+                    JOIN $paProjectsTable
+                    ON pa_project_id = pap_project_id
+                    WHERE pa_page_id = page_id
+                ) AS pap_project_title"
+			: '';
+		return $paSelect . $paProjectsSelect;
+	}
+
+	/**
+	 * Get the select and join for ProofreadPage quality level.
+	 * @param Project $project
+	 * @param int|string $namespace Namespade ID or 'all'
+	 * @return array With keys 'prpSelect' and 'prpJoin'
+	 */
+	private function getPrpConditions(
+		Project $project,
+		$namespace
+	): array {
+		if ( $project->isPrpPage( $namespace ) ) {
+			$pagePropsTable = $project->getTableName( 'page_props', '' );
+			return [
+				'prpSelect' => ", pp_value as `prp_quality`",
+				'prpJoin' => "LEFT OUTER JOIN $pagePropsTable
+                ON (pp_page, pp_propname) = (page_id, 'proofread_page_quality_level')",
+			];
+		}
+		return [ 'prpSelect' => '', 'prpJoin' => '' ];
+	}
+
+	/**
 	 * Get the top edits by a user in a single namespace.
 	 * @param Project $project
 	 * @param User $user
@@ -89,18 +144,6 @@ class TopEditsRepository extends UserRepository {
 		$pageTable = $project->getTableName( 'page' );
 		$revisionTable = $project->getTableName( 'revision' );
 
-		$hasPageAssessments = $this->isWMF && $project->hasPageAssessments( $namespace );
-		$paTable = $project->getTableName( 'page_assessments' );
-		$paSelect = $hasPageAssessments
-			? ", (
-                    SELECT pa_class
-                    FROM $paTable
-                    WHERE pa_page_id = page_id
-                    AND pa_class != ''
-                    LIMIT 1
-                ) AS pa_class"
-			: '';
-
 		$ipcJoin = '';
 		$whereClause = 'rev_actor = :actorId';
 		$params = [];
@@ -111,13 +154,18 @@ class TopEditsRepository extends UserRepository {
 			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
 		}
 
+		$paSelects = $this->getPaSelects( $project, $namespace );
+
+		$prpConditions = $this->getPrpConditions( $project, $namespace );
+
 		$offset = $pagination * $limit;
 		$sql = "SELECT page_namespace AS `namespace`, page_title,
                     page_is_redirect AS `redirect`, COUNT(page_title) AS `count`
-                    $paSelect
+                    $paSelects
+                    " . $prpConditions['prpSelect'] . "
                 FROM $pageTable
-
                 JOIN $revisionTable ON page_id = rev_page
+                " . $prpConditions['prpJoin'] . "
                 $ipcJoin
                 WHERE $whereClause
                 AND page_namespace = :namespace
@@ -271,17 +319,6 @@ class TopEditsRepository extends UserRepository {
 		$revDateConditions = $this->getDateConditions( $start, $end );
 		$pageTable = $this->getTableName( $project->getDatabaseName(), 'page' );
 		$revisionTable = $this->getTableName( $project->getDatabaseName(), 'revision' );
-		$hasPageAssessments = $this->isWMF && $project->hasPageAssessments();
-		$pageAssessmentsTable = $this->getTableName( $project->getDatabaseName(), 'page_assessments' );
-		$paSelect = $hasPageAssessments
-			? ", (
-                    SELECT pa_class
-                    FROM $pageAssessmentsTable
-                    WHERE pa_page_id = e.page_id
-                    AND pa_class != ''
-                    LIMIT 1
-                ) AS pa_class"
-			: '';
 
 		$ipcJoin = '';
 		$whereClause = 'rev_actor = :actorId';
@@ -293,28 +330,33 @@ class TopEditsRepository extends UserRepository {
 			[ $params['startIp'], $params['endIp'] ] = IPUtils::parseRange( $user->getUsername() );
 		}
 
-		$sql = "SELECT c.page_namespace AS `namespace`, e.page_title,
-                    c.page_is_redirect AS `redirect`, c.count $paSelect
-                FROM
-                (
-                    SELECT b.page_namespace, b.page_is_redirect, b.rev_page, b.count
-                        ,@rn := if(@ns = b.page_namespace, @rn + 1, 1) AS `row_number`
-                        ,@ns := b.page_namespace AS dummy
-                    FROM
-                    (
-                        SELECT page_namespace, page_is_redirect, rev_page, count(rev_page) AS count
-                        FROM $revisionTable
-                        $ipcJoin
-                        JOIN $pageTable ON page_id = rev_page
-                        WHERE $whereClause
-                        $revDateConditions
-                        GROUP BY page_namespace, rev_page
-                    ) AS b
-                    JOIN (SELECT @ns := NULL, @rn := 0) AS vars
-                    ORDER BY b.page_namespace ASC, b.count DESC
-                ) AS c
-                JOIN $pageTable e ON e.page_id = c.rev_page
-                WHERE c.`row_number` <= $limit";
+		$paSelects = $this->getPaSelects( $project, 'all' );
+		$prpConditions = $this->getPrpConditions( $project, 'all' );
+
+		$sql = "
+            SELECT * FROM (
+                SELECT
+                    page_namespace as `namespace`,
+                    page_title,
+                    page_is_redirect as `redirect`,
+                    rev_page,
+                    count(rev_page) AS `count`,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY page_namespace
+                        ORDER BY page_namespace ASC, `count` DESC
+                    ) `row_number`
+                    $paSelects
+                    " . $prpConditions['prpSelect'] . "
+                FROM $revisionTable
+                $ipcJoin
+                JOIN $pageTable ON page_id = rev_page
+                " . $prpConditions['prpJoin'] . "
+                WHERE $whereClause
+                $revDateConditions
+                GROUP BY page_namespace, rev_page
+            ) a
+            WHERE `row_number` <= $limit
+            ORDER BY `namespace` ASC, `count` DESC";
 		$resultQuery = $this->executeQuery( $sql, $project, $user, 'all', $params );
 		$result = $resultQuery->fetchAllAssociative();
 

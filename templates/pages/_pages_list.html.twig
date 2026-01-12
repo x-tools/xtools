@@ -1,5 +1,6 @@
 {% import 'macros/layout.html.twig' as layout %}
 {% import 'macros/wiki.html.twig' as wiki %}
+{% import 'macros/pieChart.html.twig' as chart %}
 
 {% set content %}
     {% if pages.getNumPages == 0 %}
@@ -25,119 +26,157 @@
                 <small class='xt-hide'>[{{ msg('hide')|lower }}]</small>
             </h4>
 
-            <table class="table table-bordered table-hover table-striped pages-table xt-show-hide--target">
-                <thead><tr>
-                    <th>#</th>
-                    {% set columns = ['page-title', 'date', 'original-size'] %}
-                    {% if pages.deleted != 'deleted' %}
-                        {% set columns = columns|merge(['current-size']) %}
-                    {% endif %}
-                    {% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
-                        {% set columns = columns|merge(['assessment']) %}
-                    {% endif %}
-                    {% for thKey in columns %}
-                        <th>
-                            <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
-                                {{ msg(thKey)|ucfirst }}
-                                <span class="glyphicon glyphicon-sort"></span>
-                            </span>
-                        </th>
-                    {% endfor %}
-                    <th>{{ msg('links') }}</th>
-                </tr></thead>
-                <tbody>
-                {% set index = 0 %}
-                {% for page in pages.results[ns] %}
-                    {% set index = index + 1 %}
-                    {% set pagename = titleWithNs(page.page_title, ns, project.namespaces) %}
-                    <tr>
-                        <td>{{ index|num_format }}</td>
-                        <td class="sort-entry--page-title" data-value="{{ pagename }}">
-                            {% if page.redirect %}
-                                {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
-                                <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
-                            {% else %}
-                                {{ wiki.pageLinkRaw(pagename, project) }}
-                            {% endif %}
-                            {% if page.deleted %}
-                                &middot;
-                                <small class="text-danger deleted-page tooltipcss" data-page-title="{{ page.page_title }}" data-namespace="{{ page.namespace }}" data-datetime="{{ page.timestamp }}" data-username="{{ user.usernameIdent }}">
-                                    ({{ msg('deleted') }})
-                                    <div class="tooltip-body">
-                                        <em class="text-muted">{{ msg('loading') }}...</em>
-                                    </div>
-                                </small>
-                                {% if page.recreated is defined and page.recreated %}
-                                    &middot; <small class="text-muted">({{ msg('recreated') }})</small>
-                                {% endif %}
-                            {% endif %}
-                        </td>
-                        <td class="sort-entry--date" data-value="{{ page.timestamp }}">
-                            {% if page.deleted %}
-                                {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.timestamp|date_format, 'timestamp=' ~ page.timestamp) }}
-                            {% else %}
-                                {{ wiki.permaLinkRaw(page.rev_id, project, page.timestamp|date_format) }}
-                            {% endif %}
-                        </td>
-                        <td class="sort-entry--original-size" data-value="{{ page.rev_length }}">
-                            {{ page.rev_length|num_format }}
-                        </td>
+            <div class="side-to-side xt-show-hide--target">
+
+                <div><table class="table table-bordered table-hover table-striped pages-table">
+                    <thead><tr>
+                        <th>#</th>
+                        {% set columns = ['page-title', 'date', 'original-size'] %}
                         {% if pages.deleted != 'deleted' %}
-                            <td class="sort-entry--current-size" data-value="{{ page.length }}">
-                                {% if page.length is null %}
-                                    {{ msg('na') }}
+                            {% set columns = columns|merge(['current-size']) %}
+                        {% endif %}
+                        {% if project.hasPageAssessments(ns) and pages.deleted != 'deleted' %}
+                            {% set columns = columns|merge(['assessment']) %}
+                        {% endif %}
+                        {% if project.isPrpPage(ns) %}
+                            {% set columns = columns|merge(['proofreadpage-quality']) %}
+                            {% set qualityNames = project.prpQualityNames %}
+                        {% endif %}
+                        {% for thKey in columns %}
+                            <th>
+                                <span class="sort-link sort-link--{{ thKey }}" data-column="{{ thKey }}">
+                                    {{ msg(thKey)|ucfirst }}
+                                    <span class="glyphicon glyphicon-sort"></span>
+                                </span>
+                            </th>
+                        {% endfor %}
+                        <th>{{ msg('links') }}</th>
+                    </tr></thead>
+                    <tbody>
+                    {% set index = 0 %}
+                    {% for page in pages.results[ns] %}
+                        {% set index = index + 1 %}
+                        {% set pagename = titleWithNs(page.page_title, ns, project.namespaces) %}
+                        <tr>
+                            <td>{{ index|num_format }}</td>
+                            <td class="sort-entry--page-title" data-value="{{ pagename }}">
+                                {% if page.redirect %}
+                                    {{ wiki.pageLinkRaw(pagename, project, pagename, 'redirect=no') }}
+                                    <small class="text-muted">&middot; ({{ msg('redirect') }})</small>
                                 {% else %}
-                                    {{ page.length|num_format }}
+                                    {{ wiki.pageLinkRaw(pagename, project) }}
+                                {% endif %}
+                                {% if page.deleted %}
+                                    &middot;
+                                    <small class="text-danger deleted-page tooltipcss" data-page-title="{{ page.page_title }}" data-namespace="{{ page.namespace }}" data-datetime="{{ page.timestamp }}" data-username="{{ user.usernameIdent }}">
+                                        ({{ msg('deleted') }})
+                                        <div class="tooltip-body">
+                                            <em class="text-muted">{{ msg('loading') }}...</em>
+                                        </div>
+                                    </small>
+                                    {% if page.recreated is defined and page.recreated %}
+                                        &middot; <small class="text-muted">({{ msg('recreated') }})</small>
+                                    {% endif %}
                                 {% endif %}
                             </td>
-                            {% if project.hasPageAssessments(ns) and page.assessment is defined %}
-                                <td class="sort-entry--assessment" data-value="{{ page.assessment.class ? page.assessment.class : 'Unknown' }}">
-                                    {% if page.deleted %}
+                            <td class="sort-entry--date" data-value="{{ page.timestamp }}">
+                                {% if page.deleted %}
+                                    {{ wiki.pageLinkRaw('Special:Undelete/' ~ pagename, project, page.timestamp|date_format, 'timestamp=' ~ page.timestamp) }}
+                                {% else %}
+                                    {{ wiki.permaLinkRaw(page.rev_id, project, page.timestamp|date_format) }}
+                                {% endif %}
+                            </td>
+                            <td class="sort-entry--original-size" data-value="{{ page.rev_length }}">
+                                {{ page.rev_length|num_format }}
+                            </td>
+                            {% if pages.deleted != 'deleted' %}
+                                <td class="sort-entry--current-size" data-value="{{ page.length }}">
+                                    {% if page.length is null %}
                                         {{ msg('na') }}
                                     {% else %}
-                                        {% if page.assessment.badge is defined %}
-                                            <img alt="{{ page.assessment.class }}" src="{{ page.assessment.badge }}" class="assessment-badge" />
-                                        {% endif %}
-                                        {{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}
+                                        {{ page.length|num_format }}
                                     {% endif %}
                                 </td>
+                                {% if project.hasPageAssessments(ns) and page.assessment is defined %}
+                                    <td class="sort-entry--assessment" data-value="{{ page.assessment.class ? page.assessment.class : 'Unknown' }}">
+                                        {% if page.deleted %}
+                                            {{ msg('na') }}
+                                        {% else %}
+                                            {% if page.assessment.badge is defined %}
+                                                <img alt="{{ page.assessment.class }}" src="{{ page.assessment.badge }}" class="assessment-badge" />
+                                            {% endif %}
+                                            {{ page.assessment.class ? page.assessment.class|ucfirst : msg('unknown') }}
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                                {% if page.prp_quality is defined %}
+                                    <td class="sort-entry--quality" data-value="{{ page.prp_quality }}">
+                                        {% if page.deleted %}
+                                            {{ msg('na') }}
+                                        {% else %}
+                                            <span class="prp-qualitytext prp-quality{{ page.prp_quality }}">
+                                                {{ qualityNames[page.prp_quality] }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                        <td>
-                            {{ wiki.pageLogLinkRaw(pagename, project) }}
-                            {% if not(page.deleted) or (page.recreated is defined and page.recreated == true) %}
-                                &middot;
-                                {{ wiki.pageHistLinkRaw(pagename, project) }}
-                                {% if enabled('PageInfo') %}
+                            <td>
+                                {{ wiki.pageLogLinkRaw(pagename, project) }}
+                                {% if not(page.deleted) or (page.recreated is defined and page.recreated == true) %}
                                     &middot;
-                                    <a href="{{ path('PageInfoResult', { 'project': project.domain, 'page': pagename }) }}">{{ msg('tool-pageinfo') }}</a>
+                                    {{ wiki.pageHistLinkRaw(pagename, project) }}
+                                    {% if enabled('PageInfo') %}
+                                        &middot;
+                                        <a href="{{ path('PageInfoResult', { 'project': project.domain, 'page': pagename }) }}">{{ msg('tool-pageinfo') }}</a>
+                                    {% endif %}
+                                    {% if enabled('TopEdits') %}
+                                        &middot;
+                                        <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
+                                    {% endif %}
+                                    {% if isWMF() %}
+                                        &middot;
+                                        <a target="_blank" href="https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
+                                            {{ msg('pageviews') }}
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
-                                {% if enabled('TopEdits') %}
-                                    &middot;
-                                    <a href="{{ path('TopEditsResultPage', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'page': page.page_title }) }}">{{ msg('tool-topedits') }}</a>
-                                {% endif %}
-                                {% if isWMF() %}
-                                    &middot;
-                                    <a target="_blank" href="https://pageviews.wmcloud.org/?project={{ project.domain }}&amp;pages={{ pagename|e('url') }}">
-                                        {{ msg('pageviews') }}
-                                    </a>
-                                {% endif %}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                {% if pages.multiNamespace and pages.counts[ns].count > pages.resultsPerPage %}
-                    <tr class="show-more-row">
-                        <td></td>
-                        <td colspan={{ columns|length + 1 }}>
-                            <a href="{{ path('PagesResult', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'redirects': pages.redirects }) }}">
-                                {{ (pages.counts[ns].count - pages.resultsPerPage)|number_format }} {{ msg('num-others', [pages.counts[ns].count - pages.resultsPerPage]) }}
-                            </a>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% if pages.multiNamespace and pages.counts[ns].count > pages.resultsPerPage %}
+                        <tr class="show-more-row">
+                            <td></td>
+                            <td colspan={{ columns|length + 1 }}>
+                                <a href="{{ path('PagesResult', { 'project': project.domain, 'username': user.usernameIdent, 'namespace': ns, 'redirects': pages.redirects }) }}">
+                                    {{ (pages.counts[ns].count - pages.resultsPerPage)|number_format }} {{ msg('num-others', [pages.counts[ns].count - pages.resultsPerPage]) }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table></div>
+
+                {% if project.isPrpPage(ns) %}
+                    {% set qualityNames = project.prpQualityNames %}
+                    <div>
+                        {{ msg('proofreadpage-quality') }}
+                        {{
+                            chart.pie_chart('prp_quality',
+                                [0, 1, 2, 3, 4]|map((i) => {
+                                    label: qualityNames[i],
+                                    value: pages.counts[ns]['prp_quality' ~ i],
+                                    percentage: ((pages.counts[ns]['prp_quality' ~ i] / pages.counts[ns].count) * 100),
+                                    color: color([11, 0, 4, 2, 1][i])
+                                }),
+                                true,
+                                'qualitychart'
+                            )
+                        }}
+                    </div>
                 {% endif %}
-                </tbody>
-            </table>
+
+            </div>
         {% endfor %}
 
         {##### PAGINATION #####}

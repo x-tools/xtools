@@ -5,11 +5,13 @@ declare( strict_types = 1 );
 namespace App\Tests\Model;
 
 use App\Model\Blame;
+use App\Model\Edit;
 use App\Model\Page;
 use App\Model\Project;
 use App\Repository\BlameRepository;
 use App\Repository\PageRepository;
 use App\Tests\TestAdapter;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * @covers \App\Model\Blame
@@ -67,20 +69,76 @@ class BlameTest extends TestAdapter {
 								'o_rev_id' => 3,
 								'editor' => 'Matthewrbowker',
 								'str' => 'foobar',
+							], [
+								'o_rev_id' => 4,
+								'editor' => 'Alien333',
+								'str' => 'ooba',
+							], [
+								'o_rev_id' => 4,
+								'editor' => 'Alien333',
+								'str' => 'bad',
 							],
 						],
 					],
 				] ],
 			] );
+		$mockEdit = $this->createMock( 'App\Model\Edit' );
 		$this->blameRepo->expects( $this->exactly( 2 ) )
 			->method( 'getEditFromRevId' )
-			->willReturn( $this->createMock( 'App\Model\Edit' ) );
+			->willReturn( $mockEdit );
 
 		$blame = new Blame( $this->blameRepo, $this->page, 'Foo bar' );
 		$blame->prepareData();
 		$matches = $blame->getMatches();
+		// test it does cache
+		$blame->prepareData();
 
 		static::assertCount( 2, $matches );
+		static::assertEquals( [ $mockEdit, $mockEdit ], $blame->getEdits() );
 		static::assertEquals( [ 3, 1 ], array_keys( $matches ) );
+	}
+
+	/**
+	 * Test fallback for Wikiwho errors
+	 */
+	public function testPrepareFallback(): void {
+		$this->blameRepo->expects( static::once() )
+			->method( 'getData' )
+			->willThrowException( $this->createMock( RequestException::class ) );
+		$blame = new Blame( $this->blameRepo, $this->page, 'Foo bar' );
+		$blame->prepareData();
+		static::assertTrue( !isset( $blame->matches ) );
+	}
+
+	/**
+	 * @dataProvider asOfProvider
+	 * @param string|null $target
+	 * @param Edit|null $edit
+	 */
+	public function testAsOf( ?string $target, ?Edit $edit ): void {
+		$blameRepo = $this->createMock( BlameRepository::class );
+		$blameRepo->expects( static::exactly( $target ? 1 : 0 ) )
+			->method( 'getEditFromRevId' )
+			->willReturn( $edit );
+		$blame = new Blame( $blameRepo, $this->page, 'Foo bar', $target );
+		static::assertEquals( $edit, $blame->getAsOf() );
+		// Get a second time to check caching
+		static::assertEquals( $edit, $blame->getAsOf() );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function asOfProvider(): array {
+		return [
+			[
+				"1234",
+				$this->createMock( Edit::class ),
+			],
+			[
+				null,
+				null,
+			],
+		];
 	}
 }

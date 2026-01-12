@@ -33,6 +33,7 @@ class EditCounterTest extends TestAdapter {
 	protected ProjectRepository $projectRepo;
 	protected User $user;
 	protected UserRepository $userRepo;
+	protected AutomatedEditsHelper $autoEdits;
 
 	/**
 	 * Set up shared mocks and class instances.
@@ -51,6 +52,7 @@ class EditCounterTest extends TestAdapter {
 
 		$this->userRepo = $this->createMock( UserRepository::class );
 		$this->user = new User( $this->userRepo, 'Testuser' );
+		$this->autoEdits = $this->createMock( AutomatedEditsHelper::class );
 
 		$this->editCounter = new EditCounter(
 			$this->editCounterRepo,
@@ -58,7 +60,7 @@ class EditCounterTest extends TestAdapter {
 			$this->createMock( UserRights::class ),
 			$this->project,
 			$this->user,
-			$this->createMock( AutomatedEditsHelper::class )
+			$this->autoEdits,
 		);
 		$this->editCounter->setRepository( $this->editCounterRepo );
 	}
@@ -72,6 +74,7 @@ class EditCounterTest extends TestAdapter {
 			->method( 'getLogCounts' )
 			->willReturn( [
 				'delete-delete' => 0,
+				'delete-restore' => 2,
 				'move-move' => 1,
 				'block-block' => 2,
 				'block-reblock' => 3,
@@ -129,6 +132,23 @@ class EditCounterTest extends TestAdapter {
 		static::assertEquals( 10, $this->editCounter->approvals() );
 		static::assertEquals( 3, $this->editCounter->accountsCreated() );
 		static::assertEquals( 9, $this->editCounter->reviews() );
+		static::assertEquals( 2, $this->editCounter->countPagesRestored() );
+	}
+
+	/**
+	 * Test counts of Commons uploads and local/Commons moves
+	 */
+	public function testFileCounts(): void {
+		$this->editCounterRepo->expects( static::exactly( 3 ) )
+			->method( 'getFileCounts' )
+			->willReturn( [
+				'files_moved' => 1,
+				'files_moved_commons' => 2,
+				'files_uploaded_commons' => 3,
+			] );
+		static::assertEquals( 3, $this->editCounter->countFilesUploadedCommons() );
+		static::assertSame( 1, $this->editCounter->countFilesMoved() );
+		static::assertEquals( 2, $this->editCounter->countFilesMovedCommons() );
 	}
 
 	/**
@@ -144,6 +164,8 @@ class EditCounterTest extends TestAdapter {
 				'minor' => 5,
 				'day' => 10,
 				'week' => 15,
+				'edited-live' => 2,
+				'edited-deleted' => 2,
 			] );
 
 		static::assertEquals( 100, $this->editCounter->countLiveRevisions() );
@@ -153,6 +175,20 @@ class EditCounterTest extends TestAdapter {
 		static::assertEquals( 5, $this->editCounter->countMinorRevisions() );
 		static::assertEquals( 10, $this->editCounter->countRevisionsInLast( 'day' ) );
 		static::assertEquals( 15, $this->editCounter->countRevisionsInLast( 'week' ) );
+		static::assertEquals( 27.5, $this->editCounter->averageRevisionsPerPage() );
+		$this->editCounterRepo->expects( static::once() )->method( 'getFirstAndLatestActions' )->willReturn( [
+				'rev_first' => [
+					'id' => 123,
+					'timestamp' => '20170510100000',
+					'type' => null,
+				],
+				'rev_latest' => [
+					'id' => 321,
+					'timestamp' => '20170515150000',
+					'type' => null,
+				],
+			] );
+		static::assertEquals( 22, $this->editCounter->averageRevisionsPerDay() );
 	}
 
 	/**
@@ -196,6 +232,24 @@ class EditCounterTest extends TestAdapter {
 	}
 
 	/**
+	 * Test the fallback if one of rev_first or rev_latest doesn't have a timestamp
+	 */
+	public function testMissingTimestamps(): void {
+		$this->editCounterRepo->expects( static::once() )->method( 'getFirstAndLatestActions' )->willReturn( [
+				'rev_first' => [
+					'id' => 123,
+					'type' => null,
+				],
+				'rev_latest' => [
+					'id' => 321,
+					'type' => null,
+				],
+			] );
+		static::assertSame( 0, (int)$this->editCounter->getDays() );
+		static::assertSame( 0, (int)$this->editCounter->averageRevisionsPerDay() );
+	}
+
+	/**
 	 * Test that page counts are reported correctly.
 	 */
 	public function testPageCounts(): void {
@@ -215,6 +269,20 @@ class EditCounterTest extends TestAdapter {
 		static::assertEquals( 6, $this->editCounter->countCreatedPagesLive() );
 		static::assertEquals( 2, $this->editCounter->countPagesCreatedDeleted() );
 		static::assertEquals( 8, $this->editCounter->countPagesCreated() );
+	}
+
+	/**
+	 * Test fallbacks for when no pages were edited
+	 */
+	public function testNoPages(): void {
+		$this->editCounterRepo->expects( static::once() )
+			->method( 'getPairData' )
+			->willReturn( [
+				'edited-live' => 0,
+				'edited-deleted' => 0,
+			] );
+		static::assertSame( 0, (int)$this->editCounter->countAllPagesEdited() );
+		static::assertSame( 0, (int)$this->editCounter->averageRevisionsPerPage() );
 	}
 
 	/**
@@ -351,7 +419,7 @@ class EditCounterTest extends TestAdapter {
 		// Mock current time by passing it in (dummy parameter, so to speak).
 		$yearCounts = $this->editCounter->yearCounts( new DateTime( '2017-04-30 23:59:59' ) );
 
-		// Make sure zeros were filled in for months with no edits, and for each namespace.
+		// Make sure zeros were filled in for years with no edits, and for each namespace.
 		static::assertArraySubset(
 			[
 				2015 => 0,
@@ -377,20 +445,102 @@ class EditCounterTest extends TestAdapter {
 
 		// Labels for the years
 		static::assertEquals( [ '2015', '2016', '2017' ], $yearCounts['yearLabels'] );
+
+		// Mock current time by passing it in (dummy parameter, so to speak).
+		$yearCountsWithNamespaces = $this->editCounter->yearCountsWithNamespaces(
+			new DateTime( '2017-04-30 23:59:59' )
+		);
+
+		// Make sure zeros were filled in for years with no edits, and for each namespace.
+		static::assertArraySubset(
+			[
+				0 => 10,
+				1 => 0,
+			],
+			$yearCountsWithNamespaces[2016]
+		);
+
+		// Assert that only active years are reported
+		static::assertEquals( [ 2015, 2016, 2017 ], array_keys( $yearCountsWithNamespaces ) );
+
+		// Assert that only active namespaces are reported.
+		static::assertEquals( [ 0, 1 ], array_keys( $yearCountsWithNamespaces[2016] ) );
+
+		// Ensure we are caching that and will not make the query again
+		$this->editCounter->yearCounts( new DateTime( '2017-04-30 23:59:59' ) );
 	}
 
 	/**
-	 * Ensure parsing of log_params properly works, based on known formats
+	 * Test reordering and filling of timecard values
+	 */
+	public function testTimeCard(): void {
+		$this->editCounterRepo->expects( static::once() )
+			->method( "getTimeCard" )
+			->willReturn( [
+				[
+					// Sunday, 2 AM
+					'day_of_week' => 1,
+					'hour' => 2,
+					'value' => 42,
+				],
+				[
+					// Wednesday, 3 PM
+					'day_of_week' => 4,
+					'hour' => 15,
+					'value' => 33,
+				],
+			] );
+		$results = $this->editCounter->timeCard();
+		$hours = range( 0, 23 );
+		$days = range( 1, 7 );
+		// The hours are seven cycles from 0 to 23
+		static::assertEquals(
+			array_merge( ...array_fill( 0, 7, $hours ) ),
+			array_map( static fn ( $row ) => $row['hour'], $results )
+		);
+		// The days are 24 of each of the seven, in order
+		static::assertEquals(
+			array_merge( ...array_map( static fn ( $day ) => array_fill( 0, 24, $day ), $days ) ),
+			array_map( static fn ( $row ) => $row['day_of_week'], $results )
+		);
+		// All values are positive
+		static::assertCount(
+			0,
+			array_filter( $results, static fn ( $row ) => (int)$row['value'] < 0 )
+		);
+
+		// Ensure we are caching and will not query again
+		$this->editCounter->timeCard();
+	}
+
+	/**
+	 * Test block logic
 	 * @dataProvider longestBlockProvider
 	 * @param array $blockLog
 	 * @param int $longestDuration
+	 * @param int $blockCount
 	 */
-	public function testLongestBlockSeconds( array $blockLog, int $longestDuration ): void {
+	public function testBlocks( array $blockLog, int $longestDuration, int $blockCount ): void {
 		$this->editCounterRepo->expects( static::once() )
 			->method( 'getBlocksReceived' )
 			->with( $this->project, $this->user )
 			->willReturn( $blockLog );
-		static::assertEquals( $this->editCounter->getLongestBlockSeconds(), $longestDuration );
+		static::assertEquals( $longestDuration, $this->editCounter->getLongestBlockSeconds() );
+		$a = array_filter(
+			$this->editCounter->getBlocks( 'received' ),
+			// static fn ( $block ) => !in_array( $block['log_action'], [ 'block', 'reblock' ] )
+			static function ( $block ) {
+				return !( $block['log_action'] === 'block' || $block['log_action'] === 'reblock' );
+			}
+		);
+		foreach ( $a as $x ) {
+			static::assertEquals( -3, $x['log_timestamp'] );
+		}
+		static::assertCount( 0, $a );
+		static::assertEquals( $blockCount, $this->editCounter->countBlocksReceived() );
+
+		// Ensure it is cached and we do not make that query a second time
+		$this->editCounter->getLongestBlockSeconds();
 	}
 
 	/**
@@ -415,6 +565,7 @@ class EditCounterTest extends TestAdapter {
 				] ],
 				// 31 days in seconds.
 				2678400,
+				2,
 			],
 			// Blocks that do overlap, without any unblocks. Combined 10 days.
 			[
@@ -432,6 +583,7 @@ class EditCounterTest extends TestAdapter {
 				] ],
 				// 10 days in seconds.
 				864000,
+				2,
 			],
 			// 30 day block that was later unblocked at only 10 days, followed by a shorter block.
 			[
@@ -454,6 +606,7 @@ class EditCounterTest extends TestAdapter {
 				] ],
 				// 10 days in seconds.
 				864000,
+				2,
 			],
 			// Blocks ending with a still active indefinite block. Older block uses legacy format.
 			[
@@ -470,16 +623,18 @@ class EditCounterTest extends TestAdapter {
 				] ],
 				// Indefinite
 				-1,
+				2,
 			],
 			// Block that's active, with an explicit expiry set.
 			[
 				[ [
 					'log_timestamp' => '20170927203624',
-					'log_params' => 'a:2:{s:11:"5::duration";s:29:"Sat, 06 Oct 2026 12:36:00 GMT"' .
+					'log_params' => 'a:2:{s:11:"5::duration";s:29:"Sat, 06 Oct 9999 12:36:00 GMT"' .
 						';s:8:"6::flags";s:11:"noautoblock";}',
 					'log_action' => 'block',
 				] ],
-				285091176,
+				251888543976,
+				1,
 			],
 			// Two indefinite blocks.
 			[
@@ -496,6 +651,30 @@ class EditCounterTest extends TestAdapter {
 					'log_action' => 'reblock',
 				] ],
 				-1,
+				2,
+			],
+			// No blocks; 0 seconds
+			[
+				[],
+				0,
+				0,
+			],
+			// Finite block that was reblocked to infinite
+			[
+				[ [
+					'log_timestamp' => '20160513200200',
+					'log_params' => 'a:2:{s:11:"5::duration";s:10:"24 hours"' .
+						';s:8:"6::flags";s:19:"nocreate,nousertalk";}',
+					'log_action' => 'block',
+				],
+				[
+					'log_timestamp' => '20160717021328',
+					'log_params' => 'a:2:{s:11:"5::duration";s:8:"infinite"' .
+						';s:8:"6::flags";s:31:"nocreate,noautoblock,nousertalk";}',
+					'log_action' => 'reblock',
+				] ],
+				-1,
+				2,
 			],
 		];
 	}
@@ -555,6 +734,67 @@ class EditCounterTest extends TestAdapter {
 						's:8:"6::flags";s:11:"noautoblock";}',
 				],
 				[ 1506544325, 230635 ],
+			],
+		];
+	}
+
+	/**
+	 * Test counting of edit data
+	 * @dataProvider editDataProvider
+	 * @param array $data
+	 * @param array $qualityChanges
+	 * @param int|float $averageSize
+	 * @param int $autoEdits
+	 */
+	public function testEditData(
+		array $data,
+		array $qualityChanges,
+		$averageSize,
+		int $autoEdits,
+	): void {
+		$this->autoEdits->expects( isset( $data['tag_lists'] ) ? static::once() : static::never() )
+			->method( "getTags" )
+			->willReturn( [
+				'AWB',
+			] );
+		$this->editCounterRepo->expects( static::once() )
+			->method( "getEditData" )
+			->willReturn( $data );
+		static::assertEquals( $qualityChanges, $this->editCounter->countQualityChanges() );
+		static::assertEquals( $averageSize, $this->editCounter->averageEditSize() );
+		static::assertEquals( $autoEdits, $this->editCounter->countAutoEdits() );
+	}
+
+	/**
+	 * Data for self::testEditData
+	 * @return array
+	 */
+	public function editDataProvider(): array {
+		return [
+			[
+				[
+					'tag_lists' => [
+						[ 'randomtag', 'proofreadpage-quality1' ],
+						[ 'proofreadpage-quality2', 'proofreadpage-quality0' ],
+						[ 'AWB' ],
+						[ 'proofreadpage-quality2', 'AWB' ],
+						[ 'proofreadpage-quality3', 'a' ],
+						[ 'proofreadpagequality0', 'proofreadpage-quality3' ],
+						[ 'prp-quality0', 'proofreadpage-quality3' ],
+					],
+					'average_size' => 3.1415926,
+				],
+				[ 0 => 0, 1 => 1, 2 => 2, 3 => 3, 4 => 0, 'total' => 6 ],
+				3.142,
+				2,
+			],
+			[
+				[
+					// Empty
+				],
+				[ 0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 'total' => 0 ],
+				0,
+				0,
 			],
 		];
 	}

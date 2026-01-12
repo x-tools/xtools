@@ -202,7 +202,7 @@ class Page extends Model {
 	 * Get the HTML content of the body of the page.
 	 * @param DateTime|int|null $target If a DateTime object, the
 	 *   revision at that time will be returned. If an integer, it is
-	 *   assumed to be the actual revision ID.
+	 *   assumed to be the actual revision ID. If null, use the last revision.
 	 * @return string
 	 */
 	// phpcs:ignore MediaWiki.Usage.NullableType.ExplicitNullableTypes
@@ -287,21 +287,19 @@ class Page extends Model {
 	 * @param false|int $start
 	 * @param false|int $end
 	 * @param int|null $limit
-	 * @param int|null $numRevisions
 	 * @return array
 	 */
 	public function getRevisions(
 		?User $user = null,
 		false|int $start = false,
 		false|int $end = false,
-		?int $limit = null,
-		?int $numRevisions = null
+		?int $limit = null
 	): array {
 		if ( isset( $this->revisions ) ) {
 			return $this->revisions;
 		}
 
-		$this->revisions = $this->repository->getRevisions( $this, $user, $start, $end, $limit, $numRevisions );
+		$this->revisions = $this->repository->getRevisions( $this, $user, $start, $end, $limit );
 
 		return $this->revisions;
 	}
@@ -324,32 +322,27 @@ class Page extends Model {
 	 * @see PageRepository::getRevisionsStmt()
 	 * @param User|null $user Specify to get only revisions by the given user.
 	 * @param ?int $limit Max number of revisions to process.
-	 * @param ?int $numRevisions Number of revisions, if known. This is used solely to determine the
-	 *   OFFSET if we are given a $limit. If $limit is set and $numRevisions is not set, a
-	 *   separate query is ran to get the nuber of revisions.
 	 * @param false|int $start
 	 * @param false|int $end
 	 * @return Result
+	 * Just returns a Repo result.
+	 * @codeCoverageIgnore
 	 */
 	public function getRevisionsStmt(
 		?User $user = null,
 		?int $limit = null,
-		?int $numRevisions = null,
 		false|int $start = false,
 		false|int $end = false
 	): Result {
-		// If we have a limit, we need to know the total number of revisions so that PageRepo
-		// will properly set the OFFSET. See PageRepository::getRevisionsStmt() for more info.
-		if ( isset( $limit ) && $numRevisions === null ) {
-			$numRevisions = $this->getNumRevisions( $user, $start, $end );
-		}
-		return $this->repository->getRevisionsStmt( $this, $user, $limit, $numRevisions, $start, $end );
+		return $this->repository->getRevisionsStmt( $this, $user, $limit, $start, $end );
 	}
 
 	/**
 	 * Get the revision ID that immediately precedes the given date.
 	 * @param DateTime $date
 	 * @return int|null Null if none found.
+	 * Just returns a Repo result.
+	 * @codeCoverageIgnore
 	 */
 	public function getRevisionIdAtDate( DateTime $date ): ?int {
 		return $this->repository->getRevisionIdAtDate( $this, $date );

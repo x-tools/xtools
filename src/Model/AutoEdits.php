@@ -231,6 +231,8 @@ class AutoEdits extends Model {
 	/**
 	 * Get a list of all available tools for the Project.
 	 * @return array
+	 * Just passes along a repository result.
+	 * @codeCoverageIgnore
 	 */
 	public function getAllTools(): array {
 		return $this->repository->getTools( $this->project );

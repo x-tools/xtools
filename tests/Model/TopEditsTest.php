@@ -84,6 +84,10 @@ class TopEditsTest extends TestAdapter {
 		$page = new Page( $this->pageRepo, $this->project, 'Test page' );
 		$te->setPage( $page );
 		static::assertEquals( $page, $te->getPage() );
+
+		// Explicit pagination
+		$te = $this->getTopEdits( null, 'all', false, false, 20, 1 );
+		static::assertSame( 1, $te->getPagination() );
 	}
 
 	/**
@@ -115,6 +119,7 @@ class TopEditsTest extends TestAdapter {
 			'assessment' => [
 				'class' => 'List',
 			],
+			'pap_project_title' => '["Biography","India"]',
 		], $result[0][0] );
 
 		// Fetching again should use value of class property.
@@ -127,25 +132,49 @@ class TopEditsTest extends TestAdapter {
 	 * Getting top edited pages within a single namespace.
 	 */
 	public function testTopEditsNamespace(): void {
-		$te = $this->getTopEdits( null, 3, false, false, 2 );
-		$this->teRepo->expects( $this->once() )
+		$te = $this->getTopEdits( null, 0, false, false, 2 );
+		$this->teRepo->expects( static::once() )
 			->method( 'getTopEditsNamespace' )
-			->with( $this->project, $this->user, 3, false, false, 2 )
-			->willReturn( $this->topEditsNamespaceFactory()[3] );
+			->with( $this->project, $this->user, 0, false, false, 2 )
+			->willReturn( $this->topEditsNamespaceFactory()[0] );
+		$this->teRepo->expects( static::once() )
+			->method( 'countEdits' )
+			->willReturn( 42 );
 		$te->setRepository( $this->teRepo );
 		$te->prepareData();
 
 		$result = $te->getTopEdits();
-		static::assertEquals( [ 3 ], array_keys( $result ) );
+		static::assertEquals( 42, $te->getNumTopEdits() );
+		static::assertEquals( [ 0 ], array_keys( $result ) );
 		static::assertCount( 1, $result );
-		static::assertCount( 2, $result[3] );
+		static::assertCount( 2, $result[0] );
 		static::assertEquals( [
-			'namespace' => '3',
-			'page_title' => 'Jimbo Wales',
+			'namespace' => '0',
+			'page_title' => '101st Airborne Division',
 			'redirect' => '0',
-			'count' => '1',
-			'full_page_title' => 'User talk:Jimbo Wales',
-		], $result[3][1] );
+			'count' => '18',
+			'full_page_title' => '101st Airborne Division',
+			'pap_project_title' => null,
+			'assessment' => [ 'class' => 'C' ],
+		], $result[0][1] );
+	}
+
+	/**
+	 * Ensure we do not show any data if the user has not opted in.
+	 */
+	public function testNotOptedIn(): void {
+		$project = $this->createMock( Project::class );
+		$project->expects( static::once() )
+			->method( 'userHasOptedIn' )
+			->willReturn( false );
+		$te = new TopEdits(
+			$this->teRepo,
+			$this->autoEditsHelper,
+			$project,
+			$this->user
+		);
+		$te->prepareData();
+		static::assertCount( 0, $te->getTopEdits() );
 	}
 
 	/**
@@ -162,6 +191,10 @@ class TopEditsTest extends TestAdapter {
 				  'count' => '24',
 				  'pa_class' => 'List',
 				  'full_page_title' => 'Foo_bar',
+				  'pap_project_title' => json_encode( [
+					'Biography',
+					'India',
+				  ] ),
 				], [
 				  'namespace' => '0',
 				  'page_title' => '101st_Airborne_Division',
@@ -169,6 +202,7 @@ class TopEditsTest extends TestAdapter {
 				  'count' => '18',
 				  'pa_class' => 'C',
 				  'full_page_title' => '101st_Airborne_Division',
+				  'pap_project_title' => null,
 				],
 			],
 			3 => [
@@ -276,6 +310,7 @@ class TopEditsTest extends TestAdapter {
 	 * @param int|false $start Start date as Unix timestamp.
 	 * @param int|false $end End date as Unix timestamp.
 	 * @param int|null $limit Number of rows to fetch.
+	 * @param int $pagination = 0
 	 * @return TopEdits
 	 */
 	private function getTopEdits(
@@ -283,7 +318,8 @@ class TopEditsTest extends TestAdapter {
 		$namespace = 0,
 		$start = false,
 		$end = false,
-		?int $limit = null
+		?int $limit = null,
+		int $pagination = 0
 	): TopEdits {
 		return new TopEdits(
 			$this->teRepo,
@@ -294,7 +330,8 @@ class TopEditsTest extends TestAdapter {
 			$namespace,
 			$start,
 			$end,
-			$limit
+			$limit,
+			$pagination
 		);
 	}
 }

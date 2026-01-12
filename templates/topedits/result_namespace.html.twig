@@ -79,6 +79,15 @@
                             </span>
                         </th>
                     {% endif %}
+                    {% if project.isPrpPage(ns) %}
+                        <th>
+                            <span class="sort-link sort-link--quality" data-column="quality">
+                                {{ msg('proofreadpage-quality') }}
+                                <span class="glyphicon glyphicon-sort"></span>
+                            </span>
+                        </th>
+                        {% set qualityNames = project.prpQualityNames %}
+                    {% endif %}
                     <th>{{ msg('links') }}</th>
                 </tr></thead>
                 <tbody>
@@ -98,6 +107,13 @@
                                         <img alt="{{ page.assessment.class }}" src="{{ badge }}" class="assessment-badge" />
                                     {% endif %}
                                     {{ page.assessment.class ? page.assessment.class : msg('unknown') }}
+                                </td>
+                            {% endif %}
+                            {% if project.isPrpPage(ns) %}
+                                <td class="sort-entry--quality" data-value="{{ page.prp_quality }}">
+                                    <span class="prp-qualitytext prp-quality{{ page.prp_quality }}">
+                                        {{ qualityNames[page.prp_quality] }}
+                                    </span>
                                 </td>
                             {% endif %}
                             <td>

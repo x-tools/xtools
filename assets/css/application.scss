@@ -741,6 +741,28 @@ a.help-icon {
     clear: both;
 }
 
+
+.prp-qualitytext {
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.prp-quality0 {
+    background-color:#ddd;
+}
+.prp-quality1 {
+    background-color:#ffabab;
+}
+.prp-quality2 {
+    background-color:#bbbbff;
+}
+.prp-quality3 {
+    background-color:#ffe867;
+}
+.prp-quality4 {
+    background-color:#90ff90;
+}
+
 .link-loading {
     pointer-events: none;
     font-style: italic;

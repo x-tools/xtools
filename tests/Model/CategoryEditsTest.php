@@ -82,22 +82,24 @@ class CategoryEditsTest extends TestAdapter {
 	 * Methods around counting edits in category.
 	 */
 	public function testCategoryCounts(): void {
+		$counts = [
+			'Living_people' => [ 'editCount' => 150, 'pageCount' => 10 ],
+			'Musicians_from_New_York_City' => [ 'editCount' => 50, 'pageCount' => 1 ],
+		];
 		$this->ceRepo->expects( $this->once() )
 			->method( 'countCategoryEdits' )
 			->willReturn( 200 );
 		$this->ceRepo->expects( $this->once() )
 			->method( 'getCategoryCounts' )
-			->willReturn( [
-				'Living_people' => 150,
-				'Musicians_from_New_York_City' => 50,
-			] );
+			->willReturn( $counts );
 		$this->ce->setRepository( $this->ceRepo );
 
 		static::assertEquals( 500, $this->ce->getEditCount() );
 		static::assertEquals( 200, $this->ce->getCategoryEditCount() );
+		static::assertEquals( 11, $this->ce->getCategoryPageCount() );
 		static::assertEquals( 40.0, $this->ce->getCategoryPercentage() );
 		static::assertEquals(
-			[ 'Living_people' => 150, 'Musicians_from_New_York_City' => 50 ],
+			$counts,
 			$this->ce->getCategoryCounts()
 		);
 

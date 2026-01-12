@@ -526,9 +526,10 @@ class EditCounterRepository extends Repository {
 	 * Will cache the result for 10 minutes.
 	 * @param Project $project The project.
 	 * @param User $user The user.
-	 * @return string[] With keys 'average_size', 'small_edits' and 'large_edits'
+	 * @return string[] With keys 'sizes, 'average_size',
+	 * 'small_edits', 'large_edits', and 'tag_lists'
 	 */
-	public function getEditSizeData( Project $project, User $user ): array {
+	public function getEditData( Project $project, User $user ): array {
 		// Set up cache.
 		$cacheKey = $this->getCacheKey( func_get_args(), 'ec_editsizes' );
 		if ( $this->cache->hasItem( $cacheKey ) ) {
@@ -552,26 +553,27 @@ class EditCounterRepository extends Repository {
 		}
 
 		$sql = "SELECT JSON_ARRAYAGG(data.size) as sizes,
-                JSON_ARRAYAGG(data.tags) as tag_lists
-                FROM (
-                    SELECT CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0) AS size,
-                    (
-                        SELECT JSON_ARRAYAGG(ctd_name)
-                        FROM $ctTable
-                        JOIN $ctdTable
-                        ON ct_tag_id = ctd_id
-                        WHERE ct_rev_id = revs.rev_id
-                    ) as tags
-                    FROM $revisionTable AS revs
-                    JOIN $pageTable ON revs.rev_page = page_id
-                    $ipcJoin
-                    LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
-                    WHERE $whereClause
-                    ORDER BY revs.rev_timestamp DESC
-                    LIMIT 5000
-                ) data";
+            JSON_ARRAYAGG(data.tags) as tag_lists
+            FROM (
+                SELECT CAST(revs.rev_len AS SIGNED) - IFNULL(parentrevs.rev_len, 0) AS size,
+                (
+                    SELECT JSON_ARRAYAGG(ctd_name)
+                    FROM $ctTable
+                    JOIN $ctdTable
+                    ON ct_tag_id = ctd_id
+                    WHERE ct_rev_id = revs.rev_id
+                ) as tags
+                FROM $revisionTable AS revs
+                JOIN $pageTable ON revs.rev_page = page_id
+                $ipcJoin
+                LEFT JOIN $revisionTable AS parentrevs ON (revs.rev_parent_id = parentrevs.rev_id)
+                WHERE $whereClause
+                ORDER BY revs.rev_timestamp DESC
+                LIMIT 5000
+            ) data";
 		$results = $this->executeProjectsQuery( $project, $sql, $params )->fetchAssociative();
-		$results['sizes'] = json_decode( $results['sizes'] ?? '[]' );
+		$results['tag_lists'] = json_decode( $results['tag_lists'] );
+		$results['sizes'] = json_decode( $results['sizes'] );
 		$results['average_size'] = count( $results['sizes'] ) > 0
 			? array_sum( $results['sizes'] ) / count( $results['sizes'] )
 			: 0;

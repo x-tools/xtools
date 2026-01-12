@@ -60,8 +60,11 @@ abstract class Model {
 	 */
 	public function getRepository(): Repository {
 		if ( !isset( $this->repository ) ) {
+			// Untestable, Model cannot be directly instantiated and all subclasses set it in __construct.
+			// @codeCoverageIgnoreStart
 			$msg = sprintf( 'The $repository property for class %s must be set before using.', static::class );
 			throw new Exception( $msg );
+			// @codeCoverageIgnoreEnd
 		}
 		return $this->repository;
 	}

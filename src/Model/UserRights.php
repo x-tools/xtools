@@ -9,7 +9,6 @@ use App\Repository\Repository;
 use App\Repository\UserRightsRepository;
 use DateInterval;
 use DateTimeImmutable;
-use Exception;
 
 /**
  * An UserRights provides methods around parsing changes to a user's rights.
@@ -282,18 +281,13 @@ class UserRights extends Model {
 				} else {
 					// This is the old school format that most likely contains
 					// the list of rights additions as a comma-separated list.
-					try {
-						[ $old, $new ] = explode( "\n", $row['log_params'] );
-						$old = array_filter( array_map( 'trim', explode( ',', $old ) ) );
-						$new = array_filter( array_map( 'trim', explode( ',', (string)$new ) ) );
-						$added = array_diff( $new, $old );
-						$removed = array_diff( $old, $new );
-					} catch ( Exception ) {
-						// Really, really old school format that may be missing metadata
-						// altogether. Here we'll just leave $added and $removed empty.
-						$added = [];
-						$removed = [];
-					}
+					// NB: none of these functions throw as long as log_params is a string or int,
+					// and we know it is.
+					[ $old, $new ] = explode( "\n", $row['log_params'] );
+					$old = array_filter( array_map( 'trim', explode( ',', $old ) ) );
+					$new = array_filter( array_map( 'trim', explode( ',', (string)$new ) ) );
+					$added = array_diff( $new, $old );
+					$removed = array_diff( $old, $new );
 				}
 
 				// Remove '(none)'.
@@ -405,10 +399,9 @@ class UserRights extends Model {
 	 * Get the timestamp of when the user became autoconfirmed.
 	 * @return string|false YmdHis format, or false if date is in the future or if AC status could not be determined.
 	 */
-	private function getAutoconfirmedTimestamp(): false|string {
-		static $acTimestamp = null;
-		if ( $acTimestamp !== null ) {
-			return $acTimestamp;
+	public function getAutoconfirmedTimestamp(): false|string {
+		if ( isset( $this->acTimestamp ) && $this->acTimestamp !== null ) {
+			return $this->acTimestamp;
 		}
 
 		if ( $this->user->isTemp( $this->project ) ) {
@@ -447,18 +440,25 @@ class UserRights extends Model {
 
 		// If more than wgAutoConfirmCount, then $acDate is when they became autoconfirmed.
 		if ( $editsByAcDate >= $thresholds['wgAutoConfirmCount'] ) {
-			return $acDate;
+			$this->acTimestamp = $acDate;
+		} else {
+			// Now check when the nth edit was made, where n is wgAutoConfirmCount.
+			// This will be false if they still haven't made 10 edits.
+			$this->acTimestamp = $this->repository->getNthEditTimestamp(
+				$this->project,
+				$this->user,
+				$registrationDate->format( 'YmdHis' ),
+				$thresholds['wgAutoConfirmCount']
+			);
+			if ( $this->acTimestamp ) {
+				if ( is_string( $this->acTimestamp ) ) {
+					$this->acTimestamp = ( new \DateTime( $this->acTimestamp ) )->format( 'YmdHis' );
+				} else {
+					$this->acTimestamp = $this->acTimestamp->format( 'YmdHis' );
+				}
+			}
 		}
 
-		// Now check when the nth edit was made, where n is wgAutoConfirmCount.
-		// This will be false if they still haven't made 10 edits.
-		$acTimestamp = $this->repository->getNthEditTimestamp(
-			$this->project,
-			$this->user,
-			$registrationDate->format( 'YmdHis' ),
-			$thresholds['wgAutoConfirmCount']
-		);
-
-		return $acTimestamp;
+		return $this->acTimestamp;
 	}
 }
