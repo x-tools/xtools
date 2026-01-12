@@ -139,6 +139,8 @@
 	"error-denied": "당신은 명백한 악용 또는 방해를 주는 자동화로 인해 XTools의 접근이 차단되었습니다. $1에 문의하십시오",
 	"error-ip-range-unsupported": "죄송합니다. IP 대역에는 이 기능을 사용할 수 없습니다. 단일 사용자 이름이나 IP 주소를 입력해 주십시오.",
 	"error-login": "로그인을 실패했습니다! 다시 시도해 주십시오.",
+	"error-login-required-link": "계속하려면 로그인해 주십시오.",
+	"error-lost-connection": "데이터베이스 연결이 끊어졌습니다. 서버에서 연결이 중단된 것으로 보이며, 이는 너무 많은 데이터가 요청되었음을 나타냅니다.",
 	"error-pageinfo-api": "판 데이터를 가져올 수 없습니다.",
 	"error-pagepile-too-large": "죄송합니다. PagePile에 내보낼 문서 수가 너무 많습니다. 수동으로 PagePile을 만드시거나 결과 집합을 특정한 이름공간이나 시간대로 제한해 주십시오.",
 	"error-param": "'$1' 값은 '$2' 변수에 대해 유효한 값이 아닙니다",
