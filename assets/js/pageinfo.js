@@ -23,7 +23,7 @@ $(function () {
 			+ $textsharesContainer.data('page') + '/'
 			+ (xtools.pageinfo.endDate ? xtools.pageinfo.endDate + '/' : '');
 		// Remove extraneous forward slash that would cause a 301 redirect, and request over HTTP instead of HTTPS.
-		url = `${url.replace(/\/$/, '')} ? htmlonly = yes`;
+		url = `${url.replace(/\/$/, '')}?htmlonly=yes`;
 
 		$.ajax({
 			url: url,
