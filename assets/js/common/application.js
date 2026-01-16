@@ -59,7 +59,7 @@ $(function () {
 				.searchParams
 				.get('focus');
 			if (focusElement) {
-				$(`[name = ${focusElement}]`).focus();
+				$(`[name=${focusElement}]`).focus();
 			}
 		}
 	});
