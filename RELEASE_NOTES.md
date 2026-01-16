@@ -1,5 +1,15 @@
 # Release Notes #
 
+## 3.24.0 ##
+- PagesCreated (T229581): add countsOnly option.
+- DefaultController: catch OAuth exceptions during login.
+- TopEditsController: prevent null namespace.
+- TopEditsRepository: skip userId for anonymous users in query.
+- PageInfo: fix zero-division check.
+- PageInfo (T414502): Fix Authorship section not displaying by default
+- (T414502) Fix PHPCS-related errors in Javascript assets.
+- Localization updates.
+
 ## 3.23.1 ##
 - PageInfo (T413692): Fix a typo in the gadget source.
 - Accept null in numberFormat.
