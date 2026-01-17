@@ -59,8 +59,8 @@ $(function () {
 		};
 
 		$.ajax({
-			url: xtBaseUrl + 'pages/deletion_summary/' + wikiDomain + '/' + username + '/' + nsId + '/' +
-				pageTitle + '/' + startTime
+			url: xtBaseUrl + 'api/pages/deletion_summary/' + wikiDomain + '/' + username + '/' + nsId
+				+ '/' + pageTitle + '/' + startTime
 		}).done(function (resp) {
 			if (null === resp.summary) {
 				return showError();

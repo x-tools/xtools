@@ -410,7 +410,13 @@ class PagesController extends XtoolsController {
 	}
 
 	#[Route(
-		'/api/pages/deletion_summary/{project}/{namespace}/{pageTitle}/{timestamp}',
+		'/api/pages/deletion_summary/{project}/{username}/{namespace}/{pageTitle}/{timestamp}',
+		requirements: [
+			// Allow slashes in pageTitle
+			"pageTitle" => ".+",
+			// And ensure the timestamp is non-empty (so pageTitle doesn't eat it)
+			"timestamp" => "\d+",
+		],
 		name: 'PagesApiDeletionSummary',
 		methods: [ 'GET' ]
 	)]
@@ -421,6 +427,7 @@ class PagesController extends XtoolsController {
 	 */
 	public function getDeletionSummaryApiAction(
 		PagesRepository $pagesRepo,
+		string $username,
 		int $namespace,
 		string $pageTitle,
 		string $timestamp
