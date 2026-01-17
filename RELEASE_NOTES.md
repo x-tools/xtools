@@ -1,13 +1,12 @@
 # Release Notes #
 
 ## 3.24.0 ##
-- PagesCreated (T414768): fix routing for the DeletionSummary API.
-- PagesCreated (T229581): add countsOnly option.
-- DefaultController: catch OAuth exceptions during login.
-- TopEditsController: prevent null namespace.
-- TopEditsRepository: skip userId for anonymous users in query.
-- PageInfo: fix zero-division check.
-- PageInfo (T414502): Fix Authorship section not displaying by default
+- PagesCreated (T414768): Fix routing for the DeletionSummary API.
+- PagesCreated (T229581): Add countsOnly option.
+- DefaultController: Catch OAuth exceptions during login.
+- TopEditsController: Prevent null namespace parameter.
+- TopEditsRepository: Skip userId for anonymous users in query.
+- PageInfo: Fix zero-division check.
 - (T414502) Fix PHPCS-related errors in Javascript assets.
 - Localization updates.
 
