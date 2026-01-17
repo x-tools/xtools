@@ -1,6 +1,7 @@
 # Release Notes #
 
 ## 3.24.0 ##
+- PagesCreated (T414768): fix routing for the DeletionSummary API.
 - PagesCreated (T229581): add countsOnly option.
 - DefaultController: catch OAuth exceptions during login.
 - TopEditsController: prevent null namespace.
