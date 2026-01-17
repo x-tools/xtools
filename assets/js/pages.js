@@ -60,7 +60,7 @@ $(function () {
 
 		$.ajax({
 			url: xtBaseUrl + 'api/pages/deletion_summary/' + wikiDomain + '/' + username + '/' + nsId
-				+ '/' + pageTitle + '/' + startTime
+				+ '/' + encodeURIComponent(pageTitle) + '/' + startTime
 		}).done(function (resp) {
 			if (null === resp.summary) {
 				return showError();
