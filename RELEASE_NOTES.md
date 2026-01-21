@@ -1,5 +1,9 @@
 # Release Notes #
 
+## 3.24.1 ##
+- (T414901) Escape uselang param when checking against project name, PR #615.
+- Localization updates.
+
 ## 3.24.0 ##
 - PagesCreated (T414768): Fix routing for the DeletionSummary API.
 - PagesCreated (T229581): Add countsOnly option.
