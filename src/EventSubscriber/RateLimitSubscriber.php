@@ -172,7 +172,7 @@ class RateLimitSubscriber implements EventSubscriberInterface {
 
 		// If requesting the same language as the target project, ignore.
 		// FIXME: This has side-effects (T384711#10759078)
-		if ( preg_match( "/[=\/]$useLang.?wik/", $this->uri ) === 1 ) {
+		if ( preg_match( '/[=\/]' . preg_quote( $useLang ) . '.?wik/', $this->uri ) === 1 ) {
 			return;
 		}
 
