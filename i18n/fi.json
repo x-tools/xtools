@@ -317,7 +317,7 @@
 	"pages-recreated-desc": "Osa poistetuista sivuista on saatettu luoda uudelleen alkuperäisen aloittajan tai muun käyttäjän toimesta. Nämä sivut on merkitty tekstillä '$1'.",
 	"pageviews": "Sivun näyttökerrat",
 	"pageviews-userpage": "Käyttäjäsivun näyttökerrat",
-	"patrol": "Partioimalla tarkastettu",
+	"patrol": "Tarkastettu",
 	"patroller-stats-notice": "Vain käyttäjät, jotka ovat suorittaneet vähintään yhden järjestelmänvalvojan toiminnon ajanjakson aikana, näytetään.",
 	"patroller-stats-notice2": "Jotkin käyttäjät voivat olla entisiä patrollereita tai olla muita kuin patrollereita, mutta heillä on oikeudet tehdä tiettyjä patrollerin toimia.",
 	"patrollers": "Tarkastajat",
