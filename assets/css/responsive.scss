@@ -124,10 +124,6 @@
     margin: 15px 5px;
   }
 
-  .xt-toc {
-    display: none;
-  }
-
   .toggle-table--chart {
     margin: 0;
     max-width: 100%;
@@ -186,19 +182,19 @@
     padding: 0 15px;
   }
 
-  // FIXME: eventually will create a pop-out nav from the right
-  // .xt-toc {
-  //     @extend .fixed;
-  //     @include prefix(transform, initial);
-  //     box-shadow: 0px 0px 8px #CCC;
-  //     height: 100%;
-  //     left: 98%;
-  // }
+  /* FIXME: eventually will create a pop-out nav from the right
+   .xt-toc {
+       @extend .fixed;
+       @include prefix(transform, initial);
+       box-shadow: 0px 0px 8px #CCC;
+       height: 100%;
+       left: 98%;
+   }
 
-  // .xt-toc.fixed {
-  //     @include prefix(transform, initial);
-  //     box-shadow: 0px 0px 8px #CCC;
-  //     height: 100%;
-  //     left: 98%;
-  // }
+   .xt-toc.fixed {
+       @include prefix(transform, initial);
+       box-shadow: 0px 0px 8px #CCC;
+       height: 100%;
+       left: 98%;
+   }*/
 }
