@@ -352,7 +352,7 @@ class AutoEditsRepository extends UserRepository {
                 AND NOT EXISTS (
                     SELECT 1 from $tagTable
                     WHERE ct_rev_id = revs.rev_id
-                    AND (ct_tag_id IN ($tagExcludesIds))
+                    " . ($tagExcludesIds == '' ? "" : "AND (ct_tag_id IN ($tagExcludesIds))") . "
                 ))" : "ct_tag_id IN ($tagIds)";
 		}
 
