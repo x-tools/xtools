@@ -105,10 +105,10 @@ class Edit extends Model {
 		// This can be passed in to save as a property on the Edit instance.
 		// Note that the Edit class knows nothing about it's value, and
 		// is not capable of detecting whether the given edit was actually reverted.
-		$this->reverted = isset($attrs['reverted']) ? (bool)$attrs['reverted'] : null;
+		$this->reverted = isset( $attrs['reverted'] ) ? (bool)$attrs['reverted'] : null;
 
 		// for FlaggedRevs
-		$this->pending = isset($attrs['is_pending']) ? (bool)$attrs['is_pending'] : null;
+		$this->pending = isset( $attrs['is_pending'] ) ? (bool)$attrs['is_pending'] : null;
 	}
 
 	/**
@@ -264,8 +264,7 @@ class Edit extends Model {
 	 * Is this edit pending? (from flaggedrevs)
 	 * @return bool|null
 	 */
-	public function isPending(): ?bool
-	{
+	public function isPending(): ?bool {
 		return $this->pending;
 	}
 

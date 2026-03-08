@@ -248,7 +248,7 @@ class Project extends Model {
 	 */
 	public function hasPageTriage(): bool {
 		$extensions = $this->getInstalledExtensions();
-		return in_array('PageTriage', $extensions);
+		return in_array( 'PageTriage', $extensions );
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Project extends Model {
 	 * (for pending changes)
 	 * @return bool
 	 */
-	public function projectHasFlaggedRevs(Project $project) : bool {
+	public function projectHasFlaggedRevs( Project $project ): bool {
 		// TODO
 		return false;
 	}
