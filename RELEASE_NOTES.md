@@ -1,5 +1,11 @@
 # Release Notes #
 
+## 3.24.2 ##
+- (T418067) AutoEditsRepository: fix query for ?tool=.
+- PagesCreated: encode page title in deletionsummary API calls.
+- (T419426) Use user group icons of standard sizes.
+- Localization updates.
+
 ## 3.24.1 ##
 - (T414901) Escape uselang param when checking against project name, PR #615.
 - Localization updates.
