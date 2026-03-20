@@ -1,3 +1,4 @@
+{% import 'macros/wiki.html.twig' as wiki %}
 * [[{{ page.title }}]]
 * {{ project.domain }}
 * {{ msg('total-edits') }}: {{ ai.numRevisions|num_format }}
@@ -17,7 +18,7 @@
 !{{ msg('added-bytes') }}
 |-
 {% for editor, stats in ai.editors|slice(0, editorlimit ) %}
-| [[ {{ attribute(project.namespaces, 2) }}:{{ editor }}|{{ editor }} ]] {#
+| {{ wiki.userLinkWikitext(project, editor, editor|split('>')|last) }} {#
 #} || {{ stats.all|num_format }} {#
 #} || {{ stats.minor|num_format }} {#
 #} || {{ stats.minor|percent_format(stats.all) }} {#

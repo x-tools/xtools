@@ -143,10 +143,6 @@ parameters:
           badge: '9/94/Symbol_support_vote.svg'
           color: '#66FF66'
           category: 'Category:GA-Class articles'
-        bplus:
-          badge: '5/5f/Symbol_b_class.svg'
-          color: '#B2FF66'
-          category: 'Category:Bplus-Class articles'
         B:
           badge: '5/5f/Symbol_b_class.svg'
           color: '#B2FF66'
@@ -186,7 +182,7 @@ parameters:
         Disambig:
           badge: '2/2a/Symbol_dab_class.svg'
           color: '#00FA9A'
-          category: 'Category:Disambig-Class articles'
+          category: 'Category:Disambig-Class pages'
         SIA:
           badge: '9/92/Symbol_sia_class.svg'
           color: '#E9DAFF'
@@ -194,39 +190,35 @@ parameters:
         Redirect:
           badge: 'a/a2/Symbol_redirect_class.svg'
           color: '#C0C0C0'
-          category: 'Category:Redirect-Class articles'
+          category: 'Category:Redirect-Class pages'
         Project:
           badge: '7/72/Symbol_project_class.svg'
           color: '#C0C090'
-          category: 'Category:Project-Class articles'
-        Book:
-          badge: '4/4d/Symbol_book_class.svg'
-          color: '#98FF98'
-          category: 'Category:Book-Class articles'
+          category: 'Category:Project-Class pages'
         Template:
           badge: '5/5c/Symbol_template_class.svg'
           color: '#FBCEB1'
-          category: 'Category:Template-Class articles'
+          category: 'Category:Template-Class pages'
         Category:
           badge: '9/96/Symbol_category_class.svg'
           color: '#FFDB58'
-          category: 'Category:Category-Class articles'
+          category: 'Category:Category-Class pages'
         Portal:
           badge: 'e/e2/Symbol_portal_class.svg'
           color: '#DDB1BC'
-          category: 'Category:Portal-Class articles'
+          category: 'Category:Portal-Class pages'
         FM:
           badge: '2/23/Symbol_star_FA.svg'
           color: '#9CBDFF'
-          category: 'Category:FM-Class articles'
+          category: 'Category:FM-Class pages'
         File:
           badge: '9/9c/Symbol_file_class.svg'
           color: '#DDCCFF'
-          category: 'Category:File-Class articles'
+          category: 'Category:File-Class pages'
         Draft:
           badge: '0/09/Symbol_draft_class.svg'
           color: '#E7B198'
-          category: 'Category:Draft-Class articles'
+          category: 'Category:Draft-Class pages'
         Future:
           badge: '6/6b/Symbol_future_class.svg'
           color: '#B4BBFF'
@@ -235,34 +227,14 @@ parameters:
           badge: '2/2f/Symbol_current_class.svg'
           color: '#E6A4FF'
           category: 'Category:Current-Class articles'
-        Deferred:
-          badge: '4/48/Symbol_deferred_class.svg'
-          color: '#D1BCAC'
-          category: 'Category:Deferred-Class articles'
         User:
           badge: '1/13/Symbol_user_class.svg'
           color: '#DDD06A'
-          category: 'Category:User-Class articles'
-        FT: # Featured topic
-          badge: 'b/b4/Symbol_star_gold.svg'
-          color: '#9CBDFF'
-          category: 'Category:FT-Class articles'
-        Needed:
-          badge: '6/63/Symbol_needed_class.svg'
-          color: '#DCDCDC'
-          category: 'Category:Needed-Class articles'
-        Merge:
-          badge: 'b/b0/Symbol_merge_vote.svg'
-          color: '#ADD8E6'
-          category: 'Category:Merge-Class articles'
-        Help:
-          badge: '8/8c/Symbol_information_vote.svg'
-          color: '#EBEBF6'
-          category: 'Category:Help-Class articles'
+          category: 'Category:User-Class pages'
         NA:
           badge: '6/6a/Symbol_na_class.svg'
           color: '#F5F5F5'
-          category: 'Category:NA-Class articles'
+          category: 'Category:NA-Class pages'
         Unknown:
           badge: 'e/e0/Symbol_question.svg'
           color: ''
@@ -290,7 +262,7 @@ parameters:
           weight: 1
         NA:
           color: '#f5f5f5'
-          category: 'Category:NA-importance articles'
+          category: 'Category:NA-importance pages'
           weight: 0
         Unknown:
           color: ''

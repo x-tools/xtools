@@ -19,6 +19,12 @@
                     {{ msg('view-wikitext') }}
                 </label>
             </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="countsOnly" value="true">
+                    {{ msg('counts-only') }}
+                </label>
+            </div>
         </fieldset>
         {{ forms.submit_btn() }}
     </form>

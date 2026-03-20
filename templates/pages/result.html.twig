@@ -238,11 +238,12 @@
         {{ layout.content_block('summary', content, downloadLink) }}
 
         {################## LIST OF PAGES ###################}
+        {% if not pages.countsOnly %}
+            {% include 'pages/_pages_list.html.twig' with {'pages': pages} %}
 
-        {% include 'pages/_pages_list.html.twig' with {'pages': pages} %}
-
-        <div class="text-muted times-in-utc" style="clear:both">
-            {{ msg('times-in-utc') }}
+            <div class="text-muted times-in-utc" style="clear:both">
+                {{ msg('times-in-utc') }}
+        {% endif %}
         </div>
     </div>
 
@@ -300,3 +301,4 @@
     {% endif %}
 </div>
 {% endblock %}
+

@@ -41,13 +41,13 @@
 |}
 {% if showPageAssessment %}
 {% set totals = te.projectTotals(ns) %}
-{% if totals|keys|length > 0 %}
+{% if totals|length > 0 %}
 {| class="wikitable sortable"
 |+ {{ msg('top-wikiprojects') }}
 ! {{ msg('wikiproject') }} !! {{ msg('count') }}
-{% for wikiproject, count in totals %}
+{% for row in totals %}
 |-
-| {{ wikiproject }} || {{ count|num_format }}
+| {{ row.pap_project_title }} || {% verbatim %}{{FORMATNUM:{% endverbatim %}{{ row.count }}}}
 {% endfor %}
 |}
 {% endif %}

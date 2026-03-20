@@ -447,4 +447,4 @@ nelmio_api_doc:
 
     areas: # to filter documented areas
         path_patterns:
-            - ^/api(\.json$|\/)(?!project/parser|page/articleinfo)
+            - ^/api(\.json$|\/)(?!project/parser|page/articleinfo|pages/deletion_summary)
