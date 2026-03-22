@@ -252,6 +252,16 @@ class Project extends Model {
 	}
 
 	/**
+	 * Get if the given Project has the FlaggedRevs extensions
+	 * (for pending changes)
+	 * @return bool
+	 */
+	public function projectHasFlaggedRevs( Project $project ): bool {
+		// TODO
+		return false;
+	}
+
+	/**
 	 * Whether this wiki has the VisualEditor extension enabled.
 	 * @return bool
 	 */

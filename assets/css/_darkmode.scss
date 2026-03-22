@@ -313,7 +313,13 @@ $tooltip-shadow: #333;
 
   .reverted-edit {
     background: #4e4c40 !important;
+  }
 
+  .pending-edit:not(.reverted-edit) {
+    background: #333127 !important;
+  }
+
+  .reverted-edit, .pending-edit {
     .text-info {
       color: #74cefa;
     }
