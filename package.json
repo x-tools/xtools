@@ -12,7 +12,7 @@
     "watch": "encore dev --watch"
   },
   "devDependencies": {
-    "@symfony/webpack-encore": "^4.0.0",
+    "@symfony/webpack-encore": "^5.3.1",
     "core-js": "^3.30.0",
     "file-loader": "^6.2.0",
     "grunt-banana-checker": "^0.10.0",
