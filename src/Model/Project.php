@@ -107,7 +107,8 @@ class Project extends Model {
 	 * @return bool
 	 */
 	public function exists(): bool {
-		return !empty( $this->getDomain() );
+		return !empty( $this->getDomain() )
+			&& $this->repository->checkReplication($this->getBasicInfo()['dbName']);
 	}
 
 	/**
@@ -148,9 +149,9 @@ class Project extends Model {
 	/**
 	 * @param Page|string $page Full page title including namespace, or a Page object.
 	 * @param bool $useUnnormalizedPageTitle Use the unnormalized page title to avoid
-	 *    an API call. This should be used only if you fetched the page title via other
-	 *    means (SQL query), and is not from user input alone. Only applicable if $page
-	 *    is a Page object.
+	 *	  an API call. This should be used only if you fetched the page title via other
+	 *	  means (SQL query), and is not from user input alone. Only applicable if $page
+	 *	  is a Page object.
 	 * @return string
 	 */
 	public function getUrlForPage( Page|string $page, bool $useUnnormalizedPageTitle = false ): string {
@@ -356,5 +357,5 @@ class Project extends Model {
 	 */
 	public function getTableName( string $tableName, ?string $tableExtension = null ): string {
 		return $this->getRepository()->getTableName( $this->getDatabaseName(), $tableName, $tableExtension );
-	}
+  }
 }
